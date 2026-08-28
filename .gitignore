@@ -7,3 +7,5 @@ out/
 *.bin
 *.npy
 *.pt
+.pytest_cache/
+*.egg-info/
