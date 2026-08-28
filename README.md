@@ -98,6 +98,10 @@ python -m nanoscigpt.core.sampler --domain text
 - DNA 领域跳过了 chr21 开头的 N 区（未测序端粒区），只取 35 万真实碱基作为流式教学样例。
 - 想看真实蛋白预训练收益，调用 ESM-2 8M 权重（A2 阶段），不要在这个仓库里追求。
 
+## 课堂讲稿
+
+逐级操作讲稿见 [docs/teaching-guide.md](docs/teaching-guide.md)：每级的讲解要点、现场命令、预期输出、停止边界和学生动手点。ESM 权重已随仓库提供（`weights/`，30MB），课堂无网络依赖。
+
 ## 一键运行全部领域
 
 ```bash

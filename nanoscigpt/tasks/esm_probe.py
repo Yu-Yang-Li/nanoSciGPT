@@ -37,10 +37,17 @@ def load_localization_dataset(out_dir, size=300):
     return seqs, labels
 
 
-def embed_esm(seqs, batch_size=8):
+def embed_esm(seqs, batch_size=8, weights_dir=None):
     import esm
 
-    model, alphabet = esm.pretrained.esm2_t6_8M_UR50D()
+    if weights_dir and (Path(weights_dir) / "esm2_t6_8M_UR50D.pt").exists():
+        # offline path: load from local weights/ instead of downloading
+        # weights_only=False required for fair-esm's legacy checkpoint format (torch>=2.6 default changed)
+        model_data = torch.load(Path(weights_dir) / "esm2_t6_8M_UR50D.pt", map_location="cpu", weights_only=False)
+        model, alphabet = esm.pretrained.load_model_and_alphabet_core("esm2_t6_8M_UR50D", model_data)
+        model.eval()
+    else:
+        model, alphabet = esm.pretrained.esm2_t6_8M_UR50D()
     model.eval()
     converter = alphabet.get_batch_converter()
     reps = []
@@ -92,12 +99,13 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("--out_dir", default="out/esm_probe")
     p.add_argument("--size", type=int, default=300)
+    p.add_argument("--weights_dir", default="weights", help="local ESM weights dir; falls back to online download")
     args = p.parse_args()
 
     seqs, labels = load_localization_dataset(args.out_dir, args.size)
     print(f"dataset: {len(seqs)} sequences, {sum(labels)} positive")
 
-    X_esm = embed_esm(seqs)
+    X_esm = embed_esm(seqs, weights_dir=args.weights_dir)
     acc_esm = train_probe(X_esm, labels)
     print(f"ESM frozen + linear probe val acc: {acc_esm:.3f}")
 

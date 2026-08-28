@@ -7,5 +7,6 @@ out/
 *.bin
 *.npy
 *.pt
+!weights/*.pt
 .pytest_cache/
 *.egg-info/
