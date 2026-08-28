@@ -1,0 +1,101 @@
+{
+  "rounds": [
+    {
+      "round": 0,
+      "action": "design",
+      "note": "hypotheses H1-H3 proposed; no execution yet (level: design)"
+    },
+    {
+      "round": 1,
+      "action": "prepare",
+      "note": "data prepared; moving to V0 training"
+    },
+    {
+      "round": 2,
+      "action": "train_v0",
+      "note": "H1 supported (val loss 2.8388); next: extend budget"
+    },
+    {
+      "round": 3,
+      "action": "train_extended",
+      "note": "executed under approval; H2 resolved"
+    },
+    {
+      "round": 4,
+      "action": "transfer_probe",
+      "note": "H3 resolved"
+    },
+    {
+      "round": 5,
+      "action": "conclude",
+      "note": "closed with explicit claim boundary"
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H1",
+      "text": "domain 'protein' can be pretrained: val loss drops below threshold",
+      "status": "supported",
+      "resolution": "val loss 2.8388 < 6.0"
+    },
+    {
+      "id": "H2",
+      "text": "more training budget improves val loss by a meaningful margin",
+      "status": "refuted",
+      "resolution": "gain +0.0416 vs required 0.05 - diminishing returns on tiny data is itself a finding"
+    },
+    {
+      "id": "H3",
+      "text": "pretrained representations transfer to a downstream probe better than one-hot",
+      "status": "refuted",
+      "resolution": "transfer delta -0.033; on a 450-sequence fixture a negative/small delta is the EXPECTED honest result"
+    }
+  ],
+  "evidence": [
+    {
+      "round": 0,
+      "tool": "none",
+      "level": "design",
+      "passed": false,
+      "summary": "only a plan exists"
+    },
+    {
+      "round": 1,
+      "tool": "prepare",
+      "level": "ran",
+      "passed": true,
+      "summary": "teaching data for 'protein' prepared"
+    },
+    {
+      "round": 2,
+      "tool": "train_v0",
+      "level": "evaluated",
+      "passed": true,
+      "summary": "val loss 2.8388 < 6.0"
+    },
+    {
+      "round": 3,
+      "tool": "train_extended",
+      "level": "evaluated",
+      "passed": false,
+      "summary": "gain +0.0416 vs required 0.05"
+    },
+    {
+      "round": 4,
+      "tool": "transfer_probe",
+      "level": "evaluated",
+      "passed": false,
+      "summary": "transfer delta -0.033; on a 450-sequence fixture a negative/small delta is the EXPECTED honest result"
+    }
+  ],
+  "open_questions": [],
+  "next_action": "done",
+  "conclusions": [
+    "what we CAN claim: the 'protein' pipeline ran end-to-end under tool contracts and formal evaluation; every number above is traceable to a run",
+    "what we CANNOT claim: any scientific performance or foundation-model capability - teaching data is orders of magnitude too small"
+  ],
+  "boundary_notes": [
+    "budget_increase approval was simulated with --auto_approve; in real use a human must sign off",
+    "transfer gain is small/negative at this data scale: no foundation-model claim is justified (mechanism identical, scale decides)"
+  ]
+}
