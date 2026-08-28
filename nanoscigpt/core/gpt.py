@@ -21,6 +21,7 @@ class CausalSelfAttention(nn.Module):
         self.c_proj = nn.Linear(config.n_embd, config.n_embd)
         self.n_head = config.n_head
         self.n_embd = config.n_embd
+        self.causal = config.causal
         self.register_buffer(
             "bias",
             torch.tril(torch.ones(config.block_size, config.block_size)).view(1, 1, config.block_size, config.block_size),
@@ -35,7 +36,8 @@ class CausalSelfAttention(nn.Module):
         att = (q @ k.transpose(-2, -1)) * (1.0 / math.sqrt(k.size(-1)))
         if pad_mask is not None:
             att = att.masked_fill(pad_mask[:, None, None, :], float("-inf"))
-        att = att.masked_fill(self.bias[:, :, :T, :T] == 0, float("-inf"))
+        if self.causal:
+            att = att.masked_fill(self.bias[:, :, :T, :T] == 0, float("-inf"))
         att = F.softmax(att, dim=-1)
         y = att @ v
         y = y.transpose(1, 2).contiguous().view(B, T, C)
@@ -68,12 +70,13 @@ class Block(nn.Module):
 
 
 class GPTConfig:
-    def __init__(self, vocab_size, block_size=256, n_layer=6, n_head=6, n_embd=384):
+    def __init__(self, vocab_size, block_size=256, n_layer=6, n_head=6, n_embd=384, causal=True):
         self.vocab_size = vocab_size
         self.block_size = block_size
         self.n_layer = n_layer
         self.n_head = n_head
         self.n_embd = n_embd
+        self.causal = causal
 
 
 class GPT(nn.Module):
