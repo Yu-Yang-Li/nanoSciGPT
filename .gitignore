@@ -7,6 +7,22 @@ out/
 *.bin
 *.npy
 *.pt
-!weights/*.pt
 .pytest_cache/
 *.egg-info/
+
+# keep per-domain research state (B-line artifact)
+!autoresearch/research_state_*.json
+
+# teaching fixtures must be trackable so students run offline
+!data/
+data/**/*.gz
+!data/text/input.txt
+!data/protein/uniprot.fasta
+!data/dna/chr21_slice.fa
+!data/smiles/delaney-processed.csv
+!data/**/meta.json
+!data/**/tokenizer.json
+!data/**/train.bin
+!data/**/val.bin
+!data/**/train_seqs.npy
+!data/**/val_seqs.npy

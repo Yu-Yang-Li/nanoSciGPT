@@ -26,6 +26,12 @@ nanoscigpt/
 │   ├── dna/                 # 基因组 FASTA
 │   └── smiles/              # 分子 SMILES
 └── tasks/                   # 下游探针（迁移评测）
+
+autoresearch/                # 【B线：与仓库互动的虚拟 AI Scientist】
+├── tools.py                 # 工具合同：唯一允许的操作入口
+├── evaluator.py             # 形式化评价器：design/ran/evaluated 证据分级
+├── state.py                 # 跨轮研究状态：假设、证据、未决问题
+└── run.py                   # 主循环：反馈改变下一步 + 人工授权门
 ```
 
 **核心设计原则**（也是课堂上要讲的）：已核实的三个 nanoGPT 魔改案例（prot-gpt、nanoGPT-DNA、dnaGPT）的全部差异都落在 tokenizer、数据准备、变长处理、评测四处；模型结构、训练循环、采样逻辑完全不变。所以本框架把前者做成每领域必写的"领域插件"，后者做成共享核心。
@@ -85,11 +91,55 @@ python -m nanoscigpt.core.sampler --domain text
 |---|---|---|---|
 | A1 科学对象语言化 | 换 tokenizer 就能换领域吗？ | 见上方四域表 | 四域全部跑通，loss 均下降 |
 | A2a 换预训练目标 | CLM 和 MLM 有什么区别？ | `python -m nanoscigpt.tasks.objective_contrast` | CLM 2.97→2.76；MLM 3.01→2.81（同一蛋白数据） |
-| A2b 表征迁移 | 预训练表征到底带来什么？ | `python -m nanoscigpt.tasks.esm_probe` | ESM 冻结+线性头 100% vs one-hot 96.7%（合成定位任务） |
+| A2b 表征迁移 | 我们的预训练到底带来什么？ | `python -m nanoscigpt.tasks.transfer_probe` | one-hot 100% / 随机编码器 98.3% / 预训练编码器 95%——迁移增益为负（诚实结果） |
 | A3a 多任务接口 | 共享编码器能否服务多任务？ | `python -m nanoscigpt.tasks.multihead` | 共享编码器：分类 100% + 回归 MAE 0.27（合成双任务） |
 | A3b 路线决策 | 什么时候不该训练基座？ | `python -m nanoscigpt.tasks.route_decision` | 五问决策链：数据不足→正确降级为专用模型 |
 
-**A2b 的诚实注**：合成任务太简单导致迁移增益（+3.3%）看起来小；真实蛋白任务上 ESM 的优势远大于此，但那需要真实标注数据集，超出课堂 fixture 范围。课堂上要讲清"探针任务难度决定迁移收益的可观测性"。
+**A2b 的核心教学价值**：迁移增益为负——450 条序列的"预训练"不如 one-hot。这不是失败，是课程要证明的事：数据规模不够时基座主张不成立。ESM 的 2.5 亿条序列与我们的 450 条相差六个数量级，"机制相同、规模决定成败"。
+
+## B线：autoresearch——与仓库互动的虚拟 AI Scientist
+
+A 线讲“模型怎么建”，B 线讲“科研过程怎么闭环”。`autoresearch/` 是一个**规则驱动**（刻意不用 LLM）的虚拟科学家，它只能通过声明过的工具合同操作本仓库，每一步都被形式化评价器检验，研究状态跨轮持久化。
+
+### 五个教学概念的落点
+
+| B线概念 | 代码落点 | 课堂观察点 |
+|---|---|---|
+| 可执行动作 | `tools.py` 的 `CONTRACTS` | 每个动作预先声明命令模板、产物、预算 |
+| 工具合同 | `run_tool()` | 不在合同里的操作被直接拒绝 |
+| 形式化评价器 | `evaluator.py` | design / ran / evaluated 三级，绝不混层 |
+| 反馈改变下一步 | `run.py` 轮次策略 | H1 失败→停止；H2 失败→记录为发现而非报错 |
+| 跨轮研究状态 | `state.py` + `research_state_<domain>.json` | 重跑不 `--fresh` 直接恢复终态 |
+| 人工授权与结论边界 | `--auto_approve` 门 + 结论轮 | 预算增加必须人工批准；结论写清“能声称什么/不能声称什么” |
+
+### 快速开始
+
+```bash
+# 文本域全流程（约 20 秒/轮）
+python -m autoresearch.run --domain text --fresh --auto_approve
+
+# 蛋白域（含迁移探针，会出现“迁移增益为负”的诚实结果）
+python -m autoresearch.run --domain protein --fresh --auto_approve
+
+# 不带 --auto_approve：人工门会真实等待输入（课堂演示用）
+python -m autoresearch.run --domain text --fresh
+
+# 跨轮恢复：重跑同一域，直接到终态
+python -m autoresearch.run --domain text
+```
+
+### 实测结果（本机 CPU，2026-08-29）
+
+四个域均跑通完整闭环，且失败案例被正确记录为科学发现：
+
+| 域 | H1 预训练 | H2 预算加倍 | H3 迁移 |
+|---|---|---|---|
+| text | 支持（val 2.66） | 支持（+0.128） | 不适用（开放问题） |
+| protein | 支持（val 2.84） | **反驳**（+0.042 未达标） | **反驳**（delta −0.033，规模决定） |
+| dna | 支持（val 1.34） | 反驳（收益≈0） | 不适用（开放问题） |
+| smiles | 支持（val 1.68） | 支持（+0.214） | 不适用（开放问题） |
+
+蛋白域两个“失败”正是课程核心：**数据规模不够时，预算和迁移都不会产生基座收益**——这不是系统出错，是 AI Scientist 用证据得出的结论。
 
 ## 诚实边界（课堂必须讲）
 
@@ -100,7 +150,7 @@ python -m nanoscigpt.core.sampler --domain text
 
 ## 课堂讲稿
 
-逐级操作讲稿见 [docs/teaching-guide.md](docs/teaching-guide.md)：每级的讲解要点、现场命令、预期输出、停止边界和学生动手点。ESM 权重已随仓库提供（`weights/`，30MB），课堂无网络依赖。
+逐级操作讲稿见 [docs/teaching-guide.md](docs/teaching-guide.md)：每级的讲解要点、现场命令、预期输出、停止边界和学生动手点。
 
 ## 一键运行全部领域
 

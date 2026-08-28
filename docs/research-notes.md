@@ -41,7 +41,7 @@ master 结构已实时核验（2026-08-28）：
 | 项目 | 规模 | 课堂角色 |
 |---|---|---|
 | Evo 1/1.5（evo-design/evo，Apache-2.0） | 7B 参数，OpenGenome 300B tokens | 从核苷酸 GPT 到长上下文架构演进 |
-| GenSLM（ramanathanlab/genslm，MIT） | 密码子级 MLM，Science 2023 | MLM vs CLM 目标对照 |
+| GenSLM（ramanathanlab/genslm，MIT） | 密码子级自回归语言模型 | 基因组生成与表征迁移参考 |
 | HyenaDNA（HazyResearch/hyena-dna） | 长上下文 SSM | 架构演进参考 |
 
 ## 四、架构决策依据
@@ -52,6 +52,8 @@ master 结构已实时核验（2026-08-28）：
 
 - **core/（共享）**：GPT 模型、trainer、sampler、tokenizer 基类、dataset 基类；
 - **domains/（领域专用）**：每领域必写 prepare.py（数据获取 + tokenizer 定义 + 模式声明）。
+
+这项结论只适用于当前四个离散字符串领域。全学科核查进一步发现，[EarthPT](https://github.com/aspiaspace/EarthPT) 与 [AstroPT](https://github.com/Smith42/astroPT) 也明确从 nanoGPT 改造而来，但分别使用连续时序/图像 patch、MLP tokenizer 和回归损失；GPTCast、OmniJet-α等还需要学习型离散tokenizer。因此未来扩展到连续科学观测时，必须把 representation adapter 与 prediction head 从 domain 中独立出来。完整证据见 [全学科GPT-like调研](gpt-like-science-landscape.md)。
 
 ## 五、诚实边界
 

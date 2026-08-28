@@ -82,35 +82,39 @@ MLM: loss 3.0134 -> 2.8093 (0.1M params)
 
 ---
 
-## 第三级 A2b：表征迁移（约 5 分钟）
+## 第三级 A2b：表征迁移——我们自己的模型（约 5 分钟）
 
 ### 讲什么
 
-"别人预训练好的表征可以直接取用"——不训练 ESM，只冻结它，在它上面训一个线性头。
+用自己的 A1 checkpoint 做三方对照：one-hot / 随机初始化编码器 / 自己预训练的编码器。
+这不是调用别人的大模型，而是问：**我们刚训出的蛋白 nanoGPT 到底学到了什么可迁移的东西？**
 
 ### 操作
 
 ```bash
-python -m nanoscigpt.tasks.esm_probe
+python -m nanoscigpt.tasks.transfer_probe
 ```
 
 输出（本机实测，size=300）：
 
 ```
-ESM frozen + linear probe val acc: 1.000
-one-hot + linear probe val acc:     0.967
-delta = +0.033
+one-hot:            1.000
+random encoder:     0.983
+pretrained encoder: 0.950
+transfer delta: -0.050
 ```
 
 ### 诚实边界（必须讲）
 
-合成任务太简单（疏水头部规则很容易学），+3.3% 低估了真实蛋白任务上 ESM 的优势。课堂上要讲清：
+**这是本仓库最重要的一页。** 迁移增益是负的——我们用 450 条序列“预训练”的模型，在下游任务上不如直接 one-hot。这不是实验失败，这正是课程要证明的事：
 
-> "探针任务的难度决定迁移收益的可观测性。任务太简单时 everyone wins，看不出差距；真实蛋白定位任务上 ESM 对 one-hot 的优势远大于此——但那需要真实标注数据集。"
+> "450 条序列训不出基座。真实蛋白基座（ESM）用了 2.5 亿条序列——比我们多六个数量级。数据规模不够时，'预训练'这个词只是自我安慰，正确路线是回到专用模型。"
 
-### 离线预案
+这个负结果直接衔接 A3b 的路线决策：五问中"迁移证据"一栏，学生应诚实回答"否"。
 
-ESM 权重已随仓库提供（`weights/esm2_t6_8M_UR50D.pt`，30MB）。默认从本地加载，无网络依赖。若权重缺失会自动回退到在线下载。
+### ESM 怎么讲
+
+不运行、不带权重，只在讲稿里讨论：ESM-2 在 2.5 亿序列上用 MLM 目标训练，同样的架构思想在足够数据下确实产生了可迁移的蛋白质表征。我们的小实验展示的是"机制相同、规模决定成败"——这正是从 nanoGPT 到科学基座的核心分界线。
 
 ---
 
@@ -191,3 +195,46 @@ python -m nanoscigpt.tasks.route_decision
 3. A2b：换探针任务难度（源码中的合成规则），看迁移收益怎么变；
 4. A3a：换分类规则为顺序敏感任务，复现"表示瓶颈"失败；
 5. A3b：用自己的课题诚实回答五问，生成 decision.json 作为作业素材。
+
+---
+
+## B线：autoresearch 虚拟 AI Scientist（约 15 分钟）
+
+### 讲什么
+
+A 线建好模型后，真正的问题是：科研过程怎么闭环。autoresearch 是一个刻意不用 LLM 的规则驱动科学家，它把“自主科研”拆成五件可检验的事，全部在本仓库真实执行：
+
+1. **可执行动作**：每一轮只调用一个工具合同（`tools.py`）。
+2. **工具合同**：不在 `CONTRACTS` 里的操作被拒绝——这是边界。
+3. **形式化评价器**：`evaluator.py` 只认 design/ran/evaluated 三级，绝不把“跑过”说成“科学结论”。
+4. **反馈改变下一步**：H1 失败就停，H2 失败记为“发现”，不是报错。
+5. **跨轮研究状态**：假设、证据、未决问题持久化到 `research_state_<domain>.json`，重跑直接恢复。
+
+### 操作（现场跑，每域约 20 秒）
+
+```bash
+# 文本域：全流程，模拟人工批准
+python -m autoresearch.run --domain text --fresh --auto_approve
+
+# 蛋白域：含迁移探针，会看到“迁移增益为负”的诚实结论
+python -m autoresearch.run --domain protein --fresh --auto_approve
+
+# 课堂演示：不带 --auto_approve，人工门真实等待学生输入
+python -m autoresearch.run --domain text --fresh
+
+# 跨轮恢复：不带 --fresh，直接到终态
+python -m autoresearch.run --domain text
+```
+
+### 预期与停止边界
+
+- protein 的 H2（预算加倍）和 H3（迁移）会被标记为 **refuted**——这正是课程要点：450 条序列撑不起基座主张。让学生亲眼看到“系统用证据说‘不’”。
+- 所有结论轮都会写清“能声称什么/不能声称什么”，这就是 scientist-in-the-loop 的边界。
+- 预算增加这类高成本动作必须过人工门；`--auto_approve` 只是课堂模拟，真实使用要人签字。
+
+### 学生动手点
+
+- 改 `evaluator.py` 里的阈值，观察 H2/H3 结论翻转。
+- 给一个新域（如 RNA）加一个工具合同，跑通 prepare→train→sample。
+- 阅读 `research_state_protein.json`，把证据链复述一遍。
+

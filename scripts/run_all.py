@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parent.parent
 DOMAINS = [
     ("text", ["python", "-m", "nanoscigpt.domains.text.prepare"]),
     ("protein", ["python", "-m", "nanoscigpt.domains.protein.prepare", "--size", "500"]),
-    ("dna", ["python", "-m", "nanoscigpt.domains.dna.prepare", "--fasta", "../nanoGPT-DNA/data/chr21.fa", "--num_bases", "500000"]),
+    ("dna", ["python", "-m", "nanoscigpt.domains.dna.prepare", "--num_bases", "350000"]),
     ("smiles", ["python", "-m", "nanoscigpt.domains.smiles.prepare"]),
 ]
 
