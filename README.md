@@ -1,5 +1,8 @@
 # nanoSciGPT
 
+> **配套课程**：科学模型专题实训（二）——如何构建领域基座模型与 AI Scientist 系统。  
+> 课程大纲、逐级操作讲稿与调研全景见 [docs/](docs/) 目录，入口：[课程大纲](docs/course-outline.md)。
+
 一个面向教学的"科学领域语言模型"最小整合框架：同一套 GPT 核心代码，通过替换 **tokenizer + 数据准备** 即可从文本迁移到蛋白质、DNA、分子（SMILES）等科学对象。
 
 ## 教学定位
@@ -168,6 +171,16 @@ python -m autoresearch.run --domain text
 - ESOL 只有 1128 条分子、UniProt 只取 500 条，预训练收益在这个规模**不会显现**；教材如实标注"演示预训练机制，不演示科学收益"。
 - DNA 领域跳过了 chr21 开头的 N 区（未测序端粒区），只取 35 万真实碱基作为流式教学样例。
 - 想看真实蛋白预训练收益，调用 ESM-2 8M 权重（A2 阶段），不要在这个仓库里追求。
+
+## 课程资料导航
+
+| 文档 | 身份 | 用途 |
+|---|---|---|
+| [docs/course-outline.md](docs/course-outline.md) | **课程大纲** | 90 分钟结构、两条时间线、案例与实践分工、作业评分 |
+| [docs/teaching-guide.md](docs/teaching-guide.md) | A 线操作讲稿 | 逐级现场命令、预期输出、停止边界 |
+| [docs/ai-scientist-guide.md](docs/ai-scientist-guide.md) | B 线操作讲稿 | autoresearch 三段式演示指南 |
+| [docs/gpt-like-science-landscape.md](docs/gpt-like-science-landscape.md) | 调研全景 | GPT-like 科学模型项目对比 |
+| [docs/research-notes.md](docs/research-notes.md) | 调研笔记 | 来源与证据记录 |
 
 ## 课堂讲稿
 
