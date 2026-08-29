@@ -2,100 +2,74 @@
   "rounds": [
     {
       "round": 0,
-      "action": "design",
-      "note": "hypotheses H1-H3 proposed; no execution yet (level: design)"
+      "action": "prepare",
+      "note": "evidence -> next: train_v0"
     },
     {
       "round": 1,
-      "action": "prepare",
-      "note": "data prepared; moving to V0 training"
+      "action": "train_v0",
+      "note": "evidence -> next: train_extended"
     },
     {
       "round": 2,
-      "action": "train_v0",
-      "note": "H1 supported (val loss 1.3355); next: extend budget"
+      "action": "train_extended",
+      "note": "evidence -> next: sample"
     },
     {
       "round": 3,
-      "action": "train_extended",
-      "note": "executed under approval; H2 resolved"
-    },
-    {
-      "round": 4,
       "action": "sample",
-      "note": "generation works; H3 not applicable to this domain"
-    },
-    {
-      "round": 5,
-      "action": "conclude",
-      "note": "closed with explicit claim boundary"
+      "note": "evidence -> next: conclude"
     }
   ],
   "hypotheses": [
     {
-      "id": "H1",
-      "text": "domain 'dna' can be pretrained: val loss drops below threshold",
-      "status": "supported",
-      "resolution": "val loss 1.3355 < 6.0"
+      "id": "IDEA-A",
+      "text": "For domain 'dna' (vocab=4, 405000 sequences, mode=stream), a causal LM can compress the corpus below the unigram entropy baseline, indicating exploitable sequence structure.",
+      "status": "proposed"
     },
     {
-      "id": "H2",
-      "text": "more training budget improves val loss by a meaningful margin",
-      "status": "refuted",
-      "resolution": "gain +0.0000 vs required 0.05 - diminishing returns on tiny data is itself a finding"
+      "id": "IDEA-B",
+      "text": "Representations from a 'dna' causal LM transfer to a downstream probe and beat one-hot encoding, justifying a foundation-model claim at teaching scale.",
+      "status": "proposed"
     },
     {
-      "id": "H3",
-      "text": "pretrained representations transfer to a downstream probe better than one-hot",
+      "id": "IDEA-C",
+      "text": "At 405000 sequences the pretraining gain is too small to support any foundation-model claim; the correct route is a specialized model, and the negative result is the finding.",
       "status": "proposed"
     }
   ],
   "evidence": [
     {
       "round": 0,
-      "tool": "none",
-      "level": "design",
-      "passed": false,
-      "summary": "only a plan exists"
-    },
-    {
-      "round": 1,
       "tool": "prepare",
       "level": "ran",
       "passed": true,
-      "summary": "teaching data for 'dna' prepared"
+      "summary": "data files present"
     },
     {
-      "round": 2,
+      "round": 1,
       "tool": "train_v0",
       "level": "evaluated",
       "passed": true,
       "summary": "val loss 1.3355 < 6.0"
     },
     {
-      "round": 3,
+      "round": 2,
       "tool": "train_extended",
       "level": "evaluated",
       "passed": false,
       "summary": "gain +0.0000 vs required 0.05"
     },
     {
-      "round": 4,
+      "round": 3,
       "tool": "sample",
       "level": "ran",
       "passed": true,
-      "summary": "checkpoint generates: --- sample 1 --- AATGTTTTTGGCTTACATAACATCTTCTTTCTTCAATTTCC"
+      "summary": "checkpoint generated samples"
     }
   ],
-  "open_questions": [
-    "transfer probe only exists for protein; add a domain-specific probe to test H3 here"
-  ],
-  "next_action": "done",
-  "conclusions": [
-    "what we CAN claim: the 'dna' pipeline ran end-to-end under tool contracts and formal evaluation; every number above is traceable to a run",
-    "what we CANNOT claim: any scientific performance or foundation-model capability - teaching data is orders of magnitude too small"
-  ],
-  "boundary_notes": [
-    "budget_increase approval was simulated with --auto_approve; in real use a human must sign off"
-  ]
+  "open_questions": [],
+  "next_action": "conclude",
+  "conclusions": [],
+  "boundary_notes": []
 }

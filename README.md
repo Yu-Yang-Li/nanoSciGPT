@@ -97,9 +97,21 @@ python -m nanoscigpt.core.sampler --domain text
 
 **A2b 的核心教学价值**：迁移增益为负——450 条序列的"预训练"不如 one-hot。这不是失败，是课程要证明的事：数据规模不够时基座主张不成立。ESM 的 2.5 亿条序列与我们的 450 条相差六个数量级，"机制相同、规模决定成败"。
 
-## B线：autoresearch——与仓库互动的虚拟 AI Scientist
+## B线：autoresearch——三段式虚拟 AI Scientist
 
 A 线讲“模型怎么建”，B 线讲“科研过程怎么闭环”。`autoresearch/` 是一个**规则驱动**（刻意不用 LLM）的虚拟科学家，它只能通过声明过的工具合同操作本仓库，每一步都被形式化评价器检验，研究状态跨轮持久化。
+
+### 三段式架构（对应 AI Scientist 讲授时间线）
+
+| 段 | 能力 | 代码 | 参考系统 |
+|---|---|---|---|
+| S1 假设生成 | 想法→评分→专家验证→假设库 | `hypothesis.py` | AstroInsight (EPJ Data Science 2026) |
+| S2 实验闭环 | 计划→工具合同执行→评价器分析→反馈决定下一步 | `experiment.py` | StarWhisper Telescope (Comms Eng 2025) |
+| S3 论文工作流 | 证据组装→结构化审稿→逐条返修→事实审计 | `paper.py` | 讲师 agentic research 实践 |
+
+三段共用 `ResearchState`（`state.py`）——跨阶段的研究状态是三段成为一个系统的关键。
+
+完整讲义见 [docs/ai-scientist-guide.md](docs/ai-scientist-guide.md)。
 
 ### 五个教学概念的落点
 
@@ -115,6 +127,15 @@ A 线讲“模型怎么建”，B 线讲“科研过程怎么闭环”。`autore
 ### 快速开始
 
 ```bash
+# 三段式全流程（推荐，约 20 秒）
+python -m autoresearch.pipeline --domain protein --fresh --auto_approve
+
+# 或分阶段演示
+python -m autoresearch.hypothesis --domain protein --auto_approve
+python -m autoresearch.experiment --domain protein --auto_approve
+python -m autoresearch.paper --domain protein
+
+# 旧接口（保留兼容）
 # 文本域全流程（约 20 秒/轮）
 python -m autoresearch.run --domain text --fresh --auto_approve
 
