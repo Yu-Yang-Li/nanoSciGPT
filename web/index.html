@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#071a2a">
+  <title>AI4S 25页扩展工作台</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand" aria-label="AI4S 25页扩展工作台">
+      <svg viewBox="0 0 30 30" aria-hidden="true"><path d="M10 3h10M12 3v7L5.7 23.2A2 2 0 0 0 7.5 26h15a2 2 0 0 0 1.8-2.8L18 10V3M9.2 18.3h11.6"/></svg>
+      <span>AI4S 双轨实训台</span><small>25页扩展版</small>
+    </div>
+    <div class="page-title" id="pageTitle">P1 · 课题入口</div>
+    <div class="page-clock">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v5l3.2 2"/></svg>
+      <span id="pageMinutes">0–2 min</span><span>·</span><span id="pageCounter">01/25</span>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <aside class="page-rail" aria-label="25页扩展工作台进度">
+      <div class="rail-heading"><strong>进度</strong><span>扩展25页</span></div>
+      <nav id="pageRail"></nav>
+      <div class="rail-arrows">
+        <button id="prevPage" type="button" aria-label="上一页"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5.5 12.5 4.5-4.5 4.5 4.5"/></svg></button>
+        <button id="nextPage" type="button" aria-label="下一页"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5.5 7.5 4.5 4.5 4.5-4.5"/></svg></button>
+      </div>
+    </aside>
+
+    <section class="teaching-pane" aria-labelledby="lessonHeading">
+      <div class="lesson-scroll" id="lessonScroll">
+        <div class="lesson-intro">
+          <div>
+            <p class="stage-path" id="stagePath">课题入口</p>
+            <h1 id="lessonHeading">Agent能搭模型，但不能替你定义什么算对</h1>
+            <p id="lessonClaim">代码、模型、分数和报告都生成了，科学问题仍可能没有成立。</p>
+          </div>
+          <span class="lesson-state">设计</span>
+        </div>
+
+        <section class="demo-frame" aria-labelledby="demoTitle">
+          <div class="frame-label">
+            <div><span class="simulation-dot"></span><strong>HTML SIMULATION</strong></div>
+            <span id="demoCaption">非真实训练或实验</span>
+          </div>
+          <div class="demo-canvas" id="demoCanvas"></div>
+        </section>
+
+        <section class="student-bridge" aria-labelledby="studentBridgeTitle">
+          <div class="bridge-heading">
+            <div>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 18 18 5M9 5h9v9"/></svg>
+              <h2 id="studentBridgeTitle">与我的课题连接</h2>
+            </div>
+            <button class="text-button" id="fillExample" type="button">载入教学示例</button>
+          </div>
+          <div class="field-grid" id="fieldGrid"></div>
+        </section>
+
+        <section class="boundary-strip" aria-label="本页判断边界">
+          <div><span>为什么需要下一步</span><strong id="whyNext"></strong></div>
+          <div><span>本页停止边界</span><strong id="stopBoundary"></strong></div>
+        </section>
+      </div>
+    </section>
+
+    <section class="chat-pane" aria-labelledby="chatTitle">
+      <div class="chat-header">
+        <div class="assistant-identity">
+          <span class="assistant-mark">AI</span>
+          <div><h2 id="chatTitle">AI4S 实训助手</h2><p>Codex CLI · scnet/GLM-5.3</p></div>
+        </div>
+        <div class="chat-header-actions">
+          <span class="connection" id="connectionState"><i></i><strong>连接中</strong></span>
+          <button class="icon-button" id="newConversation" type="button" aria-label="新建对话" title="新建对话"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+        </div>
+      </div>
+
+      <div class="chat-scroll" id="chatScroll" role="log" aria-live="polite">
+        <div class="message assistant-message welcome-message">
+          <span class="message-avatar">AI</span>
+          <div class="message-body">
+            <p>这里是25页扩展工作台；14页正式课堂版与本扩展工作台分开维护。先在左侧完成本页判断，再检查下方完整Prompt。公开页面可复制，只有本机桥接后才能真实调用Codex。</p>
+            <div class="message-meta">扩展工作台 · 设计状态 · 尚未运行</div>
+          </div>
+        </div>
+      </div>
+
+      <section class="prompt-composer" aria-label="当前页可复制Prompt">
+        <div class="composer-toolbar">
+          <div><strong>当前页可复制 Prompt</strong><span id="promptStatus">已根据左侧输入生成</span></div>
+          <div><button id="rebuildPrompt" type="button">重建</button><button id="copyPrompt" type="button">复制</button></div>
+        </div>
+        <textarea id="promptEditor" spellcheck="false" aria-label="可编辑Prompt"></textarea>
+        <div class="composer-footer">
+          <details class="repro-details">
+            <summary>复现信息</summary>
+            <div class="repro-grid">
+              <span>模型</span><code>scnet/GLM-5.3</code>
+              <span>环境</span><code>Codex CLI · read-only</code>
+              <span>状态</span><code id="runStatus">设计 · 尚未运行</code>
+              <span>耗时</span><code id="runElapsed">—</code>
+            </div>
+          </details>
+          <button class="send-button" id="sendPrompt" type="button"><span>发送给 Codex</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 14-7-4.5 14-3-5-6.5-2Z"/></svg></button>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="./course-data.js" defer></script>
+  <script src="./simulations.js" defer></script>
+  <script src="./app.js" defer></script>
+</body>
+</html>
