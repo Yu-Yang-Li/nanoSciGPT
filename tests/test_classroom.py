@@ -124,6 +124,55 @@ def test_cpu_smoke_run_finishes_for_every_student_choice(tmp_path, domain):
         assert task["label_source"] == "text-derived teaching label"
 
 
+def test_classroom_profile_shows_the_expected_lesson_for_every_student_choice(tmp_path):
+    subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "nanoscigpt.classroom",
+            "--domain",
+            "all",
+            "--profile",
+            "classroom",
+            "--data_root",
+            str(DATA_ROOT),
+            "--out_root",
+            str(tmp_path),
+        ],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=180,
+    )
+
+    structured = {"weather", "crystal", "structure3d", "image", "spectrum", "field"}
+    for domain in RUNNABLE:
+        domain_dir = tmp_path / domain
+        report = json.loads((domain_dir / "run_report.json").read_text(encoding="utf-8"))
+        train_log = json.loads(
+            (domain_dir / "model" / "train_log.json").read_text(encoding="utf-8")
+        )
+        task = json.loads(
+            (domain_dir / "downstream" / "downstream_result.json").read_text(
+                encoding="utf-8"
+            )
+        )
+
+        assert report["status"] == "completed"
+        assert report["profile"] == "classroom"
+        assert report["preflight"]["status"] == "ready"
+        assert (domain_dir / "model" / "ckpt.pt").is_file()
+        assert task["status"] == "completed"
+        assert task["teaching_only"] is True
+        if domain in structured:
+            assert train_log["pretrain_loss_end"] < train_log["pretrain_loss_start"]
+            assert (domain_dir / "representation_preview.json").is_file()
+        else:
+            assert train_log["best_val_loss"] < train_log["history"][0]["val_loss"]
+            assert (domain_dir / "model" / "samples.txt").is_file()
+
+
 def test_classroom_list_only_offers_domains_that_pass_preflight():
     completed = subprocess.run(
         [sys.executable, "-m", "nanoscigpt.classroom", "--list", "--data_root", str(DATA_ROOT)],
