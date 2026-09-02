@@ -23,13 +23,13 @@ metadata:
 python -m autoresearch.experiment --domain protein --baseline_run out/classroom/protein/run_report.json --out_root out/autoresearch --plan_only
 ```
 
-把 `protein` 换成学生的领域。打开生成的 `iteration_spec.json`，用自然语言告诉学生：这轮保持了什么、改变了什么、怎样比较。学生想继续时，再运行：
+把 `protein` 换成学生的领域。打开生成的 `iteration_spec.json`，用自然语言告诉学生：这轮保持了什么、改变了什么、怎样比较。学生明确说可以运行以后，再执行：
 
 ```powershell
 python -m autoresearch.experiment --domain protein --baseline_run out/classroom/protein/run_report.json --out_root out/autoresearch --fresh --auto_approve
 ```
 
-命令完成后读取 `comparison.json` 和 `research_state.json`。评价没有达到计划中的门槛时，也把它当作一份完整结果：说明这次改动没有带来足够变化，并依据 `next_action` 停止或重新提出一个小问题。
+命令完成后读取 `comparison.json` 和 `research_state.json`。说明基线值、候选值、差值、比较门槛和 `next_action`；其中任何一项缺失时先补齐记录，不凭印象宣布改进。评价没有达到门槛时，也把它当作一份完整结果：说明这次改动没有带来足够变化，并依据 `next_action` 停止或重新提出一个小问题。
 
 ## 从 autoresearch 讲到 AI Scientist
 

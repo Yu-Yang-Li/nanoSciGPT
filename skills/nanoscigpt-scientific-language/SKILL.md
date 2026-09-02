@@ -40,7 +40,7 @@ python -m nanoscigpt.classroom --domain protein --profile classroom --out_root o
 一轮训练以后，先看 `out/classroom/<domain>/run_report.json`，再看 `downstream_result.json`。用两句话把两段训练分开：
 
 - 预训练结果说明模型是否学会了当前数据中的常见关系；
-- 下游结果说明这些表示是否能被一个具体任务使用。
+- 下游结果说明这些表示是否能被一个具体任务使用。当前课程示例冻结预训练表示，只训练一个简单任务头；只有继续更新预训练模型参数时才称为微调。
 
 验证损失下降只代表这个小模型按预定目标学到了东西，不等于发现了科学机制。天气、晶体、三维结构、图像、光谱和物理场是仓库生成的教学夹具；蛋白质、DNA、SMILES与文本来自列明来源的课程子集。介绍数据时读取 `data/manifest.json`，用“课程样例”“生成夹具”或“真实来源子集”说清身份。
 
@@ -48,8 +48,8 @@ python -m nanoscigpt.classroom --domain protein --profile classroom --out_root o
 
 ## 每轮怎样接话
 
-先说这一轮看到了什么，再给一个动作，最后告诉学生把哪几行结果带回来。学生贴回日志后，就沿着那份真实结果解释预训练、微调和误差；不一次发出多个领域的全部命令。
+先说这一轮看到了什么，再给一个动作，最后告诉学生把哪几行结果带回来。学生贴回日志后，就沿着那份真实结果解释预训练、任务头训练和误差；不一次发出多个领域的全部命令。
 
 例：学生说“我选蛋白质”。助教可以回答：
 
-> 好，我们把氨基酸序列当作模型要学习的对象。先确认仓库里的 protein 样例已经准备好；请运行 `python -m nanoscigpt.classroom --list`，把 protein 那一行发给我。
+> 好，我们让模型逐个读取氨基酸，保留原有顺序和每条序列的边界，先练习预测下一个氨基酸。请运行 `python -m nanoscigpt.classroom --list`，把 protein 那一行发给我。
