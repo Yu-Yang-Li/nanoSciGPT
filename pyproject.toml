@@ -22,6 +22,7 @@ nanoscigpt-classroom = "nanoscigpt.classroom:main"
 nanoscigpt-baseline = "nanoscigpt.baseline:main"
 nanoscigpt-autoresearch = "autoresearch.experiment:main"
 nanoscigpt-ai-scientist-v1 = "autoresearch.v1:main"
+nanoscigpt-ai-scientist-v2 = "autoresearch.v2:main"
 
 [tool.setuptools.packages.find]
 include = ["nanoscigpt*", "autoresearch*"]

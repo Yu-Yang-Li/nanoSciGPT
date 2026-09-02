@@ -51,3 +51,14 @@ def test_ai_scientist_v1_is_packaged_as_its_own_lesson():
     assert "--plan-only" in skill
     assert "--confirm-plan" in skill
     assert "evidence_map.json" in skill
+
+
+def test_ai_scientist_v2_is_packaged_as_its_own_lesson():
+    skill_path = ROOT / "skills" / "ai-scientist-v2-tree-search" / "SKILL.md"
+
+    assert skill_path.is_file()
+    skill = skill_path.read_text(encoding="utf-8")
+    assert "name: ai-scientist-v2-tree-search" in skill
+    assert "run-next" in skill
+    assert "tree_state.json" in skill
+    assert "reproduces_original_system" in skill
