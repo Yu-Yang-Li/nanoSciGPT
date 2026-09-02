@@ -40,3 +40,14 @@ def test_autoresearch_model_iteration_is_packaged_as_its_own_lesson():
     assert "--baseline_run" in skill
     assert "candidate_run_report.json" in skill
     assert "comparison.json" in skill
+
+
+def test_ai_scientist_v1_is_packaged_as_its_own_lesson():
+    skill_path = ROOT / "skills" / "ai-scientist-v1-workflow" / "SKILL.md"
+
+    assert skill_path.is_file()
+    skill = skill_path.read_text(encoding="utf-8")
+    assert "name: ai-scientist-v1-workflow" in skill
+    assert "--plan-only" in skill
+    assert "--confirm-plan" in skill
+    assert "evidence_map.json" in skill

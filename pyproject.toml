@@ -21,6 +21,7 @@ dev = ["pytest>=7.0"]
 nanoscigpt-classroom = "nanoscigpt.classroom:main"
 nanoscigpt-baseline = "nanoscigpt.baseline:main"
 nanoscigpt-autoresearch = "autoresearch.experiment:main"
+nanoscigpt-ai-scientist-v1 = "autoresearch.v1:main"
 
 [tool.setuptools.packages.find]
 include = ["nanoscigpt*", "autoresearch*"]

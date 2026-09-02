@@ -1,0 +1,27 @@
+{
+  "schema_version": "nanoscigpt.ai_scientist_v1_literature.v1",
+  "common": [
+    {
+      "id": "ai-scientist-v1-2024",
+      "title": "The AI Scientist: Towards Fully Automated Open-Ended Scientific Discovery",
+      "authors": ["Lu, Chris", "Lu, Cong", "Lange, Robert Tjarko", "Foerster, Jakob", "Clune, Jeff", "Ha, David"],
+      "year": 2024,
+      "venue": "arXiv preprint",
+      "doi_or_url": "https://arxiv.org/abs/2408.06292",
+      "role": "workflow_reference",
+      "checked": true
+    }
+  ],
+  "domains": {
+    "text": [{"id": "nanogpt", "title": "nanoGPT", "authors": ["Karpathy, Andrej"], "year": 2022, "venue": "GitHub software", "doi_or_url": "https://github.com/karpathy/nanoGPT", "role": "model_and_training_reference", "checked": true}],
+    "protein": [{"id": "esm-pnas-2021", "title": "Biological structure and function emerge from scaling unsupervised learning to 250 million protein sequences", "authors": ["Rives, Alexander", "Meier, Joshua", "Sercu, Tom"], "year": 2021, "venue": "PNAS", "doi_or_url": "https://doi.org/10.1073/pnas.2016239118", "role": "domain_background", "checked": true}],
+    "dna": [{"id": "dnabert-2021", "title": "DNABERT: pre-trained Bidirectional Encoder Representations from Transformers model for DNA-language in genome", "authors": ["Ji, Yanrong", "Zhou, Zhihan", "Liu, Han", "Davuluri, Ramana V."], "year": 2021, "venue": "Bioinformatics", "doi_or_url": "https://doi.org/10.1093/bioinformatics/btab083", "role": "domain_background", "checked": true}],
+    "smiles": [{"id": "esol-2004", "title": "ESOL: A Simple Model for Aqueous Solubility Based on Molecular Properties", "authors": ["Delaney, John S."], "year": 2004, "venue": "Journal of Chemical Information and Computer Sciences", "doi_or_url": "https://doi.org/10.1021/ci034243x", "role": "dataset_and_task_reference", "checked": true}],
+    "weather": [{"id": "pangu-weather-2023", "title": "Accurate medium-range global weather forecasting with 3D neural networks", "authors": ["Bi, Kaifeng", "Xie, Lingxi", "Zhang, Hengheng"], "year": 2023, "venue": "Nature", "doi_or_url": "https://doi.org/10.1038/s41586-023-06185-3", "role": "domain_background", "checked": true}],
+    "crystal": [{"id": "cgcnn-2018", "title": "Crystal Graph Convolutional Neural Networks for an Accurate and Interpretable Prediction of Material Properties", "authors": ["Xie, Tian", "Grossman, Jeffrey C."], "year": 2018, "venue": "Physical Review Letters", "doi_or_url": "https://doi.org/10.1103/PhysRevLett.120.145301", "role": "domain_background", "checked": true}],
+    "structure3d": [{"id": "alphafold2-2021", "title": "Highly accurate protein structure prediction with AlphaFold", "authors": ["Jumper, John", "Evans, Richard", "Pritzel, Alexander"], "year": 2021, "venue": "Nature", "doi_or_url": "https://doi.org/10.1038/s41586-021-03819-2", "role": "domain_background", "checked": true}],
+    "image": [{"id": "source-extractor-1996", "title": "SExtractor: Software for source extraction", "authors": ["Bertin, Emmanuel", "Arnouts, Stephane"], "year": 1996, "venue": "Astronomy and Astrophysics Supplement Series", "doi_or_url": "https://doi.org/10.1051/aas:1996164", "role": "task_reference", "checked": true}],
+    "spectrum": [{"id": "atlas-a-2023", "title": "ATLAS-A directly observed stellar spectra", "authors": ["Ji et al."], "year": 2023, "venue": "National Astronomical Data Center", "doi_or_url": "https://doi.org/10.12149/101205", "role": "data_reference", "checked": true}],
+    "field": [{"id": "fno-2021", "title": "Fourier Neural Operator for Parametric Partial Differential Equations", "authors": ["Li, Zongyi", "Kovachki, Nikola", "Azizzadenesheli, Kamyar"], "year": 2021, "venue": "ICLR", "doi_or_url": "https://openreview.net/forum?id=c8P9NQVtmnO", "role": "domain_background", "checked": true}]
+  }
+}
