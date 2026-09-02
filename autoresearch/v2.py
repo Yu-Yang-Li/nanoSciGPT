@@ -54,6 +54,8 @@ def init_tree(v1_state_path: Path, out_root: Path) -> Path:
         raise FileExistsError(f"tree state already exists: {state_path}")
     route1 = v1["route"]
     route2 = backlog[0]
+    route1_evaluation = dict(route1["result"])
+    route1_evaluation["passed"] = bool(route1_evaluation["criterion_passed"])
     state = {
         "schema_version": "nanoscigpt.ai_scientist_v2.tree.v1",
         "implementation": {
@@ -76,7 +78,7 @@ def init_tree(v1_state_path: Path, out_root: Path) -> Path:
                 "attempts": 1,
                 "change": route1["change"],
                 "run_report": route1["run_report"],
-                "evaluation": route1["result"],
+                "evaluation": route1_evaluation,
             },
             "route-2": {
                 "id": "route-2",

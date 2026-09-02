@@ -60,6 +60,7 @@ def test_v2_init_creates_two_sibling_routes_without_running_a_model(completed_v1
     assert set(state["nodes"]) == {"route-1", "route-2"}
     assert {node["parent_id"] for node in state["nodes"].values()} == {"root"}
     assert state["nodes"]["route-1"]["status"] == "completed"
+    assert state["nodes"]["route-1"]["evaluation"]["passed"] is state["nodes"]["route-1"]["evaluation"]["criterion_passed"]
     assert state["nodes"]["route-2"]["status"] == "planned"
     assert state["frontier"] == ["route-2"]
     assert not (out_root / "text" / "nodes" / "route-2" / "model").exists()
@@ -109,6 +110,32 @@ def test_v2_run_next_requires_explicit_approval(completed_v1, tmp_path):
     state = json.loads(state_path.read_text(encoding="utf-8"))
     assert state["nodes"]["route-2"]["status"] == "planned"
     assert state["nodes"]["route-2"]["attempts"] == 0
+
+
+def test_v2_decision_can_retain_the_completed_v1_route(completed_v1, tmp_path):
+    out_root = tmp_path / "v2"
+    assert _run("init", "--from-v1", completed_v1, "--out-root", out_root).returncode == 0
+    state_path = out_root / "text" / "tree_state.json"
+    state = json.loads(state_path.read_text(encoding="utf-8"))
+    state["nodes"]["route-1"]["evaluation"].update(
+        {"passed": True, "candidate": 1.0}
+    )
+    state["nodes"]["route-2"].update(
+        {
+            "status": "completed",
+            "evaluation": {"passed": False, "candidate": 2.0},
+        }
+    )
+    state["frontier"] = []
+    state_path.write_text(json.dumps(state), encoding="utf-8")
+
+    completed = _run("decide", "--state", state_path)
+
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    decision = json.loads(
+        (state_path.parent / "route_decision.json").read_text(encoding="utf-8")
+    )
+    assert decision["retained"] == "route-1"
 
 
 def test_v2_cli_help_is_available():
