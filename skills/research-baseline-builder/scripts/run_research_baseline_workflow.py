@@ -16,6 +16,9 @@ from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 INIT_SCRIPT = SCRIPT_DIR / "init_research_baseline_workspace.py"
+REPO_ROOT = SCRIPT_DIR.parents[2]
+LAMOST_COURSE_CSV = REPO_ROOT / "data" / "course" / "lamost_atlas_a_teff_2000.csv"
+LAMOST_SOURCE_NAME = "ATLAS-A LAMOST teaching subset"
 
 
 def clock() -> str:
@@ -62,12 +65,24 @@ def workspace_from_init_output(output: str) -> Path:
     return Path(lines[-1])
 
 
+def data_identity(csv_path: Path | None) -> tuple[str, str | None]:
+    if csv_path is None:
+        return "demo", None
+    if csv_path.resolve() == LAMOST_COURSE_CSV.resolve():
+        return "bundled_course", LAMOST_SOURCE_NAME
+    return "user_csv", None
+
+
 def baseline_command(script_name: str, args: argparse.Namespace) -> list[str] | None:
     base = [sys.executable, str(Path("scripts") / script_name)]
     if script_name == "baseline_randomforest.py":
         cmd = base + ["--task", args.task]
         if args.csv:
             cmd += ["--csv", str(args.csv), "--target", args.target]
+            data_mode, source_name = data_identity(args.csv)
+            cmd += ["--data-mode", data_mode]
+            if source_name:
+                cmd += ["--source-name", source_name]
         return cmd
     if script_name == "baseline_xgboost_optuna.py":
         cmd = base + ["--task", args.task, "--n_trials", str(args.n_trials)]
@@ -171,9 +186,10 @@ def main() -> None:
         write_json(status_path, status)
         parser.error("--csv with GRU baseline requires --value-column")
 
+    data_mode, _ = data_identity(args.csv)
     progress(
         "基线运行",
-        f"脚本：scripts/{script_name}；数据：{'用户 CSV' if args.csv else 'demo/合成数据'}；工作区：{workspace}",
+        f"脚本：scripts/{script_name}；数据身份：{data_mode}；工作区：{workspace}",
     )
     baseline_result = run_command(cmd, cwd=workspace)
     print(baseline_result.stdout, end="")
@@ -190,7 +206,7 @@ def main() -> None:
             "baseline_output_log": str(run_log.resolve()),
             "baseline_summary": str(summary_path.resolve()) if summary_path.exists() else None,
             "metrics": str(metrics_path.resolve()) if metrics_path.exists() else None,
-            "data_mode": "user_csv" if args.csv else "demo",
+            "data_mode": data_mode,
         }
     )
     write_json(status_path, status)

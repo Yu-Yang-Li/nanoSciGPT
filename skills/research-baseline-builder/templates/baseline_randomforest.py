@@ -108,7 +108,15 @@ def build_model(task: str, cfg: dict):
 
 
 # ---------- 3. 训练 & 评估 ----------
-def train_and_evaluate(X: pd.DataFrame, y, cfg: dict, target_names=None, data_mode="demo", source=None):
+def train_and_evaluate(
+    X: pd.DataFrame,
+    y,
+    cfg: dict,
+    target_names=None,
+    data_mode="demo",
+    source=None,
+    data_source_name=None,
+):
     log_lines = []
     task = cfg["task"]
     X_train, X_test, y_train, y_test = train_test_split(
@@ -116,7 +124,12 @@ def train_and_evaluate(X: pd.DataFrame, y, cfg: dict, target_names=None, data_mo
         random_state=cfg["random_state"],
         stratify=y if task == "classification" else None,
     )
-    emit(f"[数据模式] {data_mode}：{'当前使用示例/合成数据，不代表用户真实数据结果。' if data_mode == 'demo' else '当前使用用户提供的数据文件。'}", log_lines)
+    identity_notes = {
+        "demo": "当前使用示例/合成数据，不代表用户真实数据结果。",
+        "bundled_course": "当前使用仓库内置课程数据，来源和使用边界见 data/manifest.json。",
+        "user_csv": "当前使用用户提供的数据文件。",
+    }
+    emit(f"[数据模式] {data_mode}：{identity_notes[data_mode]}", log_lines)
     emit(f"[数据] train={X_train.shape}, test={X_test.shape}", log_lines)
 
     model = build_model(task, cfg)
@@ -160,6 +173,7 @@ def train_and_evaluate(X: pd.DataFrame, y, cfg: dict, target_names=None, data_mo
         "created_at": datetime.now().isoformat(timespec="seconds"),
         "data_mode": data_mode,
         "data_source": str(source) if source else None,
+        "data_source_name": data_source_name,
         "model": "RandomForest",
         "task": task,
         "train_shape": list(X_train.shape),
@@ -168,7 +182,7 @@ def train_and_evaluate(X: pd.DataFrame, y, cfg: dict, target_names=None, data_mo
         "metrics": metrics,
         "top_features": [{"field": str(k), "importance": float(v)} for k, v in top.items()],
         "model_path": str(cfg["model_save_path"]),
-        "warning": "当前为 demo 数据，不代表用户真实数据结果。" if data_mode == "demo" else None,
+        "warning": identity_notes[data_mode] if data_mode != "user_csv" else None,
     }
     write_json(cfg["metrics_path"], metrics)
     write_json(cfg["summary_path"], summary)
@@ -184,6 +198,13 @@ def main():
                         default=CONFIG["task"])
     parser.add_argument("--csv", type=Path, help="可选：用户 CSV 数据路径。")
     parser.add_argument("--target", help="CSV 中的目标列名。")
+    parser.add_argument(
+        "--data-mode",
+        choices=("user_csv", "bundled_course"),
+        default="user_csv",
+        help="CSV 的证据身份。",
+    )
+    parser.add_argument("--source-name", help="课程数据的可读来源名称。")
     args = parser.parse_args()
     cfg = {**CONFIG, "task": args.task}
 
@@ -191,7 +212,15 @@ def main():
         if not args.target:
             parser.error("--csv requires --target")
         X, y, target_names = load_csv_data(args.csv, args.target)
-        train_and_evaluate(X, y, cfg, target_names=target_names, data_mode="user_csv", source=args.csv)
+        train_and_evaluate(
+            X,
+            y,
+            cfg,
+            target_names=target_names,
+            data_mode=args.data_mode,
+            source=args.csv,
+            data_source_name=args.source_name,
+        )
     else:
         X, y, target_names = load_demo_data(cfg["task"])
         train_and_evaluate(X, y, cfg, target_names=target_names, data_mode="demo")
