@@ -23,7 +23,7 @@ metadata:
 python -m autoresearch.experiment --domain protein --baseline_run out/classroom/protein/run_report.json --out_root out/autoresearch --plan_only
 ```
 
-把 `protein` 换成学生的领域。打开生成的 `iteration_spec.json`，用自然语言告诉学生：这轮保持了什么、改变了什么、怎样比较。学生明确说可以运行以后，再执行：
+把 `protein` 换成学生的领域。默认 `python` 不可用时，先运行 `scripts/find_course_python.ps1 -RequiredModules numpy,torch` 找到可用环境。打开生成的 `iteration_spec.json`，用自然语言告诉学生：这轮保持了什么、改变了什么、怎样比较。学生明确说可以运行以后，再执行：
 
 ```powershell
 python -m autoresearch.experiment --domain protein --baseline_run out/classroom/protein/run_report.json --out_root out/autoresearch --fresh --auto_approve

@@ -31,7 +31,7 @@ metadata:
 
 学生提到“LAMOST 示例”“光谱预测恒星参数”或相近意思时，直接使用仓库 `data/course/lamost_atlas_a_teff_2000.csv`。这份课程子集包含 2000 条光谱，128 个流量特征，目前提供的目标只有有效温度 `teff`。先做 RandomForest 回归，让学生看到完整的数据检查、训练与评价流程；不要把它说成能够估计所有恒星参数。
 
-从一个新的输出目录运行 `templates/baseline_randomforest.py --task regression --csv <CSV绝对路径> --target teff`。先实际检查将要使用的 Python 能否导入 `numpy`、`pandas` 和 `sklearn`；当前命令行里的 `python` 不可用时，再找本机已有的环境。给学生的命令应当能直接复制，不让他先手工定义一组变量。
+从一个新的输出目录运行 `templates/baseline_randomforest.py --task regression --csv <CSV绝对路径> --target teff`。先实际检查将要使用的 Python 能否导入 `numpy`、`pandas` 和 `sklearn`；当前命令行里的 `python` 不可用时，运行仓库 `scripts/find_course_python.ps1`，它会返回第一个已经具备这些依赖的解释器。给学生的命令应当能直接复制，不让他先手工定义一组变量。
 
 报告实际生成的 `metrics.json`、`baseline_summary.json` 和 `train_log.txt`。说明这里的随机留出结果回答的是“同一课程数据范围内能否预测”，不能自动代表跨巡天、跨仪器或分布外效果。
 

@@ -33,7 +33,7 @@ python -m nanoscigpt.classroom --list
 python -m nanoscigpt.classroom --domain protein --profile classroom --out_root out/classroom
 ```
 
-把 `protein` 换成学生选择的领域。使用能成功导入仓库依赖的 Python；这台电脑上的默认 `python` 若指向 LibreOffice，应改用已经验证的科研环境。
+把 `protein` 换成学生选择的领域。使用能成功导入仓库依赖的 Python；默认 `python` 不可用时，可以运行 `scripts/find_course_python.ps1 -RequiredModules numpy,torch` 找到本机已有的课程环境。
 
 ## 怎样读运行结果
 
