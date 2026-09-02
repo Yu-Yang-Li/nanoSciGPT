@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 
 from autoresearch import experiment
-from autoresearch.evaluator import evaluate_train
+from autoresearch.evaluator import evaluate_loss_gain, evaluate_train
 from autoresearch.experiment import ExperimentLoop
 from autoresearch.hypothesis import HypothesisEngine, load_data_stats
 from autoresearch.paper import PaperWorkflow
@@ -218,6 +218,10 @@ class TestExperimentLoop:
             "metric": "loss_gain_vs_v0",
             "value": 0.0478,
             "baseline": 2.9163,
+            "candidate_value": 2.8685,
+            "threshold": 0.05,
+            "next_action": "stop_branch",
+            "candidate_run_report": "candidate_run_report.json",
             "reason": "gain +0.0478 vs required 0.05",
             "tool": "train_extended",
         }
@@ -231,6 +235,18 @@ class TestExperimentLoop:
         assert comparison["primary_metric"] == "best_val_loss"
         assert comparison["observed_delta"] == 0.0478
         assert comparison["evidence_level"] == "evaluated"
+
+    def test_loss_gain_threshold_uses_the_unrounded_delta(self):
+        result = evaluate_loss_gain(1.0, 0.95004)
+
+        assert result["delta"] == pytest.approx(0.04996)
+        assert result["passed"] is False
+
+    def test_loss_gain_accepts_the_exact_threshold(self):
+        result = evaluate_loss_gain(1.0, 0.95)
+
+        assert result["delta"] == pytest.approx(0.05)
+        assert result["passed"] is True
 
     def test_baseline_mode_keeps_research_state_with_iteration_artifacts(self, tmp_path):
         assert experiment.iteration_state_path("protein", tmp_path) == (

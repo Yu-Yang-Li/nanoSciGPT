@@ -28,3 +28,15 @@ def test_nanogpt_and_nanoscigpt_skills_have_distinct_triggers():
     assert "text" in nanogpt_description.lower()
     assert "text" not in nanoscigpt_description.lower()
     assert "fine-tuning" not in nanoscigpt_description.lower()
+
+
+def test_autoresearch_model_iteration_is_packaged_as_its_own_lesson():
+    skill_path = ROOT / "skills" / "autoresearch-model-iteration" / "SKILL.md"
+
+    assert skill_path.is_file()
+    skill = skill_path.read_text(encoding="utf-8")
+    assert "name: autoresearch-model-iteration" in skill
+    assert "--plan_only" in skill
+    assert "--baseline_run" in skill
+    assert "candidate_run_report.json" in skill
+    assert "comparison.json" in skill

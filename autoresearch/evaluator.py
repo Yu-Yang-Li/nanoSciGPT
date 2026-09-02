@@ -22,6 +22,22 @@ CRITERIA = {
 }
 
 
+def evaluate_loss_gain(baseline, candidate, threshold=None):
+    """Compare two loss values without rounding before the decision."""
+    threshold = CRITERIA["train_improve_min"] if threshold is None else float(threshold)
+    baseline = float(baseline)
+    candidate = float(candidate)
+    delta = baseline - candidate
+    return {
+        "baseline": baseline,
+        "candidate": candidate,
+        "delta": delta,
+        "threshold": threshold,
+        "direction": "lower_is_better",
+        "passed": delta >= threshold,
+    }
+
+
 def _read_json(path):
     try:
         with open(path, "r", encoding="utf-8") as f:
