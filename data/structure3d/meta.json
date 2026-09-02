@@ -1,0 +1,15 @@
+{
+  "mode": "structured",
+  "teaching_only": true,
+  "generator": "scripts/build_structured_fixtures.py",
+  "seed": 20260830,
+  "train_samples": 80,
+  "val_samples": 16,
+  "representation": "pairwise_distance_tokens",
+  "pretraining": "masked distance-row reconstruction",
+  "task_name": "helix pitch teaching regression",
+  "task_type": "regression",
+  "sample_unit": "one 16-point three-dimensional backbone",
+  "target_unit": "coordinate units per turn",
+  "patch_size": 1
+}

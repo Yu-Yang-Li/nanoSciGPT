@@ -131,14 +131,31 @@ class GPT(nn.Module):
         return logits, loss
 
     @torch.no_grad()
-    def generate(self, idx, max_new_tokens, temperature=1.0, top_k=None):
+    def generate(
+        self,
+        idx,
+        max_new_tokens,
+        temperature=1.0,
+        top_k=None,
+        stop_token_id=None,
+        forbidden_token_ids=None,
+    ):
+        finished = torch.zeros(idx.size(0), dtype=torch.bool, device=idx.device)
         for _ in range(max_new_tokens):
             idx_cond = idx if idx.size(1) <= self.config.block_size else idx[:, -self.config.block_size :]
             logits, _ = self(idx_cond)
             logits = logits[:, -1, :] / temperature
+            if forbidden_token_ids:
+                logits[:, list(forbidden_token_ids)] = float("-Inf")
             if top_k is not None:
                 v, _ = torch.topk(logits, min(top_k, logits.size(-1)))
                 logits[logits < v[:, [-1]]] = float("-Inf")
             probs = F.softmax(logits, dim=-1)
-            idx = torch.cat([idx, torch.multinomial(probs, 1)], dim=1)
+            next_token = torch.multinomial(probs, 1)
+            if stop_token_id is not None:
+                next_token[finished] = stop_token_id
+                finished |= next_token[:, 0].eq(stop_token_id)
+            idx = torch.cat([idx, next_token], dim=1)
+            if stop_token_id is not None and bool(finished.all()):
+                break
         return idx

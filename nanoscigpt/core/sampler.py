@@ -9,6 +9,12 @@ from .gpt import GPT, GPTConfig
 from .tokenizer import CharTokenizer
 
 
+def trim_at_token(token_ids, stop_token_id):
+    if stop_token_id is None or stop_token_id not in token_ids:
+        return token_ids
+    return token_ids[: token_ids.index(stop_token_id)]
+
+
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--domain", required=True, choices=["text", "protein", "dna", "smiles"])
@@ -35,10 +41,19 @@ def main():
     defaults = {"text": "\n", "protein": "M", "dna": "A", "smiles": "C"}
     start = args.start or defaults[args.domain]
     x = torch.tensor([tok.encode(start)], dtype=torch.long, device=args.device)
+    stop_token_id = tok.stoi.get("<eos>")
+    forbidden_token_ids = [tok.stoi["<pad>"]] if "<pad>" in tok.stoi else None
     for i in range(args.num_samples):
-        y = model.generate(x, args.max_new_tokens, temperature=args.temperature, top_k=args.top_k)
+        y = model.generate(
+            x,
+            args.max_new_tokens,
+            temperature=args.temperature,
+            top_k=args.top_k,
+            stop_token_id=stop_token_id,
+            forbidden_token_ids=forbidden_token_ids,
+        )
         print(f"--- sample {i+1} ---")
-        print(tok.decode(y[0].tolist()))
+        print(tok.decode(trim_at_token(y[0].tolist(), stop_token_id)))
 
 
 if __name__ == "__main__":

@@ -5,12 +5,15 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "nanoscigpt"
 version = "0.1.0"
-description = "Minimal teaching framework: one GPT core, pluggable scientific domains"
+description = "CPU teaching framework for sequence, grid, graph, geometry, and continuous scientific data"
 requires-python = ">=3.10"
 dependencies = ["torch>=2.0", "numpy>=1.24"]
 
 [project.optional-dependencies]
 dev = ["pytest>=7.0"]
+
+[project.scripts]
+nanoscigpt-classroom = "nanoscigpt.classroom:main"
 
 [tool.setuptools.packages.find]
 include = ["nanoscigpt*"]

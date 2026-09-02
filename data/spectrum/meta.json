@@ -1,0 +1,15 @@
+{
+  "mode": "structured",
+  "teaching_only": true,
+  "generator": "scripts/build_structured_fixtures.py",
+  "seed": 20260830,
+  "train_samples": 80,
+  "val_samples": 16,
+  "representation": "wavelength_patches",
+  "pretraining": "masked wavelength-patch reconstruction",
+  "task_name": "blackbody temperature teaching regression",
+  "task_type": "regression",
+  "sample_unit": "one 128-bin normalized spectrum",
+  "target_unit": "kelvin",
+  "patch_size": 8
+}

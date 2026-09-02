@@ -1,0 +1,15 @@
+{
+  "mode": "structured",
+  "teaching_only": true,
+  "generator": "scripts/build_structured_fixtures.py",
+  "seed": 20260830,
+  "train_samples": 80,
+  "val_samples": 16,
+  "representation": "image_patches",
+  "pretraining": "masked image-patch reconstruction",
+  "task_name": "astronomical source-count teaching regression",
+  "task_type": "regression",
+  "sample_unit": "one 16x16 single-band image",
+  "target_unit": "sources",
+  "patch_size": 4
+}

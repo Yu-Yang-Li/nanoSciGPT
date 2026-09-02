@@ -15,6 +15,7 @@ out/
 
 # teaching fixtures must be trackable so students run offline
 !data/
+!data/**/
 data/**/*.gz
 !data/text/input.txt
 !data/protein/uniprot.fasta
@@ -26,3 +27,4 @@ data/**/*.gz
 !data/**/val.bin
 !data/**/train_seqs.npy
 !data/**/val_seqs.npy
+!data/**/fixture.npz

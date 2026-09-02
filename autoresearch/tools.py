@@ -11,51 +11,111 @@ import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
+STRUCTURED_DOMAINS = {"weather", "crystal", "structure3d", "image", "spectrum", "field"}
 
 _TRAIN_BASE = ["--block_size", "64", "--batch_size", "8",
                "--n_layer", "2", "--n_head", "2", "--n_embd", "64",
                "--eval_interval", "50", "--eval_iters", "10"]
 
+
+def prepare_command(domain, **_):
+    return [
+        sys.executable,
+        "-X",
+        "utf8",
+        "-m",
+        "nanoscigpt.tasks.prepare_domain",
+        "--domain",
+        domain,
+    ]
+
+
+def train_command(domain, iterations):
+    if domain in STRUCTURED_DOMAINS:
+        steps = 10 if iterations == 100 else 20
+        return [
+            sys.executable,
+            "-X",
+            "utf8",
+            "-m",
+            "nanoscigpt.tasks.structured_demo",
+            "--domain",
+            domain,
+            "--out_dir",
+            str(Path("out") / domain),
+            "--pretrain_steps",
+            str(steps),
+            "--task_steps",
+            "5",
+        ]
+    return [
+        sys.executable,
+        "-X",
+        "utf8",
+        "-m",
+        "nanoscigpt.core.trainer",
+        "--domain",
+        domain,
+        "--max_iters",
+        str(iterations),
+    ] + _TRAIN_BASE
+
+
+def sample_command(domain, **_):
+    if domain in STRUCTURED_DOMAINS:
+        return [
+            sys.executable,
+            "-X",
+            "utf8",
+            "-m",
+            "nanoscigpt.tasks.inspect_structured",
+            "--domain",
+            domain,
+            "--out_dir",
+            str(Path("out") / domain),
+        ]
+    return [
+        sys.executable,
+        "-X",
+        "utf8",
+        "-m",
+        "nanoscigpt.core.sampler",
+        "--domain",
+        domain,
+        "--max_new_tokens",
+        "40",
+        "--num_samples",
+        "1",
+    ]
+
 CONTRACTS = {
     "prepare": {
         "desc": "prepare teaching data for one domain",
-        "cmd": lambda domain, **_: [sys.executable, "-X", "utf8", "-m",
-                                    f"nanoscigpt.domains.{domain}.prepare"],
-        "declared_outputs": ["data/<domain>/train.*", "data/<domain>/val.*", "data/<domain>/meta.json"],
+        "cmd": prepare_command,
+        "declared_outputs": ["data/<domain>/meta.json", "data/<domain>/prepared payload"],
         "max_seconds": 600,
         "requires_approval": None,
     },
     "train_v0": {
-        "desc": "train the smallest GPT for 100 iterations (V0 baseline)",
-        "cmd": lambda domain, **_: [sys.executable, "-X", "utf8", "-m", "nanoscigpt.core.trainer",
-                                    "--domain", domain, "--max_iters", "100"] + _TRAIN_BASE,
-        "declared_outputs": ["out/<domain>/ckpt.pt", "out/<domain>/train_log.json"],
+        "desc": "run the smallest sequence or structured pretraining baseline",
+        "cmd": lambda domain, **_: train_command(domain, 100),
+        "declared_outputs": ["out/<domain>/checkpoint", "out/<domain>/train log"],
         "max_seconds": 900,
         "requires_approval": None,
     },
     "train_extended": {
-        "desc": "double the training budget to 200 iterations (budget increase)",
-        "cmd": lambda domain, **_: [sys.executable, "-X", "utf8", "-m", "nanoscigpt.core.trainer",
-                                    "--domain", domain, "--max_iters", "200"] + _TRAIN_BASE,
-        "declared_outputs": ["out/<domain>/ckpt.pt", "out/<domain>/train_log.json"],
+        "desc": "double the domain-appropriate pretraining budget",
+        "cmd": lambda domain, **_: train_command(domain, 200),
+        "declared_outputs": ["out/<domain>/checkpoint", "out/<domain>/train log"],
         "max_seconds": 1800,
         "requires_approval": "budget_increase",
     },
     "sample": {
         "desc": "draw samples from the trained checkpoint",
-        "cmd": lambda domain, **_: [sys.executable, "-X", "utf8", "-m", "nanoscigpt.core.sampler",
-                                    "--domain", domain, "--max_new_tokens", "40", "--num_samples", "1"],
-        "declared_outputs": ["stdout samples"],
+        "cmd": sample_command,
+        "declared_outputs": ["stdout sample or representation preview"],
         "max_seconds": 300,
         "requires_approval": None,
-    },
-    "transfer_probe": {
-        "desc": "frozen-encoder probe: does our pretraining transfer? (protein only)",
-        "cmd": lambda domain, **_: [sys.executable, "-X", "utf8", "-m", "nanoscigpt.tasks.transfer_probe"],
-        "declared_outputs": ["out/transfer_probe/probe_results.json"],
-        "max_seconds": 600,
-        "requires_approval": None,
-        "domains": ["protein"],
     },
 }
 

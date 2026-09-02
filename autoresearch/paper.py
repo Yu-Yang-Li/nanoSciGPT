@@ -19,6 +19,8 @@ import json
 import re
 from pathlib import Path
 
+from nanoscigpt.classroom import RUNNABLE_DOMAINS
+
 
 class PaperWorkflow:
     """Rule-based paper pipeline over the persistent research state."""
@@ -132,8 +134,12 @@ class PaperWorkflow:
 
     # ---- stage 5: claim boundary ----------------------------------------------
     def boundary(self):
-        return (f"For domain '{self.domain}', we CAN claim: the loop ran end-to-end "
-                f"under tool contracts with formal evaluation. We CANNOT claim: any "
+        if self.state.data.get("next_action") == "stop":
+            ran_claim = ("the process ran under tool contracts until a formal stop "
+                         "condition, and the negative result was preserved")
+        else:
+            ran_claim = "the contracted steps ran with formal evaluation"
+        return (f"For domain '{self.domain}', we CAN claim: {ran_claim}. We CANNOT claim: any "
                 f"foundation-model capability; teaching data is {self._data_scale()}.")
 
     def _data_scale(self):
@@ -146,15 +152,18 @@ class PaperWorkflow:
                 if seqs.exists():
                     import numpy as np
                     n = int(np.load(seqs, allow_pickle=True).shape[0])
+                elif m.get("train_samples") is not None:
+                    n = int(m["train_samples"])
                 else:
                     n = "streaming"
-            return f"{n} sequences"
+            unit = "structured samples" if m.get("mode") == "structured" else "sequences"
+            return f"{n} {unit}"
         return "teaching fixtures only"
 
 
 def main():
     p = argparse.ArgumentParser(description="S3: paper/review/revision workflow")
-    p.add_argument("--domain", default="text", choices=["text", "dna", "protein", "smiles"])
+    p.add_argument("--domain", default="text", choices=RUNNABLE_DOMAINS)
     args = p.parse_args()
 
     from .state import ResearchState

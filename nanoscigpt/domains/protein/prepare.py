@@ -13,12 +13,42 @@ URL = "https://rest.uniprot.org/uniprotkb/search?query=reviewed:true&format=fast
 AA = "ACDEFGHIKLMNPQRSTVWY"
 
 
+def parse_fasta_sequences(path, max_len=0):
+    sequences = []
+    rejected = 0
+    current = []
+
+    def keep_current():
+        nonlocal rejected
+        if not current:
+            return
+        sequence = "".join(current).upper()
+        if not sequence or set(sequence) - set(AA):
+            rejected += 1
+            return
+        sequences.append(sequence[:max_len] if max_len else sequence)
+
+    for line in Path(path).read_text(encoding="utf-8").splitlines():
+        if line.startswith(">"):
+            keep_current()
+            current = []
+        else:
+            current.append(line.strip())
+    keep_current()
+    return sequences, rejected
+
+
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--data_root", default="data")
     p.add_argument("--out_dir", default=None)
     p.add_argument("--size", type=int, default=500)
-    p.add_argument("--max_len", type=int, default=128)
+    p.add_argument(
+        "--max_len",
+        type=int,
+        default=0,
+        help="optional preprocessing truncation; 0 keeps full sequences and trainer samples windows",
+    )
     args = p.parse_args()
 
     domain_dir = Path(args.out_dir) if args.out_dir else Path(args.data_root) / "protein"
@@ -28,18 +58,11 @@ def main():
         print(f"downloading {args.size} reviewed UniProt entries...")
         urllib.request.urlretrieve(URL.format(size=args.size), raw)
 
-    seqs = []
-    current = []
-    for line in raw.read_text(encoding="utf-8").splitlines():
-        if line.startswith(">"):
-            if current and 0 < len(current) <= args.max_len:
-                seqs.append("".join(current))
-            current = []
-        else:
-            current.append(line.strip())
-    if current and 0 < len(current) <= args.max_len:
-        seqs.append("".join(current))
-    print(f"parsed {len(seqs)} protein sequences (max_len={args.max_len})")
+    seqs, rejected = parse_fasta_sequences(raw, max_len=args.max_len)
+    print(
+        f"parsed {len(seqs)} canonical protein sequences "
+        f"(rejected={rejected}, max_len={args.max_len or 'full'})"
+    )
 
     tok = CharTokenizer(set(AA) | {"<pad>", "<eos>"})
     tok.save(domain_dir / "tokenizer.json")
@@ -57,7 +80,20 @@ def main():
     np.save(domain_dir / "train_seqs.npy", train_arr, allow_pickle=True)
     np.save(domain_dir / "val_seqs.npy", val_arr, allow_pickle=True)
     with open(domain_dir / "meta.json", "w") as f:
-        json.dump({"vocab_size": tok.vocab_size, "mode": "independent", "pad_id": pad_id}, f)
+        json.dump(
+            {
+                "vocab_size": tok.vocab_size,
+                "mode": "independent",
+                "pad_id": pad_id,
+                "source": URL.format(size=args.size),
+                "raw_sequences": len(seqs) + rejected,
+                "accepted_sequences": len(seqs),
+                "rejected_noncanonical": rejected,
+                "split": "source_order_90_10_teaching_only",
+                "long_sequence_handling": "random_window_at_training_time",
+            },
+            f,
+        )
     print(f"vocab={tok.vocab_size} train={split} val={n - split} -> {domain_dir}")
 
 

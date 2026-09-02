@@ -52,9 +52,11 @@ def main():
     p.add_argument("--out_dir", default="out/multihead")
     p.add_argument("--epochs", type=int, default=100)
     p.add_argument("--lr", type=float, default=1e-3)
+    p.add_argument("--seed", type=int, default=0)
     args = p.parse_args()
 
-    X, y_cls, y_reg = make_synthetic_tasks()
+    torch.manual_seed(args.seed)
+    X, y_cls, y_reg = make_synthetic_tasks(seed=args.seed)
     n_train = int(len(X) * 0.8)
     model = MultiTaskModel(vocab_size=10)
     opt = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=0.1)

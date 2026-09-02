@@ -12,10 +12,12 @@ Usage:
 import argparse
 from pathlib import Path
 
+from nanoscigpt.classroom import RUNNABLE_DOMAINS
+
 
 def main():
     p = argparse.ArgumentParser(description="Run the full S1->S2->S3 pipeline")
-    p.add_argument("--domain", default="text", choices=["text", "dna", "protein", "smiles"])
+    p.add_argument("--domain", default="text", choices=RUNNABLE_DOMAINS)
     p.add_argument("--fresh", action="store_true", help="reset research state first")
     p.add_argument("--auto_approve", action="store_true")
     args = p.parse_args()
@@ -35,12 +37,12 @@ def main():
         cmd = [sys.executable, "-X", "utf8"] + mod + ["--domain", args.domain]
         if args.auto_approve and needs_approval:
             cmd.append("--auto_approve")
-        print(f"\n{'='*60}\n[{name}]\n{'='*60}")
+        print(f"\n{'='*60}\n[{name}]\n{'='*60}", flush=True)
         r = subprocess.run(cmd, cwd=Path(__file__).resolve().parent.parent)
         if r.returncode != 0:
             raise SystemExit(f"{name} failed with code {r.returncode}")
 
-    print(f"\n{'='*60}\npipeline complete for domain '{args.domain}'\n{'='*60}")
+    print(f"\n{'='*60}\npipeline complete for domain '{args.domain}'\n{'='*60}", flush=True)
 
 
 if __name__ == "__main__":

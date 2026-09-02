@@ -1,0 +1,14 @@
+{
+  "mode": "structured",
+  "teaching_only": true,
+  "generator": "scripts/build_structured_fixtures.py",
+  "seed": 20260830,
+  "train_samples": 80,
+  "val_samples": 16,
+  "representation": "periodic_graph",
+  "pretraining": "masked atomic-number reconstruction",
+  "task_name": "unit-cell mass density proxy regression",
+  "task_type": "regression",
+  "sample_unit": "one periodic crystal cell",
+  "target_unit": "atomic-mass proxy per cubic angstrom"
+}

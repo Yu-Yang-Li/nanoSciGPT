@@ -18,6 +18,8 @@ import argparse
 import json
 from pathlib import Path
 
+from nanoscigpt.classroom import RUNNABLE_DOMAINS
+
 
 class HypothesisEngine:
     """Rule-based stand-in for AstroInsight's idea-generation pipeline."""
@@ -34,36 +36,46 @@ class HypothesisEngine:
         the actual token statistics of the domain corpus, so every idea is
         grounded in real numbers students can recompute.
         """
-        vocab = data_stats["vocab_size"]
+        vocab = data_stats.get("vocab_size")
+        representation = data_stats.get("representation")
         n_seq = data_stats["n_sequences"]
         mode = data_stats["mode"]
         ideas = []
 
-        # idea template A: compression / entropy angle
+        if vocab is not None:
+            data_description = f"vocab={vocab}, {n_seq} sequences, mode={mode}"
+            baseline_action = "the smallest causal LM can complete pretraining"
+            budget_start, budget_end = 100, 200
+        else:
+            data_description = f"representation={representation}, {n_seq} samples, mode={mode}"
+            baseline_action = "the smallest representation encoder can complete pretraining"
+            budget_start, budget_end = 10, 20
+
+        # Idea A: the first executable pretraining step.
         ideas.append({
             "id": "IDEA-A",
-            "text": (f"For domain '{self.domain}' (vocab={vocab}, {n_seq} sequences, "
-                     f"mode={mode}), a causal LM can compress the corpus below the "
-                     f"unigram entropy baseline, indicating exploitable sequence structure."),
-            "grounding": {"metric": "val_loss", "baseline": "unigram entropy"},
+            "text": (f"For domain '{self.domain}' ({data_description}), "
+                     f"{baseline_action} "
+                     f"and leave a validation-loss record and checkpoint."),
+            "grounding": {"metric": "val_loss", "baseline": "first evaluation"},
             "novelty": 2, "feasibility": 5,
         })
-        # idea template B: transfer angle
+        # Idea B: a single controlled change for the next round.
         ideas.append({
             "id": "IDEA-B",
-            "text": (f"Representations from a '{self.domain}' causal LM transfer to a "
-                     f"downstream probe and beat one-hot encoding, justifying a "
-                     f"foundation-model claim at teaching scale."),
-            "grounding": {"metric": "probe_acc", "baseline": "one-hot"},
+            "text": (f"For domain '{self.domain}', increasing the training budget from "
+                     f"{budget_start} to {budget_end} steps changes validation loss by at least 0.05 "
+                     f"when data and model settings stay fixed."),
+            "grounding": {"metric": "loss_gain_vs_v0", "baseline": "0.05"},
             "novelty": 3, "feasibility": 4,
         })
-        # idea template C: the honest negative (the most valuable idea in class)
+        # Idea C: the alternative the loop can test after the budget check.
         ideas.append({
             "id": "IDEA-C",
-            "text": (f"At {n_seq} sequences the pretraining gain is too small to support "
-                     f"any foundation-model claim; the correct route is a specialized "
-                     f"model, and the negative result is the finding."),
-            "grounding": {"metric": "transfer_delta", "baseline": "0"},
+            "text": (f"For domain '{self.domain}', if the budget-only change stays below "
+                     f"0.05, the next run should keep the budget fixed and change one "
+                     f"data or context setting."),
+            "grounding": {"metric": "next_single_factor_test", "baseline": "current run"},
             "novelty": 4, "feasibility": 5,
         })
         return ideas
@@ -78,7 +90,7 @@ class HypothesisEngine:
         refinement loop.
         """
         for idea in ideas:
-            vagueness = 2 if "foundation-model claim" in idea["text"] and idea["novelty"] < 4 else 0
+            vagueness = 1 if "should" in idea["text"] and idea["novelty"] < 4 else 0
             score = idea["novelty"] + idea["feasibility"] - vagueness
             idea["critique_score"] = score
             idea["history"] = idea.get("history", [])
@@ -145,13 +157,18 @@ def load_data_stats(domain):
             # streaming domain: report total tokens instead
             n_seq = (root / "train.bin").stat().st_size // 2  # uint16 tokens
             meta["data_unit"] = "tokens"
+        elif (root / "fixture.npz").exists():
+            import numpy as np
+            with np.load(root / "fixture.npz") as fixture:
+                n_seq = int(len(fixture["train_y"]))
+            meta["data_unit"] = "structured samples"
         meta["n_sequences"] = n_seq
     return meta
 
 
 def main():
     p = argparse.ArgumentParser(description="S1: hypothesis generation (AstroInsight-style)")
-    p.add_argument("--domain", default="text", choices=["text", "dna", "protein", "smiles"])
+    p.add_argument("--domain", default="text", choices=RUNNABLE_DOMAINS)
     p.add_argument("--refine_rounds", type=int, default=2)
     p.add_argument("--auto_approve", action="store_true",
                    help="simulate the human expert gate in classroom mode")
@@ -163,8 +180,13 @@ def main():
 
     print(f"[S1 hypothesis] domain={args.domain}")
     stats = load_data_stats(args.domain)
-    print(f"  data grounding: vocab={stats.get('vocab_size')}, "
-          f"sequences={stats.get('n_sequences', 'stream')}, mode={stats.get('mode')}")
+    descriptor = (
+        f"vocab={stats['vocab_size']}"
+        if stats.get("vocab_size") is not None
+        else f"representation={stats.get('representation')}"
+    )
+    print(f"  data grounding: {descriptor}, "
+          f"samples={stats.get('n_sequences', 'stream')}, mode={stats.get('mode')}")
 
     engine = HypothesisEngine(args.domain, st)
     ideas = engine.conceive(stats)

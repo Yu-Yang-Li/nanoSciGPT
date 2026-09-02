@@ -1,0 +1,15 @@
+{
+  "mode": "structured",
+  "teaching_only": true,
+  "generator": "scripts/build_structured_fixtures.py",
+  "seed": 20260830,
+  "train_samples": 80,
+  "val_samples": 16,
+  "representation": "spatiotemporal_patches",
+  "pretraining": "masked patch reconstruction",
+  "task_name": "advection speed teaching regression",
+  "task_type": "regression",
+  "sample_unit": "four 16x16 scalar-field frames",
+  "target_unit": "grid units per frame",
+  "patch_size": 4
+}

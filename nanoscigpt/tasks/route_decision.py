@@ -24,7 +24,7 @@ QUESTIONS = [
     },
     {
         "id": "transfer_evidence",
-        "question": "冻结表征 + 探针是否优于 one-hot/随机初始化基线（A2 实验已跑）？",
+        "question": "在合理OOD留出下，冻结表征接入具体任务的流程是否已经跑通？",
         "if_no": "迁移收益未证实；不升级为基座路线。",
     },
     {

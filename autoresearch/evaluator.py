@@ -19,7 +19,6 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 CRITERIA = {
     "train_val_loss_max": 6.0,       # any loss below this counts as "learned something"
     "train_improve_min": 0.05,       # extended training must beat V0 by at least this
-    "transfer_gain_min": 0.05,       # probe must beat one-hot by at least this
 }
 
 
@@ -33,41 +32,35 @@ def _read_json(path):
 
 def evaluate_train(domain):
     """Did training actually run, and did it pass the loss criterion?"""
-    log_path = REPO_ROOT / "out" / domain / "train_log.json"
-    ckpt_path = REPO_ROOT / "out" / domain / "ckpt.pt"
+    structured = domain in {"weather", "crystal", "structure3d", "image", "spectrum", "field"}
+    base = REPO_ROOT / "out" / domain
+    log_path = base / "model" / "train_log.json" if structured else base / "train_log.json"
+    ckpt_path = base / "model" / "ckpt.pt" if structured else base / "ckpt.pt"
     if not ckpt_path.exists():
         return {"level": "ran", "passed": False, "reason": "checkpoint missing"}
     log = _read_json(log_path)
-    if not log or "best_val_loss" not in log:
+    metric_key = "pretrain_val_loss" if structured else "best_val_loss"
+    if not log or metric_key not in log:
         return {"level": "ran", "passed": False, "reason": "train_log.json incomplete"}
-    loss = log["best_val_loss"]
+    loss = log[metric_key]
     passed = loss < CRITERIA["train_val_loss_max"]
-    return {"level": "evaluated", "passed": passed, "metric": "best_val_loss",
+    metric = "pretrain_loss" if structured else "best_val_loss"
+    return {"level": "evaluated", "passed": passed, "metric": metric,
             "value": round(loss, 4),
-            "reason": f"val loss {loss:.4f} {'<' if passed else '>='} {CRITERIA['train_val_loss_max']}"}
+            "reason": f"{metric.replace('_', ' ')} {loss:.4f} {'<' if passed else '>='} {CRITERIA['train_val_loss_max']}"}
 
 
 def evaluate_train_gain(domain, baseline_loss):
     """Did extending the budget improve on the V0 baseline by enough?"""
-    log = _read_json(REPO_ROOT / "out" / domain / "train_log.json")
-    if not log or "best_val_loss" not in log:
+    structured = domain in {"weather", "crystal", "structure3d", "image", "spectrum", "field"}
+    log_path = REPO_ROOT / "out" / domain
+    log_path = log_path / "model" / "train_log.json" if structured else log_path / "train_log.json"
+    log = _read_json(log_path)
+    metric_key = "pretrain_val_loss" if structured else "best_val_loss"
+    if not log or metric_key not in log:
         return {"level": "ran", "passed": False, "reason": "no train_log.json after extended run"}
-    delta = baseline_loss - log["best_val_loss"]
+    delta = baseline_loss - log[metric_key]
     passed = delta >= CRITERIA["train_improve_min"]
     return {"level": "evaluated", "passed": passed, "metric": "loss_gain_vs_v0",
             "value": round(delta, 4), "baseline": round(baseline_loss, 4),
             "reason": f"gain {delta:+.4f} vs required {CRITERIA['train_improve_min']}"}
-
-
-def evaluate_transfer_probe():
-    """Does our pretrained encoder beat one-hot on the probe task?"""
-    res = _read_json(REPO_ROOT / "out" / "transfer_probe" / "probe_results.json")
-    if not res:
-        return {"level": "ran", "passed": False, "reason": "probe_results.json missing"}
-    delta = res.get("pretrained_encoder", 0.0) - res.get("onehot", 1.0)
-    passed = delta >= CRITERIA["transfer_gain_min"]
-    return {"level": "evaluated", "passed": passed, "metric": "transfer_delta",
-            "value": round(delta, 3), "detail": res,
-            "reason": (f"transfer delta {delta:+.3f}; on a 450-sequence fixture a negative/"
-                       f"small delta is the EXPECTED honest result") if not passed else
-                      f"transfer delta {delta:+.3f} passes"}

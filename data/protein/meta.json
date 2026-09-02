@@ -1,1 +1,1 @@
-{"vocab_size": 22, "mode": "independent", "pad_id": 1}
+{"vocab_size": 22, "mode": "independent", "pad_id": 1, "source": "https://rest.uniprot.org/uniprotkb/search?query=reviewed:true&format=fasta&size=500", "raw_sequences": 500, "accepted_sequences": 500, "rejected_noncanonical": 0, "split": "source_order_90_10_teaching_only", "long_sequence_handling": "random_window_at_training_time"}

@@ -41,8 +41,13 @@ class IndependentSequenceDataset:
         y = torch.full((len(batch), T), -1, dtype=torch.long)
         pad_mask = torch.ones((len(batch), T), dtype=torch.bool)
         for j, seq in enumerate(batch):
-            n = min(len(seq), T)
-            x[j, :n] = torch.from_numpy(seq[:n].astype(np.int64))
-            y[j, : n - 1] = torch.from_numpy(seq[1:n].astype(np.int64))
-            pad_mask[j, :n] = False
+            max_start = max(0, len(seq) - (T + 1))
+            start = np.random.randint(0, max_start + 1) if max_start else 0
+            window = seq[start : start + T + 1].astype(np.int64)
+            input_length = min(len(window), T)
+            target_length = min(max(0, len(window) - 1), T)
+            x[j, :input_length] = torch.from_numpy(window[:input_length])
+            if target_length:
+                y[j, :target_length] = torch.from_numpy(window[1 : target_length + 1])
+            pad_mask[j, :input_length] = False
         return x.to(device), y.to(device), pad_mask.to(device)

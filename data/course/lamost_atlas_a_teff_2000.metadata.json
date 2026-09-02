@@ -1,0 +1,16 @@
+{
+  "source": "ATLAS empirical stellar library and catalogs",
+  "source_url": "https://nadc.china-vo.org/res/r101205/",
+  "input_files": 2000,
+  "catalog_rows": 5584,
+  "catalog_rows_without_matching_file": 54,
+  "wavelength_min_angstrom": 3800.0,
+  "wavelength_max_angstrom": 8700.0,
+  "original_pixels": 4901,
+  "rebinned_features": 128,
+  "normalization": "divide each spectrum by its median flux over 5000-8000 Angstrom",
+  "target": "Teff_sed",
+  "teff_min": 3348.477173495428,
+  "teff_max": 49856.206552656506,
+  "teaching_boundary": "ATLAS-A contains directly observed spectra, but a random holdout within one library still does not establish transfer to another survey, SNR regime, or parameter range."
+}
