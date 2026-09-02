@@ -1,6 +1,6 @@
 ---
 name: nanoscigpt-scientific-language
-description: Use when a student wants to understand or run nanoGPT-style pretraining and fine-tuning on text, protein, DNA, SMILES, weather, crystal, 3D structure, image, spectrum, or physical-field data in the nanoSciGPT repository.
+description: Use when a student wants to turn protein, DNA, molecule, weather, crystal, 3D structure, image, spectrum, or physical-field data into a small runnable scientific pretraining lesson in the nanoSciGPT repository.
 metadata:
   short-description: 从语言模型走到科学数据预训练
 ---
@@ -15,13 +15,13 @@ metadata:
 
 > 你想先试哪一种数据？可以说蛋白质、DNA、分子、天气、晶体、三维结构、图像、光谱或连续物理场。
 
-蛋白质适合教师贯穿讲解，但不是默认答案。学生只是想理解语言模型预训练时，可以先运行 `text`；已经选好科学对象时，可以直接进入相应示例。
+蛋白质适合教师贯穿讲解，但不是默认答案。学生还只想理解文本语言模型时，交给 `nanogpt-pretraining`；已经选好科学对象时，直接进入相应示例。
 
 ## 把“科学语言”说具体
 
 运行以前，先用学生熟悉的话说明三件事：模型一次读什么单位、哪些关系不能被打散、训练时让它猜什么。例如蛋白质是氨基酸及其前后联系，天气是相邻网格和时间变化，光谱是连续波长上的谱线形状。这里的“语言”指可学习的排列与关系，不等于所有科学数据都要强行变成文字。
 
-仓库提供十个离线样例：`text`、`protein`、`dna`、`smiles`、`weather`、`crystal`、`structure3d`、`image`、`spectrum`、`field`。先在仓库根目录运行：
+仓库提供九个科学数据样例：`protein`、`dna`、`smiles`、`weather`、`crystal`、`structure3d`、`image`、`spectrum`、`field`。先在仓库根目录运行预检；列表中的 `text` 留给 nanoGPT 热身：
 
 ```powershell
 python -m nanoscigpt.classroom --list
@@ -37,7 +37,7 @@ python -m nanoscigpt.classroom --domain protein --profile classroom --out_root o
 
 ## 怎样读运行结果
 
-一轮训练以后，先看 `out/classroom/<domain>/run_report.json`，再看 `downstream_result.json`。用两句话把两段训练分开：
+一轮训练以后，先看 `out/classroom/<domain>/run_report.json`，再沿其中的路径看训练记录、生成样例或表示预览，以及 `downstream_result.json`。用两句话把两段训练分开：
 
 - 预训练结果说明模型是否学会了当前数据中的常见关系；
 - 下游结果说明这些表示是否能被一个具体任务使用。当前课程示例冻结预训练表示，只训练一个简单任务头；只有继续更新预训练模型参数时才称为微调。

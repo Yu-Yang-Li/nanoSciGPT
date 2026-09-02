@@ -154,12 +154,18 @@ def run_command(command, cwd):
     return completed
 
 
-def run_domain(domain, profile, data_root, out_root, cwd=None):
+def run_domain(domain, profile, data_root, out_root, cwd=None, overwrite=False):
     if profile not in CPU_PROFILES:
         raise ValueError(f"unknown profile={profile}; choose from {tuple(CPU_PROFILES)}")
     settings = CPU_PROFILES[profile]
     data_root = Path(data_root).resolve()
     out_dir = Path(out_root).resolve() / domain
+    report_path = out_dir / "run_report.json"
+    if report_path.exists() and not overwrite:
+        raise FileExistsError(
+            f"finished classroom run already exists: {report_path}; "
+            "choose another --out_root or pass --overwrite"
+        )
     model_dir = out_dir / "model"
     downstream_dir = out_dir / "downstream"
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -186,6 +192,7 @@ def run_domain(domain, profile, data_root, out_root, cwd=None):
         run_command(command, cwd)
         report = {
             "status": "completed",
+            "lesson_stage": "nanoscigpt",
             "domain": domain,
             "profile": profile,
             "device": settings["device"],
@@ -200,7 +207,6 @@ def run_domain(domain, profile, data_root, out_root, cwd=None):
             },
             "commands": [[str(part) for part in command]],
         }
-        report_path = out_dir / "run_report.json"
         report_path.write_text(
             json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8"
         )
@@ -255,7 +261,9 @@ def run_domain(domain, profile, data_root, out_root, cwd=None):
         "--max_new_tokens",
         settings["max_new_tokens"],
     ]
-    run_command(sampler_command, cwd)
+    sampler_result = run_command(sampler_command, cwd)
+    samples_path = model_dir / "samples.txt"
+    samples_path.write_text(sampler_result.stdout, encoding="utf-8")
 
     commands = [trainer_command, sampler_command]
     downstream_command = [
@@ -281,6 +289,7 @@ def run_domain(domain, profile, data_root, out_root, cwd=None):
 
     report = {
         "status": "completed",
+        "lesson_stage": "nanogpt" if domain == "text" else "nanoscigpt",
         "domain": domain,
         "profile": profile,
         "device": settings["device"],
@@ -290,11 +299,11 @@ def run_domain(domain, profile, data_root, out_root, cwd=None):
         "artifacts": {
             "checkpoint": str(model_dir / "ckpt.pt"),
             "train_log": str(model_dir / "train_log.json"),
+            "samples": str(samples_path),
             "downstream": str(downstream_dir / "downstream_result.json"),
         },
         "commands": [[str(part) for part in command] for command in commands],
     }
-    report_path = out_dir / "run_report.json"
     report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"classroom run completed: {domain} -> {report_path}", flush=True)
     return report
@@ -324,6 +333,9 @@ def main():
     parser.add_argument("--profile", choices=tuple(CPU_PROFILES), default=DEFAULT_PROFILE)
     parser.add_argument("--data_root", default="data")
     parser.add_argument("--out_root", default="out/classroom")
+    parser.add_argument(
+        "--overwrite", action="store_true", help="replace a finished run in the target directory"
+    )
     parser.add_argument("--list", action="store_true", help="show only choices that are ready")
     args = parser.parse_args()
 
@@ -336,7 +348,16 @@ def main():
         )
     domains = RUNNABLE_DOMAINS if args.domain == "all" else (args.domain,)
     for domain in domains:
-        run_domain(domain, args.profile, args.data_root, args.out_root)
+        try:
+            run_domain(
+                domain,
+                args.profile,
+                args.data_root,
+                args.out_root,
+                overwrite=args.overwrite,
+            )
+        except FileExistsError as error:
+            parser.error(str(error))
 
 
 if __name__ == "__main__":

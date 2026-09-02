@@ -263,6 +263,8 @@ def run_structured(domain, data_root, out_dir, pretrain_steps=20, task_steps=20,
         "target_unit": meta["target_unit"],
         "train_samples": int(meta["train_samples"]),
         "val_samples": int(meta["val_samples"]),
+        "encoder_frozen": True,
+        "pretrained_parameters_updated": False,
         "teaching_only": True,
     }
     result_path = downstream_dir / "downstream_result.json"

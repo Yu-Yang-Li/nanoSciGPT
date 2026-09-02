@@ -240,6 +240,8 @@ def run_downstream(domain, ckpt_path, data_root, out_dir, epochs=20, max_samples
         "metric_value": metric_value,
         "train_samples": len(train_sequences),
         "val_samples": len(val_sequences),
+        "encoder_frozen": True,
+        "pretrained_parameters_updated": False,
         "teaching_only": True,
     }
     out_dir = Path(out_dir)

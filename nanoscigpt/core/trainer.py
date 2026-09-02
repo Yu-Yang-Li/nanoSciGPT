@@ -56,6 +56,7 @@ def main():
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=0.1)
 
     best_val = float("inf")
+    history = []
     t0 = time.time()
     for it in range(args.max_iters + 1):
         if it % args.eval_interval == 0 or it == args.max_iters:
@@ -71,6 +72,13 @@ def main():
                     losses.append(sum(ls) / len(ls))
             model.train()
             print(f"iter {it}: train {losses[0]:.4f} val {losses[1]:.4f} ({time.time()-t0:.1f}s)")
+            history.append(
+                {
+                    "iter": it,
+                    "train_loss": round(losses[0], 6),
+                    "val_loss": round(losses[1], 6),
+                }
+            )
             if losses[1] < best_val:
                 best_val = losses[1]
                 torch.save({"model": model.state_dict(), "model_args": vars(config), "iter_num": it, "best_val_loss": best_val, "domain": args.domain}, out_dir / "ckpt.pt")
@@ -83,8 +91,19 @@ def main():
         torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
         optimizer.step()
 
-    with open(out_dir / "train_log.json", "w") as f:
-        json.dump({"best_val_loss": best_val, "iters": args.max_iters, "domain": args.domain}, f)
+    with open(out_dir / "train_log.json", "w", encoding="utf-8") as f:
+        json.dump(
+            {
+                "domain": args.domain,
+                "pretraining": "next_token_prediction",
+                "iters": args.max_iters,
+                "best_val_loss": best_val,
+                "history": history,
+            },
+            f,
+            ensure_ascii=False,
+            indent=2,
+        )
     print(f"done: best val loss {best_val:.4f} -> {out_dir/'ckpt.pt'}")
 
 

@@ -138,6 +138,53 @@ def test_classroom_list_only_offers_domains_that_pass_preflight():
         assert f"{domain}: ready" in completed.stdout
 
 
+def test_text_lesson_keeps_training_history_sample_and_task_head_identity(tmp_path):
+    from nanoscigpt.classroom import run_domain
+
+    report = run_domain("text", "smoke", DATA_ROOT, tmp_path, cwd=ROOT)
+    model_dir = tmp_path / "text" / "model"
+    train_log = json.loads((model_dir / "train_log.json").read_text(encoding="utf-8"))
+    task = json.loads(
+        (tmp_path / "text" / "downstream" / "downstream_result.json").read_text(
+            encoding="utf-8"
+        )
+    )
+
+    assert report["lesson_stage"] == "nanogpt"
+    assert len(train_log["history"]) >= 2
+    assert {"iter", "train_loss", "val_loss"} <= set(train_log["history"][0])
+    assert (model_dir / "samples.txt").is_file()
+    assert report["artifacts"]["samples"].endswith("samples.txt")
+    assert task["encoder_frozen"] is True
+    assert task["pretrained_parameters_updated"] is False
+
+
+def test_scientific_lesson_names_its_stage_and_frozen_encoder(tmp_path):
+    from nanoscigpt.classroom import run_domain
+
+    report = run_domain("weather", "smoke", DATA_ROOT, tmp_path, cwd=ROOT)
+    task = json.loads(
+        (tmp_path / "weather" / "downstream" / "downstream_result.json").read_text(
+            encoding="utf-8"
+        )
+    )
+
+    assert report["lesson_stage"] == "nanoscigpt"
+    assert task["encoder_frozen"] is True
+    assert task["pretrained_parameters_updated"] is False
+
+
+def test_classroom_refuses_to_silently_overwrite_a_finished_run(tmp_path):
+    from nanoscigpt.classroom import run_domain
+
+    finished = tmp_path / "protein" / "run_report.json"
+    finished.parent.mkdir(parents=True)
+    finished.write_text("{}", encoding="utf-8")
+
+    with pytest.raises(FileExistsError, match="--overwrite"):
+        run_domain("protein", "smoke", DATA_ROOT, tmp_path, cwd=ROOT)
+
+
 @pytest.mark.parametrize(
     ("domain", "representation", "task_type"),
     [
