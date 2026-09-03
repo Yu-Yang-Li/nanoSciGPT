@@ -40,7 +40,7 @@ def completed_autoresearch(tmp_path_factory):
     return autoresearch_root / "text"
 
 
-def _run_v1(autoresearch_dir, out_dir, mode):
+def _run_v1(autoresearch_dir, out_dir, mode, *extra):
     return subprocess.run(
         [
             sys.executable,
@@ -53,6 +53,7 @@ def _run_v1(autoresearch_dir, out_dir, mode):
             "--out-dir",
             str(out_dir),
             mode,
+            *extra,
         ],
         cwd=ROOT,
         capture_output=True,
@@ -161,3 +162,31 @@ def test_v1_cli_help_is_domain_neutral():
     )
     assert completed.returncode == 0
     assert "AI Scientist v1 classroom workflow" in completed.stdout
+
+
+def test_v1_refuses_to_overwrite_completed_workflow_without_explicit_flag(
+    completed_autoresearch, tmp_path
+):
+    out_dir = tmp_path / "v1"
+    first = _run_v1(completed_autoresearch, out_dir, "--confirm-plan")
+    assert first.returncode == 0, first.stdout + first.stderr
+    original = (out_dir / "workflow_state.json").read_text(encoding="utf-8")
+
+    repeated = _run_v1(completed_autoresearch, out_dir, "--confirm-plan")
+
+    assert repeated.returncode == 2
+    assert "--overwrite" in repeated.stderr
+    assert (out_dir / "workflow_state.json").read_text(encoding="utf-8") == original
+
+
+def test_v1_can_confirm_an_unchanged_plan_in_the_same_directory(
+    completed_autoresearch, tmp_path
+):
+    out_dir = tmp_path / "v1"
+    planned = _run_v1(completed_autoresearch, out_dir, "--plan-only")
+    assert planned.returncode == 0, planned.stdout + planned.stderr
+
+    confirmed = _run_v1(completed_autoresearch, out_dir, "--confirm-plan")
+
+    assert confirmed.returncode == 0, confirmed.stdout + confirmed.stderr
+    assert (out_dir / "workflow_state.json").is_file()

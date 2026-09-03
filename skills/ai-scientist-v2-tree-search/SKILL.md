@@ -37,6 +37,8 @@ python -m autoresearch.v2 status --state out/ai-scientist-v2/[领域]/tree_state
 
 `tree_state.json` 记录每条路线的状态和执行次数。已完成的路线不会再次执行。
 
+如果训练进程没有启动、返回非零、缺少训练记录或缺少原评价指标，路线会写成 `failed`，并把原因记入该路线的 `run_report.json`。此时先读失败原因和标准输出，不把失败路线当作已完成结果；修正后建立新的输出目录再运行。
+
 ## 最后取舍
 
 ```powershell

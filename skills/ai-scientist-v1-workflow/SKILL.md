@@ -21,6 +21,8 @@ python -m autoresearch.v1 --domain protein --autoresearch-dir out/autoresearch/p
 
 查看 `plan.json` 和 `related_work.json`。相关工作来自仓库内已经列明来源的课程目录，`novelty_assessment` 固定为 `not_performed_offline`；它提供阅读入口，不代表完成新颖性检索。
 
+如果输出目录里已经有一份完成的研究材料，先请学生换一个新目录。确实要重做时才显式加入 `--overwrite`；该选项只替换本工作流生成的文件。由 `--plan-only` 生成且内容未变的计划，可以在同一目录继续 `--confirm-plan`。
+
 ## 确认路线以后整理结果
 
 学生确认这条路线后运行：

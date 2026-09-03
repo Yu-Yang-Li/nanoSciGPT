@@ -150,25 +150,14 @@ def run_next(state_path: Path, approved: bool) -> int:
     atomic_write_json(state_path, state)
 
     node_dir.mkdir(parents=True, exist_ok=True)
-    completed = subprocess.run(
-        run_spec["command"],
-        cwd=Path(__file__).resolve().parent.parent,
-        capture_output=True,
-        text=True,
-        encoding="utf-8",
-        errors="replace",
-    )
-    (node_dir / "stdout.txt").write_text(completed.stdout, encoding="utf-8")
-    (node_dir / "stderr.txt").write_text(completed.stderr, encoding="utf-8")
     report_path = (node_dir / "run_report.json").resolve()
     report = {
-        "status": "completed" if completed.returncode == 0 else "failed",
+        "status": "running",
         "domain": state["domain"],
         "route_id": node_id,
         "baseline_run": baseline["report_path"],
         "command": run_spec["command"],
         "change": node["change"],
-        "returncode": completed.returncode,
         "artifacts": {
             "model_dir": str(run_spec["model_dir"].resolve()),
             "train_log": str(run_spec["train_log"].resolve()),
@@ -176,30 +165,74 @@ def run_next(state_path: Path, approved: bool) -> int:
             "stderr": str((node_dir / "stderr.txt").resolve()),
         },
     }
-    if completed.returncode == 0 and run_spec["train_log"].is_file():
-        log = read_json(run_spec["train_log"])
-        metric = baseline["primary_metric"]
-        candidate = float(log[metric])
-        evaluation = evaluate_loss_gain(
-            baseline["baseline_value"],
-            candidate,
-            state["root"]["evaluator"]["minimum_delta"],
+
+    failure = None
+    exit_code = 1
+    try:
+        completed = subprocess.run(
+            run_spec["command"],
+            cwd=Path(__file__).resolve().parent.parent,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
         )
-        report["primary_metric"] = metric
-        report["primary_metric_value"] = candidate
-        report["evaluation"] = evaluation
-        node["status"] = "completed"
-        node["evaluation"] = evaluation
-    else:
+        (node_dir / "stdout.txt").write_text(completed.stdout, encoding="utf-8")
+        (node_dir / "stderr.txt").write_text(completed.stderr, encoding="utf-8")
+        report["returncode"] = completed.returncode
+        if completed.returncode != 0:
+            failure = {
+                "kind": "training_failed",
+                "message": f"training command returned {completed.returncode}",
+            }
+        elif not run_spec["train_log"].is_file():
+            failure = {
+                "kind": "missing_artifact",
+                "message": "training finished without train_log.json",
+            }
+        else:
+            log = read_json(run_spec["train_log"])
+            metric = baseline["primary_metric"]
+            if metric not in log:
+                failure = {
+                    "kind": "missing_metric",
+                    "message": f"train_log.json has no {metric}",
+                }
+            else:
+                candidate = float(log[metric])
+                evaluation = evaluate_loss_gain(
+                    baseline["baseline_value"],
+                    candidate,
+                    state["root"]["evaluator"]["minimum_delta"],
+                )
+                report["primary_metric"] = metric
+                report["primary_metric_value"] = candidate
+                report["evaluation"] = evaluation
+                report["status"] = "completed"
+                node["status"] = "completed"
+                node["evaluation"] = evaluation
+                exit_code = 0
+    except KeyboardInterrupt:
+        failure = {"kind": "interrupted", "message": "training was interrupted"}
+        exit_code = 130
+    except (OSError, ValueError, KeyError, json.JSONDecodeError) as error:
+        failure = {"kind": "process_error", "message": str(error)}
+
+    if failure is not None:
+        report["status"] = "failed"
+        report["failure"] = failure
         node["status"] = "failed"
-        node["failure"] = "training failed or train_log.json is missing"
+        node["failure"] = failure
     atomic_write_json(report_path, report)
     node["run_report"] = str(report_path)
     state["frontier"] = frontier[1:]
-    state["next_action"] = "decide" if not state["frontier"] else "run-next"
+    if node["status"] == "failed":
+        state["next_action"] = "inspect_failure"
+    else:
+        state["next_action"] = "decide" if not state["frontier"] else "run-next"
     atomic_write_json(state_path, state)
     print(f"{node_id} -> {report_path}")
-    return 0 if node["status"] == "completed" else 1
+    return exit_code
 
 
 def status_text(state: dict) -> str:

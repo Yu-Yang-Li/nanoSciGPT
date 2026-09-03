@@ -142,3 +142,58 @@ def test_v2_cli_help_is_available():
     completed = _run("--help")
     assert completed.returncode == 0
     assert "AI Scientist v2 classroom tree" in completed.stdout
+
+
+def test_v2_records_subprocess_exception_as_failed_state(
+    completed_v1, tmp_path, monkeypatch
+):
+    from autoresearch import v2
+
+    state_path = v2.init_tree(completed_v1, tmp_path / "v2")
+
+    def fail_to_start(*args, **kwargs):
+        raise OSError("training process could not start")
+
+    monkeypatch.setattr(v2.subprocess, "run", fail_to_start)
+
+    result = v2.run_next(state_path, approved=True)
+
+    assert result == 1
+    state = json.loads(state_path.read_text(encoding="utf-8"))
+    route = state["nodes"]["route-2"]
+    assert route["status"] == "failed"
+    assert route["attempts"] == 1
+    assert route["failure"]["kind"] == "process_error"
+    assert state["frontier"] == []
+    assert state["next_action"] == "inspect_failure"
+    report = json.loads(Path(route["run_report"]).read_text(encoding="utf-8"))
+    assert report["status"] == "failed"
+
+
+def test_v2_records_missing_metric_as_failed_state(
+    completed_v1, tmp_path, monkeypatch
+):
+    from autoresearch import v2
+
+    state_path = v2.init_tree(completed_v1, tmp_path / "v2")
+
+    def finish_without_metric(command, **kwargs):
+        options = v2.command_options(command)
+        model_dir = Path(options["out_dir"])
+        model_dir.mkdir(parents=True, exist_ok=True)
+        (model_dir / "train_log.json").write_text(
+            json.dumps({"some_other_metric": 1.0}), encoding="utf-8"
+        )
+        return subprocess.CompletedProcess(command, 0, stdout="done", stderr="")
+
+    monkeypatch.setattr(v2.subprocess, "run", finish_without_metric)
+
+    result = v2.run_next(state_path, approved=True)
+
+    assert result == 1
+    state = json.loads(state_path.read_text(encoding="utf-8"))
+    route = state["nodes"]["route-2"]
+    assert route["status"] == "failed"
+    assert route["failure"]["kind"] == "missing_metric"
+    assert state["frontier"] == []
+    assert state["next_action"] == "inspect_failure"
