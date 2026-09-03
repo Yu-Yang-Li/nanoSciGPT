@@ -79,7 +79,7 @@ def validate_manifest_files(domain, data_root):
     return entry
 
 
-def validate_domain_data(domain, data_root="data"):
+def validate_domain_data(domain, data_root="data", required_block_size=None):
     if domain not in RUNNABLE_DOMAINS:
         raise ValueError(f"unknown classroom domain: {domain}")
     data_root = Path(data_root)
@@ -88,7 +88,9 @@ def validate_domain_data(domain, data_root="data"):
         from .tasks.structured_demo import validate_structured_fixture
 
         report = validate_structured_fixture(domain, data_root)
-        report["source_name"] = manifest_entry.get("source_name") if manifest_entry else None
+        if manifest_entry:
+            report["source_name"] = manifest_entry.get("source_name")
+            report["source_kind"] = get_domain_spec(domain).source_kind
         return report
     data_dir = data_root / domain
     meta_path = data_dir / "meta.json"
@@ -105,6 +107,17 @@ def validate_domain_data(domain, data_root="data"):
         train = np.memmap(train_path, dtype=np.uint16, mode="r")
         val = np.memmap(val_path, dtype=np.uint16, mode="r")
         train_items, val_items = len(train), len(val)
+        if required_block_size is not None:
+            for split_name, item_count in (
+                ("training", train_items),
+                ("validation", val_items),
+            ):
+                if item_count <= required_block_size:
+                    raise ValueError(
+                        f"{domain} {split_name} stream has {item_count} tokens; "
+                        f"the selected profile needs more than {required_block_size}. "
+                        "Add more source data or choose a smaller profile."
+                    )
         max_token = max(int(train.max()), int(val.max()))
     elif mode == "independent":
         train_path = data_dir / "train_seqs.npy"
@@ -191,7 +204,11 @@ def run_domain(
     downstream_dir = out_dir / "downstream"
     out_dir.mkdir(parents=True, exist_ok=True)
     cwd = Path(cwd or Path.cwd()).resolve()
-    preflight = validate_domain_data(domain, data_root)
+    preflight = validate_domain_data(
+        domain,
+        data_root,
+        required_block_size=settings["block_size"],
+    )
     started = time.perf_counter()
 
     if domain in STRUCTURED_DOMAINS:

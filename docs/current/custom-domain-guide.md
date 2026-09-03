@@ -11,8 +11,9 @@
 | 蛋白质FASTA | `nanoscigpt.domains.protein.prepare --fasta` | 可在自有序列上预训练；无功能标签时运行课程命令需加`--skip-downstream` |
 | DNA FASTA | `nanoscigpt.domains.dna.prepare --fasta` | 可在自有序列上预训练；无目标标签时可加`--skip-downstream` |
 | SMILES CSV | `nanoscigpt.domains.smiles.prepare --csv` | 可在自有分子字符串上预训练；ESOL水溶解度标签不会自动借给用户数据 |
+| 天气/图像/光谱/连续场/三维点集NPZ | `nanoscigpt-prepare-structured` | 需提供`train_x/val_x/train_y/val_y`；当前下游为回归 |
 
-天气网格、晶体、三维结构、图像、光谱和连续物理场目前仍只提供内置教学夹具。学生自己的这些数据需按下列五个接口接入，不能直接套用内置样例的结果。
+晶体的周期邻域和原子掩码合同仍需单独接入。学生数据不满足上述现成格式时，需按下列五个接口实现，不能直接套用内置样例的结果。
 
 ## 五个必需接口
 

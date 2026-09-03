@@ -56,6 +56,9 @@ def test_scientific_language_skill_can_use_student_protein_fasta_without_overcla
     assert "nanoscigpt.domains.smiles.prepare --csv" in skill
     assert "ESOL" in skill
     assert "先只做预训练" in skill
+    assert "nanoscigpt.prepare_structured" in skill
+    assert "train_x" in skill
+    assert "val_y" in skill
 
 
 def test_autoresearch_model_iteration_is_packaged_as_its_own_lesson():

@@ -57,6 +57,9 @@ def validate_structured_fixture(domain, data_root="data"):
         "val_items": val_items,
         "task_name": meta["task_name"],
         "data_dir": str(data_dir.resolve()),
+        "source_name": meta.get("source"),
+        "source_kind": meta.get("source_kind", "generated_fixture"),
+        "teaching_only": bool(meta.get("teaching_only", True)),
     }
 
 
@@ -254,7 +257,9 @@ def run_structured(domain, data_root, out_dir, pretrain_steps=20, task_steps=20,
         "domain": domain,
         "task_name": meta["task_name"],
         "task_type": meta["task_type"],
-        "label_source": "recorded parameter from deterministic teaching generator",
+        "label_source": meta.get(
+            "label_source", "recorded parameter from deterministic teaching generator"
+        ),
         "metric_name": "mae",
         "metric_value": mae,
         "target_unit": meta["target_unit"],
@@ -262,7 +267,7 @@ def run_structured(domain, data_root, out_dir, pretrain_steps=20, task_steps=20,
         "val_samples": int(meta["val_samples"]),
         "encoder_frozen": True,
         "pretrained_parameters_updated": False,
-        "teaching_only": True,
+        "teaching_only": bool(meta.get("teaching_only", True)),
     }
     result_path = downstream_dir / "downstream_result.json"
     result_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")

@@ -63,6 +63,20 @@
 
 > 你手里是SMILES分子串，仓库已支持，没标签就先只做预训练。请运行：`python -m nanoscigpt.domains.smiles.prepare --csv D:\data\molecules.csv --smiles-column molecule --out_dir out/student-data/smiles`，跑完把输出贴给我。
 
+### 学生有整理好的光谱NPZ和温度标签
+
+加入结构化NPZ入口后，用真实GLM-5.3 CLI再次测试。学生已经说明文件路径、四个数组、输入形状和回归目标，回答不再重复提问：
+
+> 你的光谱符合NPZ合同，温度是一维回归目标。运行：`python -m nanoscigpt.prepare_structured --domain spectrum --npz D:\data\spectra.npz --out-dir out/student-data/spectrum --patch-size 8 --task-name “恒星温度回归”`。完成后发我输出。
+
+这次模型给出的命令漏掉了命令行要求的`--sample-unit`和`--target-unit`，因此不能作为可复制的最终教学记录。Skill随后补入了完整命令示例，并要求路径、数组和目标已知时直接给出全部必需参数。
+
+修改后再次用同一提示复测，得到：
+
+> 你的光谱符合NPZ合同，温度是一维回归目标。运行：`python -m nanoscigpt.prepare_structured --domain spectrum --npz D:\data\spectra.npz --out-dir out/student-data/spectrum --patch-size 8 --task-name "恒星温度回归" --sample-unit "一条归一化光谱" --target-unit kelvin`。完成后发我输出。
+
+这一命令包含解析器要求的全部参数，并且没有把未执行的操作说成已经完成。
+
 ## 当前判断
 
-Skill现在能稳定做到：已有信息不重复问；自有数据与内置样例分开；目标未知时只追问当前缺口；结构化样例的预训练说法与实际代码一致。蛋白质与DNA的自备FASTA已经可以完成数据准备和小型预训练；学生自己的功能标签、天气网格、图像、光谱等仍需另行接入。
+Skill现在能稳定做到：已有信息不重复问；自有数据与内置样例分开；目标未知时只追问当前缺口；结构化样例的预训练说法与实际代码一致。蛋白质与DNA的自备FASTA、学生自己的SMILES表已经可以完成数据准备和小型预训练；天气、图像、光谱、连续场和三维点集可通过明确的NPZ合同进入预训练与一维回归任务。晶体、FITS和原始仪器格式仍需另行接入。

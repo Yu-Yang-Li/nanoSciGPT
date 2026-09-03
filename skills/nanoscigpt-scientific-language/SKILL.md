@@ -59,7 +59,7 @@ python -m nanoscigpt.domains.protein.prepare --fasta <FASTA绝对路径> --out_d
 python -m nanoscigpt.classroom --domain protein --data_root out/student-data --profile classroom --out_root out/student-runs --skip-downstream
 ```
 
-这两条命令会在学生自己的序列上完成小型预训练，并在没有功能标签时明确跳过下游任务。去掉`--skip-downstream`后，当前随后的组成分类使用从序列本身构造的教学标签；如果学生真正要预测蛋白质功能，还需要另接功能标签，不能把组成分类的结果写成功能预测结果。DNA也可由`nanoscigpt.domains.dna.prepare --fasta`接入自己的FASTA；其他数据格式仍按实际加载器边界处理。
+这两条命令会在学生自己的序列上完成小型预训练，并在没有功能标签时明确跳过下游任务。去掉`--skip-downstream`后，当前随后的组成分类使用从序列本身构造的教学标签；如果学生真正要预测蛋白质功能，还需要另接功能标签，不能把组成分类的结果写成功能预测结果。DNA也可由`nanoscigpt.domains.dna.prepare --fasta`接入自己的FASTA；其他数据格式仍按实际加载器边界处理。数据过短时，课堂预检会在训练前说明当前训练档位所需的最低长度；不要让学生等到训练器内部报错后再猜原因。
 
 ### 学生自己的SMILES表
 
@@ -71,6 +71,18 @@ python -m nanoscigpt.domains.smiles.prepare --csv <CSV绝对路径> --smiles-col
 
 准备完成后运行`python -m nanoscigpt.classroom --domain smiles --data_root out/student-data --profile classroom --out_root out/student-runs --skip-downstream`。内置ESOL样例的水溶解度标签不会自动出现在学生的SMILES表中；学生要预测自己的分子性质时，必须另接对应性质列。
 
+### 学生自己的连续或结构化数组
+
+天气、图像、光谱、连续场和三维点集可以通过一个明确的NPZ合同接入。文件必须已经包含`train_x`、`val_x`、`train_y`和`val_y`，其中标签是一维回归目标。模型输入形状分别是：天气/图像`(样本, 通道, 高, 宽)`，光谱/连续场`(样本, 通道, 长度)`，三维点集`(样本, 点, 3)`。
+
+下面以光谱为例，先准备数据：
+
+```powershell
+python -m nanoscigpt.prepare_structured --domain spectrum --npz <NPZ绝对路径> --out-dir out/student-data/spectrum --patch-size 8 --task-name "恒星温度回归" --sample-unit "一条归一化光谱" --target-unit kelvin
+```
+
+再运行`python -m nanoscigpt.classroom --domain spectrum --data_root out/student-data --profile classroom --out_root out/student-runs`。输出会把标签来源记为`user_provided`，不会继续沿用生成夹具的标签说明。晶体的周期邻域合同不同，目前不走这个入口。
+
 ## 怎样读运行结果
 
 一轮训练以后，先看 `out/classroom/<domain>/run_report.json`，再沿其中的路径看训练记录、生成样例或表示预览，以及 `downstream_result.json`。用两句话把两段训练分开：
@@ -80,7 +92,7 @@ python -m nanoscigpt.domains.smiles.prepare --csv <CSV绝对路径> --smiles-col
 
 验证损失下降只代表这个小模型按预定目标学到了东西，不等于发现了科学机制。天气、晶体、三维结构、图像、光谱和物理场是仓库生成的教学夹具；蛋白质、DNA、SMILES与文本来自列明来源的课程子集。介绍数据时读取 `data/manifest.json`，用“课程样例”“生成夹具”或“真实来源子集”说清身份。
 
-学生提到自己的数据时，第一句话同时说清两件事：已经识别的科学对象，以及当前有没有对应加载器。蛋白质和DNA的FASTA、SMILES表可以先准备后运行；普通表格与单条数值时序交给`nanoscigpt-research-baseline-builder`；尚未接入的结构化格式停在设计。除非已经实际读到文件，否则只说“你的是……”或“你手里有……”，不说“已经收到数据”。
+学生提到自己的数据时，第一句话同时说清两件事：已经识别的科学对象，以及当前有没有对应加载器。蛋白质和DNA的FASTA、SMILES表可以先准备后运行；天气、图像、光谱、连续场和三维点集可以按NPZ合同接入；普通表格与单条数值时序交给`nanoscigpt-research-baseline-builder`；晶体等尚未接入的格式停在设计。除非已经实际读到文件，否则只说“你的是……”或“你手里有……”，不说“已经收到数据”。
 
 接下来按这个形状回复：
 
@@ -99,6 +111,10 @@ python -m nanoscigpt.domains.smiles.prepare --csv <CSV绝对路径> --smiles-col
 
 > 好，我们让模型逐个读取氨基酸，保留原有顺序和每条序列的边界，先练习预测下一个氨基酸。请运行 `python -m nanoscigpt.classroom --list`，把 protein 那一行发给我。
 
-学生说“我有一批光谱，今天想先跑起来”时，回答的形状是：
+学生给出的光谱还没有整理成NPZ合同时，回答的形状是：
 
-> 你的是连续波长上的光谱。仓库里有同类表示的生成教学样例，但下面的课程命令还不会读取你的光谱文件。你最后希望从光谱预测什么？
+> 你的是连续波长上的光谱，仓库可以读取整理好的NPZ数组；你现在的文件还没有说明是否包含训练/验证输入和标签。请先告诉我：文件里是否已有`train_x`、`val_x`、`train_y`、`val_y`？
+
+学生已经给出NPZ路径、数组形状和回归目标时，不再追问，直接给数据准备命令：
+
+> 你的光谱符合NPZ合同，温度是一维回归目标。运行：`python -m nanoscigpt.prepare_structured --domain spectrum --npz D:\data\spectra.npz --out-dir out/student-data/spectrum --patch-size 8 --task-name "恒星温度回归" --sample-unit "一条归一化光谱" --target-unit kelvin`。完成后发我输出。

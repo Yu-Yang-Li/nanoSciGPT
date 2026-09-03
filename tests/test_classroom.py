@@ -95,6 +95,22 @@ def test_preflight_rejects_a_choice_when_a_manifest_file_is_missing(tmp_path):
         validate_domain_data("smiles", tmp_path)
 
 
+def test_preflight_explains_when_a_stream_is_too_short_for_the_profile(tmp_path):
+    from nanoscigpt.classroom import validate_domain_data
+
+    data_dir = tmp_path / "dna"
+    data_dir.mkdir(parents=True)
+    (data_dir / "meta.json").write_text(
+        json.dumps({"mode": "stream", "vocab_size": 5}), encoding="utf-8"
+    )
+    (data_dir / "tokenizer.json").write_text("{}", encoding="utf-8")
+    (data_dir / "train.bin").write_bytes(b"\x00\x00" * 80)
+    (data_dir / "val.bin").write_bytes(b"\x00\x00" * 32)
+
+    with pytest.raises(ValueError, match="validation stream has 32 tokens.*more than 32"):
+        validate_domain_data("dna", tmp_path, required_block_size=32)
+
+
 @pytest.mark.parametrize("domain", RUNNABLE)
 def test_cpu_smoke_run_finishes_for_every_student_choice(tmp_path, domain):
     command = [
