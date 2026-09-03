@@ -2,7 +2,7 @@
 
 课程最终拆成六个职责独立的 Skill。目前已落地的部分如下：
 
-1. [`research-baseline-builder`](research-baseline-builder/SKILL.md)：把有标签的科学问题变成第一份分类、回归、时序或图像基线；仓库自带 LAMOST `teff` 课程数据和四类代码模板。
+1. [`nanoscigpt-research-baseline-builder`](nanoscigpt-research-baseline-builder/SKILL.md)：把有标签的科学问题变成第一份基线；仓库可直接运行 LAMOST `teff` 与带标签 CSV 的分类或回归，其他格式先完成任务识别和接入设计。
 2. [`nanogpt-pretraining`](nanogpt-pretraining/SKILL.md)：用 tiny Shakespeare 小样例分开看文本预训练和带标签任务头。
 3. [`nanoscigpt-scientific-language`](nanoscigpt-scientific-language/SKILL.md)：把同一思路迁移到蛋白质、DNA、SMILES、天气、晶体、三维结构、图像、光谱和连续物理场。
 4. [`autoresearch-model-iteration`](autoresearch-model-iteration/SKILL.md)：读取已有模型 V0，先生成设置，再运行一个只改变训练预算的候选，并留下完整比较和下一步。

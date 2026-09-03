@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW = (
     ROOT
     / "skills"
-    / "research-baseline-builder"
+    / "nanoscigpt-research-baseline-builder"
     / "scripts"
     / "run_research_baseline_workflow.py"
 )

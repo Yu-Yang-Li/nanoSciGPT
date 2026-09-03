@@ -21,6 +21,7 @@
 - [上游项目与适配边界](upstream-adaptation.md)：说明哪些代码来自或参考外部项目。
 - [Scientific Language Skill的GLM-5.3实测](skill-evals/scientific-language-glm53-2026-09-03.md)：无Skill对照、修改前失败与修改后回答。
 - [nanoGPT预训练与微调Skill的GLM-5.3实测](skill-evals/nanogpt-pretraining-glm53-2026-09-03.md)：检查课堂所说的“微调”与模型参数是否真的更新。
+- [Baseline Builder Skill的GLM-5.3实测](skill-evals/baseline-builder-glm53-2026-09-03.md)：记录同名Skill冲突、FITS能力边界和修改后的课堂回答。
 - [AI Scientist旧研究指南](ai-scientist-guide.md)：保留为研究档案，不作为当前六Skill的学生入口。
 
 ## 研究档案

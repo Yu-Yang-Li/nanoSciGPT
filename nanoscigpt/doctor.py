@@ -13,7 +13,7 @@ from pathlib import Path
 REQUIRED_MODULES = ("torch", "numpy", "pandas", "sklearn")
 DISTRIBUTIONS = {"sklearn": "scikit-learn"}
 SKILL_NAMES = (
-    "research-baseline-builder",
+    "nanoscigpt-research-baseline-builder",
     "nanogpt-pretraining",
     "nanoscigpt-scientific-language",
     "autoresearch-model-iteration",

@@ -7,7 +7,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 EXPECTED = {
-    "research-baseline-builder",
+    "nanoscigpt-research-baseline-builder",
     "nanogpt-pretraining",
     "nanoscigpt-scientific-language",
     "autoresearch-model-iteration",

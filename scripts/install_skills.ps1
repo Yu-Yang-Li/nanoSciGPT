@@ -9,7 +9,7 @@ $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $sourceRoot = Join-Path $repoRoot "skills"
 $destinationRoot = [System.IO.Path]::GetFullPath($Destination)
 $skillNames = @(
-    "research-baseline-builder",
+    "nanoscigpt-research-baseline-builder",
     "nanogpt-pretraining",
     "nanoscigpt-scientific-language",
     "autoresearch-model-iteration",

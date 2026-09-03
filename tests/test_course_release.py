@@ -9,7 +9,7 @@ CURRENT_DOCS = (
     ROOT / "docs" / "current" / "speaker-script-16p.md",
 )
 EXPECTED_SKILLS = {
-    "research-baseline-builder",
+    "nanoscigpt-research-baseline-builder",
     "nanogpt-pretraining",
     "nanoscigpt-scientific-language",
     "autoresearch-model-iteration",

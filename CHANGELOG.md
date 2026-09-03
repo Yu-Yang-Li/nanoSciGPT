@@ -8,6 +8,7 @@
 - 发布六个原子 Skill 的安装脚本、环境自检命令和Windows/Ubuntu持续集成。
 - 增加可追溯的结课证据包，不把课程运行写成外部科学验证。
 - 基线入口为子进程固定使用UTF-8，避免英文版Windows终端输出中文进度时中断。
+- 课程基线Skill改用`nanoscigpt-research-baseline-builder`命名空间，避免与本机同名通用Skill混用；同时明确CSV/LAMOST可运行，FITS与其他格式暂只做接入设计。
 
 ### 运行与研究状态
 

@@ -11,7 +11,7 @@ repo_root="$(cd -- "$script_dir/.." && pwd)"
 source_root="$repo_root/skills"
 destination_root="$1"
 skill_names=(
-  research-baseline-builder
+  nanoscigpt-research-baseline-builder
   nanogpt-pretraining
   nanoscigpt-scientific-language
   autoresearch-model-iteration

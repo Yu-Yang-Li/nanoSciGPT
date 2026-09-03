@@ -6,7 +6,7 @@
 
 - 讲清：观测光谱怎样落到输入、目标和评价。
 - 你可以这样说：`我想用LAMOST课程光谱预测恒星有效温度，先帮我跑一个基线。`
-- 接续：`research-baseline-builder`先核对目标，再运行`nanoscigpt-baseline --case lamost --out_root out/baseline`。
+- 接续：`nanoscigpt-research-baseline-builder`先核对目标，再运行`nanoscigpt-baseline --case lamost --out_root out/baseline`。
 - 留下：数据说明、基线模型、`metrics.json`和`workflow_status.json`。用“已有专家参数时可以直接监督训练”转到P2。
 
 ### P2｜大量没有专家订正的数据怎样使用

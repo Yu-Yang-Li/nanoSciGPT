@@ -4,6 +4,19 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def test_baseline_skill_is_namespaced_and_states_its_runnable_boundary():
+    skill_path = (
+        ROOT / "skills" / "nanoscigpt-research-baseline-builder" / "SKILL.md"
+    )
+
+    assert skill_path.is_file()
+    skill = skill_path.read_text(encoding="utf-8")
+    assert "name: nanoscigpt-research-baseline-builder" in skill
+    assert "python -m nanoscigpt.baseline --case lamost" in skill
+    assert "FITS" in skill
+    assert "不能直接运行" in skill
+
+
 def test_nanogpt_pretraining_skill_is_packaged_as_its_own_lesson():
     skill_path = ROOT / "skills" / "nanogpt-pretraining" / "SKILL.md"
 
