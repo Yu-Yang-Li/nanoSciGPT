@@ -8,11 +8,19 @@ import json
 import shutil
 from pathlib import Path
 
-from nanoscigpt.classroom import RUNNABLE_DOMAINS
+from nanoscigpt.classroom import RUNNABLE_DOMAINS, STRUCTURED_DOMAINS
 
 
 ROOT = Path(__file__).resolve().parent.parent
 LITERATURE = ROOT / "data" / "course" / "ai_scientist_v1_literature.json"
+STRUCTURED_REPRESENTATION_ROUTES = {
+    "weather": "spatiotemporal_patch_or_variable_grouping",
+    "crystal": "neighbor_radius_or_graph_edges",
+    "structure3d": "distance_or_angle_features",
+    "image": "patch_size_or_augmentation",
+    "spectrum": "wavelength_binning_or_normalization",
+    "field": "spatial_resolution_or_boundary_encoding",
+}
 GENERATED_OUTPUTS = {
     "plan.json",
     "related_work.json",
@@ -253,12 +261,39 @@ V0 的 {results['metric']} 为 {results['baseline']:.4f}，V1 为 {results['cand
 
 def build_workflow_state(plan: dict, results: dict, inputs: dict) -> dict:
     changed = plan["route"]["changed"]
-    alternate_to = changed["from"] * 3 if isinstance(changed.get("from"), int) else changed["to"]
+    domain = inputs["domain"]
+    if domain in STRUCTURED_DOMAINS:
+        alternate = {
+            "id": "route-2",
+            "status": "held",
+            "execution_mode": "design_only",
+            "design_reason": (
+                "the current structured classroom command exposes only training budget; "
+                "a second representation route must be implemented before execution"
+            ),
+            "change": {
+                "field": "scientific_representation",
+                "from": "bundled_baseline",
+                "to": STRUCTURED_REPRESENTATION_ROUTES[domain],
+            },
+        }
+    else:
+        block_size = int(plan["route"]["fixed_arguments"]["block_size"])
+        alternate = {
+            "id": "route-2",
+            "status": "held",
+            "execution_mode": "executable",
+            "change": {
+                "field": "block_size",
+                "from": block_size,
+                "to": block_size * 2,
+            },
+        }
     return {
         "schema_version": "nanoscigpt.ai_scientist_v1.workflow.v1",
         "implementation": plan["implementation"],
         "status": "evaluated",
-        "domain": inputs["domain"],
+        "domain": domain,
         "route_count": 1,
         "research_question": plan["research_question"],
         "baseline_run": plan["route"]["baseline_run"],
@@ -269,7 +304,7 @@ def build_workflow_state(plan: dict, results: dict, inputs: dict) -> dict:
             "minimum_delta": results["threshold"],
         },
         "route": {"id": "route-1", "status": "completed", "change": changed, "run_report": str(inputs["candidate_path"]), "result": results},
-        "candidate_backlog": [{"id": "route-2", "status": "held", "change": {"field": changed["field"], "from": changed["from"], "to": alternate_to}}],
+        "candidate_backlog": [alternate],
     }
 
 

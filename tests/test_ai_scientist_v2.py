@@ -62,6 +62,9 @@ def test_v2_init_creates_two_sibling_routes_without_running_a_model(completed_v1
     assert state["nodes"]["route-1"]["status"] == "completed"
     assert state["nodes"]["route-1"]["evaluation"]["passed"] is state["nodes"]["route-1"]["evaluation"]["criterion_passed"]
     assert state["nodes"]["route-2"]["status"] == "planned"
+    assert state["nodes"]["route-1"]["change"]["field"] == "max_iters"
+    assert state["nodes"]["route-2"]["change"]["field"] == "block_size"
+    assert state["nodes"]["route-2"]["execution_mode"] == "executable"
     assert state["frontier"] == ["route-2"]
     assert not (out_root / "text" / "nodes" / "route-2" / "model").exists()
 
@@ -197,3 +200,70 @@ def test_v2_records_missing_metric_as_failed_state(
     assert route["failure"]["kind"] == "missing_metric"
     assert state["frontier"] == []
     assert state["next_action"] == "inspect_failure"
+
+
+def test_v2_rejects_two_routes_that_change_the_same_research_variable(
+    completed_v1, tmp_path
+):
+    from autoresearch import v2
+
+    copied = tmp_path / "same-field-v1.json"
+    state = json.loads(completed_v1.read_text(encoding="utf-8"))
+    state["candidate_backlog"][0]["change"] = dict(state["route"]["change"])
+    copied.write_text(json.dumps(state), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="different research variables"):
+        v2.init_tree(copied, tmp_path / "v2")
+
+
+def test_v2_keeps_unsupported_structured_route_as_design_only(tmp_path):
+    from autoresearch import v2
+
+    v1_path = tmp_path / "weather-v1.json"
+    v1_path.write_text(
+        json.dumps(
+            {
+                "status": "evaluated",
+                "route_count": 1,
+                "domain": "weather",
+                "baseline_run": "unused-for-init.json",
+                "evaluator": {
+                    "id": "pretrain_loss_gain.v1",
+                    "metric": "pretrain_val_loss",
+                    "direction": "lower_is_better",
+                    "minimum_delta": 0.01,
+                },
+                "route": {
+                    "id": "route-1",
+                    "change": {"field": "pretrain_steps", "from": 2, "to": 4},
+                    "run_report": "route-1.json",
+                    "result": {
+                        "criterion_passed": False,
+                        "candidate": 1.2,
+                    },
+                },
+                "candidate_backlog": [
+                    {
+                        "id": "route-2",
+                        "execution_mode": "design_only",
+                        "design_reason": "current classroom command has no second safe lever",
+                        "change": {
+                            "field": "spatiotemporal_representation",
+                            "from": "bundled_baseline",
+                            "to": "alternative_patch_or_variable_grouping",
+                        },
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    state_path = v2.init_tree(v1_path, tmp_path / "v2")
+
+    state = json.loads(state_path.read_text(encoding="utf-8"))
+    route = state["nodes"]["route-2"]
+    assert route["status"] == "design_only"
+    assert route["execution_mode"] == "design_only"
+    assert state["frontier"] == []
+    assert state["next_action"] == "review_design_only_route"

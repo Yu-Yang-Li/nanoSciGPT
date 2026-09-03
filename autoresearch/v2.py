@@ -54,6 +54,11 @@ def init_tree(v1_state_path: Path, out_root: Path) -> Path:
         raise FileExistsError(f"tree state already exists: {state_path}")
     route1 = v1["route"]
     route2 = backlog[0]
+    route2_mode = route2.get("execution_mode", "executable")
+    if route2_mode not in {"executable", "design_only"}:
+        raise ValueError(f"unsupported route-2 execution_mode={route2_mode}")
+    if route1["change"]["field"] == route2["change"]["field"]:
+        raise ValueError("v2 routes must change different research variables")
     route1_evaluation = dict(route1["result"])
     route1_evaluation["passed"] = bool(route1_evaluation["criterion_passed"])
     state = {
@@ -83,13 +88,23 @@ def init_tree(v1_state_path: Path, out_root: Path) -> Path:
             "route-2": {
                 "id": "route-2",
                 "parent_id": "root",
-                "status": "planned",
+                "status": "planned" if route2_mode == "executable" else "design_only",
                 "attempts": 0,
                 "change": route2["change"],
+                "execution_mode": route2_mode,
+                **(
+                    {"design_reason": route2["design_reason"]}
+                    if route2.get("design_reason")
+                    else {}
+                ),
             },
         },
-        "frontier": ["route-2"],
-        "next_action": "review_route-2_then_run-next",
+        "frontier": ["route-2"] if route2_mode == "executable" else [],
+        "next_action": (
+            "review_route-2_then_run-next"
+            if route2_mode == "executable"
+            else "review_design_only_route"
+        ),
     }
     atomic_write_json(state_path, state)
     return state_path
@@ -250,7 +265,7 @@ def decide(state_path: Path) -> Path:
     unfinished = [
         node_id
         for node_id, node in state["nodes"].items()
-        if node["status"] not in {"completed", "failed"}
+        if node["status"] not in {"completed", "failed", "design_only"}
     ]
     if unfinished:
         raise ValueError(f"routes are not finished: {', '.join(unfinished)}")
@@ -272,11 +287,14 @@ def decide(state_path: Path) -> Path:
             node["stop_reason"] = None
         else:
             node["status"] = "stopped"
-            node["stop_reason"] = (
-                "dominated_under_same_evaluator"
-                if retained != "baseline" and node.get("evaluation", {}).get("passed")
-                else "criterion_not_met"
-            )
+            if node.get("execution_mode") == "design_only":
+                node["stop_reason"] = "not_executed_design_only"
+            else:
+                node["stop_reason"] = (
+                    "dominated_under_same_evaluator"
+                    if retained != "baseline" and node.get("evaluation", {}).get("passed")
+                    else "criterion_not_met"
+                )
     decision = {
         "schema_version": "nanoscigpt.ai_scientist_v2.decision.v1",
         "evaluator_id": state["root"]["evaluator"]["id"],
