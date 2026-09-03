@@ -10,10 +10,7 @@ import torch.nn as nn
 
 from ..scientific.adapters import patchify_1d, patchify_2d, pairwise_distance_tokens
 from ..scientific.models import CrystalGraphEncoder, PatchEncoder, masked_mean
-
-
-STRUCTURED_DOMAINS = ("weather", "crystal", "structure3d", "image", "spectrum", "field")
-
+from ..domains.registry import STRUCTURED_DOMAINS
 
 def load_meta(data_root, domain):
     path = Path(data_root) / domain / "meta.json"

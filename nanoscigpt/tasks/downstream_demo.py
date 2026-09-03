@@ -16,11 +16,10 @@ import numpy as np
 import torch
 import torch.nn as nn
 
+from ..domains.registry import SEQUENCE_DOMAINS
+
 from ..core.gpt import GPT, GPTConfig
 from ..core.tokenizer import CharTokenizer
-
-
-RUNNABLE_DOMAINS = ("text", "protein", "dna", "smiles")
 
 
 def load_checkpoint(ckpt_path):
@@ -208,7 +207,7 @@ def fit_regression(train_x, train_y, val_x, val_y, epochs, seed):
 
 
 def run_downstream(domain, ckpt_path, data_root, out_dir, epochs=20, max_samples=128, seed=1337):
-    if domain not in RUNNABLE_DOMAINS:
+    if domain not in SEQUENCE_DOMAINS:
         raise ValueError(f"downstream classroom task is unavailable for domain={domain}")
     model, config, checkpoint = load_checkpoint(ckpt_path)
     if checkpoint.get("domain") != domain:
@@ -256,7 +255,7 @@ def run_downstream(domain, ckpt_path, data_root, out_dir, epochs=20, max_samples
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--domain", required=True, choices=RUNNABLE_DOMAINS)
+    parser.add_argument("--domain", required=True, choices=SEQUENCE_DOMAINS)
     parser.add_argument("--ckpt", required=True)
     parser.add_argument("--data_root", default="data")
     parser.add_argument("--out_dir", default=None)

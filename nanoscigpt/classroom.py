@@ -10,10 +10,8 @@ from pathlib import Path
 
 import numpy as np
 
+from .domains.registry import RUNNABLE_DOMAINS, SEQUENCE_DOMAINS, STRUCTURED_DOMAINS
 
-SEQUENCE_DOMAINS = ("text", "protein", "dna", "smiles")
-STRUCTURED_DOMAINS = ("weather", "crystal", "structure3d", "image", "spectrum", "field")
-RUNNABLE_DOMAINS = SEQUENCE_DOMAINS + STRUCTURED_DOMAINS
 DEFAULT_PROFILE = "classroom"
 CPU_PROFILES = {
     "smoke": {

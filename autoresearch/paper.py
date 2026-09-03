@@ -19,7 +19,7 @@ import json
 import re
 from pathlib import Path
 
-from nanoscigpt.classroom import RUNNABLE_DOMAINS
+from nanoscigpt.domains.registry import RUNNABLE_DOMAINS
 
 
 class PaperWorkflow:

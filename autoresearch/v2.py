@@ -12,11 +12,11 @@ from pathlib import Path
 
 from .evaluator import evaluate_loss_gain
 from .experiment import (
-    STRUCTURED_DOMAINS,
     command_options,
     load_baseline_run,
     replace_option,
 )
+from nanoscigpt.domains.registry import STRUCTURED_DOMAINS
 
 
 def read_json(path: Path) -> dict:

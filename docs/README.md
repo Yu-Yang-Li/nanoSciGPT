@@ -5,6 +5,7 @@
 - [16页课堂大纲](current/course-outline-16p.md)：页码、时间、案例与课堂操作。
 - [16页页面文字](current/slide-copy-16p.md)：每页实际出现的文字。
 - [16页讲稿](current/speaker-script-16p.md)：教师口播与页间衔接。
+- [自定义科学数据接入说明](current/custom-domain-guide.md)：接入自己数据前需要补齐的五个接口。
 - [六个课堂 Skill](../skills/README.md)：学生从基线走到AI Scientist v2的六段入口。
 - [内置数据说明](../data/README.md)与[数据来源清单](../data/manifest.json)：课程数据身份、来源与使用边界。
 

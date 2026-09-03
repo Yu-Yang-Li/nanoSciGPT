@@ -8,7 +8,7 @@ import json
 import shutil
 from pathlib import Path
 
-from nanoscigpt.classroom import RUNNABLE_DOMAINS, STRUCTURED_DOMAINS
+from nanoscigpt.domains.registry import RUNNABLE_DOMAINS, STRUCTURED_DOMAINS
 
 
 ROOT = Path(__file__).resolve().parent.parent

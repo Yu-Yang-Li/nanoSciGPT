@@ -6,7 +6,7 @@
 内置数据 → 科学对象表示 → 小型预训练 → 具体任务 → 模型V0 → V0到V1迭代记录
 ```
 
-当前正式课堂材料是 [16页大纲](docs/current/course-outline-16p.md)、[16页页面文字](docs/current/slide-copy-16p.md) 和 [16页讲稿](docs/current/speaker-script-16p.md)。课程先用LAMOST光谱参数估计走一遍有标签科学数据的标准流程，再进入nanoSciGPT与AI Scientist。其他材料的当前/档案身份见[资料导航](docs/README.md)。
+当前正式课堂材料是 [16页大纲](docs/current/course-outline-16p.md)、[16页页面文字](docs/current/slide-copy-16p.md) 和 [16页讲稿](docs/current/speaker-script-16p.md)。课程先用LAMOST光谱参数估计走一遍有标签科学数据的标准流程，再进入nanoSciGPT与AI Scientist。换成自己的数据前，请先看[自定义科学数据接入说明](docs/current/custom-domain-guide.md)。其他材料的当前/档案身份见[资料导航](docs/README.md)。
 
 ## 六个课堂 Skill
 
