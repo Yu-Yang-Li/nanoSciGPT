@@ -64,6 +64,9 @@ def test_v2_init_creates_two_sibling_routes_without_running_a_model(completed_v1
     assert state["nodes"]["route-2"]["status"] == "planned"
     assert state["nodes"]["route-1"]["change"]["field"] == "max_iters"
     assert state["nodes"]["route-2"]["change"]["field"] == "block_size"
+    assert state["nodes"]["route-1"]["change_label"] == "预训练步数"
+    assert state["nodes"]["route-2"]["change_label"] == "一次可见的上下文长度"
+    assert state["root"]["evaluator"]["metric_label"] == "验证损失"
     assert state["nodes"]["route-2"]["execution_mode"] == "executable"
     assert state["frontier"] == ["route-2"]
     assert not (out_root / "text" / "nodes" / "route-2" / "model").exists()
@@ -87,6 +90,7 @@ def test_v2_runs_one_route_recovers_state_and_makes_a_formal_decision(
 
     status = _run("status", "--state", state_path)
     assert status.returncode == 0
+    assert "一次可见的上下文长度 32→64" in status.stdout
     unchanged = json.loads(state_path.read_text(encoding="utf-8"))
     assert unchanged["nodes"]["route-2"]["attempts"] == 1
 
@@ -98,6 +102,9 @@ def test_v2_runs_one_route_recovers_state_and_makes_a_formal_decision(
     final_state = json.loads(state_path.read_text(encoding="utf-8"))
     assert decision["evaluator_id"] == final_state["root"]["evaluator"]["id"]
     assert decision["retained"] in {"baseline", "route-1", "route-2"}
+    assert decision["metric_label"] == "验证损失"
+    assert decision["rule_id"] == "lowest_passing_loss_else_baseline"
+    assert "若均未达到，则保留V0" in decision["rule"]
     assert final_state["next_action"] == "complete"
     assert all(node["status"] in {"retained", "stopped"} for node in final_state["nodes"].values())
 

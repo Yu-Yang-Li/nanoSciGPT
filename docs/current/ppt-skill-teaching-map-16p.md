@@ -79,12 +79,12 @@
 - 接续：`ai-scientist-v2-tree-search`运行`python -m autoresearch.v2 init --from-v1 out/ai-scientist-v1/protein/workflow_state.json --out-root out/ai-scientist-v2`。
 - 留下：`tree_state.json`。序列示例可批准第二路线；结构化领域没有第二个安全变量时停在`design_only`。
 
-### P12｜2004—2023，结果已经会改变下一步
+### P12｜2004—2020，自动化实验
 
 - 讲清：Robot Scientist、Adam、Eve、ARES、Ada和Mobile Robotic Chemist如何让实验结果改变下一轮。
 - 你可以这样说：`刚才comparison.json里的结果，实际改变了下一步什么？`
 - 接续：不新增命令。用P9的`comparison.json`类比可读取的实验反馈，同时指出真实实验还需要仪器接口。
-- 留下：动作、返回结果、下一步变化三项对应关系。
+- 留下：动作、返回结果、下一步变化三项对应关系；本页不新增课堂命令。
 
 ### P13｜2023—2024，研究目标接入具体工具
 

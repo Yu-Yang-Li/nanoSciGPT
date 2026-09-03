@@ -19,6 +19,23 @@ from .experiment import (
 from nanoscigpt.domains.registry import STRUCTURED_DOMAINS
 
 
+FIELD_DISPLAY_NAMES = {
+    "max_iters": "预训练步数",
+    "pretrain_steps": "预训练步数",
+    "block_size": "一次可见的上下文长度",
+    "scientific_representation": "科学数据表示方式",
+    "spatiotemporal_representation": "时空数据表示方式",
+}
+METRIC_DISPLAY_NAMES = {
+    "best_val_loss": "验证损失",
+    "pretrain_val_loss": "预训练验证损失",
+}
+
+
+def display_name(field: str) -> str:
+    return FIELD_DISPLAY_NAMES.get(field, field)
+
+
 def read_json(path: Path) -> dict:
     if not path.is_file():
         raise FileNotFoundError(path)
@@ -61,6 +78,10 @@ def init_tree(v1_state_path: Path, out_root: Path) -> Path:
         raise ValueError("v2 routes must change different research variables")
     route1_evaluation = dict(route1["result"])
     route1_evaluation["passed"] = bool(route1_evaluation["criterion_passed"])
+    evaluator = dict(v1["evaluator"])
+    evaluator["metric_label"] = METRIC_DISPLAY_NAMES.get(
+        evaluator["metric"], evaluator["metric"]
+    )
     state = {
         "schema_version": "nanoscigpt.ai_scientist_v2.tree.v1",
         "implementation": {
@@ -72,7 +93,7 @@ def init_tree(v1_state_path: Path, out_root: Path) -> Path:
         "root": {
             "id": "root",
             "baseline_run": v1["baseline_run"],
-            "evaluator": v1["evaluator"],
+            "evaluator": evaluator,
             "source_v1_state": str(v1_path),
         },
         "nodes": {
@@ -82,6 +103,7 @@ def init_tree(v1_state_path: Path, out_root: Path) -> Path:
                 "status": "completed",
                 "attempts": 1,
                 "change": route1["change"],
+                "change_label": display_name(route1["change"]["field"]),
                 "run_report": route1["run_report"],
                 "evaluation": route1_evaluation,
             },
@@ -91,6 +113,7 @@ def init_tree(v1_state_path: Path, out_root: Path) -> Path:
                 "status": "planned" if route2_mode == "executable" else "design_only",
                 "attempts": 0,
                 "change": route2["change"],
+                "change_label": display_name(route2["change"]["field"]),
                 "execution_mode": route2_mode,
                 **(
                     {"design_reason": route2["design_reason"]}
@@ -251,10 +274,14 @@ def run_next(state_path: Path, approved: bool) -> int:
 
 
 def status_text(state: dict) -> str:
-    rows = [
-        f"{node_id}: {node['status']} (attempts={node['attempts']})"
-        for node_id, node in state["nodes"].items()
-    ]
+    rows = []
+    for node_id, node in state["nodes"].items():
+        change = node["change"]
+        label = node.get("change_label", display_name(change["field"]))
+        rows.append(
+            f"{node_id}: {node['status']} | {label} "
+            f"{change['from']}→{change['to']} (attempts={node['attempts']})"
+        )
     rows.append(f"next: {state['next_action']}")
     return "\n".join(rows)
 
@@ -299,9 +326,13 @@ def decide(state_path: Path) -> Path:
         "schema_version": "nanoscigpt.ai_scientist_v2.decision.v1",
         "evaluator_id": state["root"]["evaluator"]["id"],
         "metric": state["root"]["evaluator"]["metric"],
+        "metric_label": state["root"]["evaluator"].get(
+            "metric_label", state["root"]["evaluator"]["metric"]
+        ),
         "baseline": baseline_value,
         "retained": retained,
-        "rule": "retain the lowest-loss route that clears the recorded threshold; otherwise retain baseline",
+        "rule_id": "lowest_passing_loss_else_baseline",
+        "rule": "在同一评价标准下，保留达到门槛且验证损失最低的路线；若均未达到，则保留V0",
         "merge_performed": False,
         "reproduces_original_system": False,
     }
