@@ -131,6 +131,6 @@
 - Consumes: 前五项全部产物。
 - Produces: 可打标签的课程版本。
 
-- [ ] 在干净worktree执行六Skill校验、全量pytest、安装后命令检查和一条完整protein链。
-- [ ] 检查Markdown链接、第三方声明、未跟踪文件和Git差异。
+- [x] 在干净worktree执行六Skill校验、全量pytest、安装后命令检查和一条完整protein链。
+- [x] 检查Markdown链接、第三方声明、未跟踪文件和Git差异。
 - [ ] 更新变更记录，提交并推送分支供最终合并。
