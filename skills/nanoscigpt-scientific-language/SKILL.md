@@ -45,6 +45,22 @@ python -m nanoscigpt.classroom --domain protein --profile classroom --out_root o
 
 把 `protein` 换成学生选择的领域。使用能成功导入仓库依赖的 Python；默认 `python` 不可用时，可以运行 `scripts/find_course_python.ps1 -RequiredModules numpy,torch` 找到本机已有的课程环境。
 
+### 学生自己的蛋白质FASTA
+
+学生给出可读的蛋白质FASTA时，不必换回内置UniProt样例。先把数据准备到一个单独目录：
+
+```powershell
+python -m nanoscigpt.domains.protein.prepare --fasta <FASTA绝对路径> --out_dir out/student-data/protein
+```
+
+再运行：
+
+```powershell
+python -m nanoscigpt.classroom --domain protein --data_root out/student-data --profile classroom --out_root out/student-runs
+```
+
+这两条命令会在学生自己的序列上完成小型预训练。当前随后的组成分类使用从序列本身构造的教学标签；如果学生真正要预测蛋白质功能，还需要另接功能标签，不能把组成分类的结果写成功能预测结果。DNA也可由`nanoscigpt.domains.dna.prepare --fasta`接入自己的FASTA；其他数据格式仍按实际加载器边界处理。
+
 ## 怎样读运行结果
 
 一轮训练以后，先看 `out/classroom/<domain>/run_report.json`，再沿其中的路径看训练记录、生成样例或表示预览，以及 `downstream_result.json`。用两句话把两段训练分开：
@@ -54,7 +70,7 @@ python -m nanoscigpt.classroom --domain protein --profile classroom --out_root o
 
 验证损失下降只代表这个小模型按预定目标学到了东西，不等于发现了科学机制。天气、晶体、三维结构、图像、光谱和物理场是仓库生成的教学夹具；蛋白质、DNA、SMILES与文本来自列明来源的课程子集。介绍数据时读取 `data/manifest.json`，用“课程样例”“生成夹具”或“真实来源子集”说清身份。
 
-学生提到自己的数据时，第一句话同时说清两件事：已经识别的科学对象，以及仓库命令当前只会读取内置课程样例，不会读取学生给出的文件。除非已经实际读到文件，否则只说“你的是……”或“你手里有……”，不说“已经收到数据”。
+学生提到自己的数据时，第一句话同时说清两件事：已经识别的科学对象，以及当前有没有对应加载器。蛋白质和DNA的FASTA可以先准备后运行；普通表格与单条数值时序交给`nanoscigpt-research-baseline-builder`；尚未接入的结构化格式停在设计。除非已经实际读到文件，否则只说“你的是……”或“你手里有……”，不说“已经收到数据”。
 
 接下来按这个形状回复：
 

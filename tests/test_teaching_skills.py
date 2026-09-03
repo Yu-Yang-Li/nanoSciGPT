@@ -44,6 +44,16 @@ def test_nanogpt_and_nanoscigpt_skills_have_distinct_triggers():
     assert "fine-tuning" not in nanoscigpt_description.lower()
 
 
+def test_scientific_language_skill_can_use_student_protein_fasta_without_overclaiming_labels():
+    skill = (
+        ROOT / "skills" / "nanoscigpt-scientific-language" / "SKILL.md"
+    ).read_text(encoding="utf-8")
+
+    assert "nanoscigpt.domains.protein.prepare --fasta" in skill
+    assert "功能标签" in skill
+    assert "组成分类" in skill
+
+
 def test_autoresearch_model_iteration_is_packaged_as_its_own_lesson():
     skill_path = ROOT / "skills" / "autoresearch-model-iteration" / "SKILL.md"
 

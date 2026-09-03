@@ -132,7 +132,16 @@ def validate_domain_data(domain, data_root="data"):
         "val_items": val_items,
         "vocab_size": int(meta["vocab_size"]),
         "data_dir": str(data_dir.resolve()),
-        "source_name": manifest_entry.get("source_name") if manifest_entry else None,
+        "source_name": (
+            manifest_entry.get("source_name")
+            if manifest_entry
+            else meta.get("source")
+        ),
+        "source_kind": (
+            get_domain_spec(domain).source_kind
+            if manifest_entry
+            else meta.get("source_kind", "user_prepared")
+        ),
     }
 
 
