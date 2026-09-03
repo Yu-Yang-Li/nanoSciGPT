@@ -1,6 +1,6 @@
 ---
 name: nanoscigpt-research-baseline-builder
-description: Use in the nanoSciGPT course when a researcher or student wants to turn a scientific question and labeled data into a first baseline. The bundled CLI directly runs the LAMOST lesson and labeled CSV classification or regression; other formats are routed without pretending they have already run.
+description: Use in the nanoSciGPT course when a researcher or student wants to turn a scientific question and data into a first baseline. The bundled CLI directly runs the LAMOST lesson, labeled CSV classification or regression, and single-series CSV forecasting; other formats are routed without pretending they have already run.
 metadata:
   short-description: 把科学问题变成一个能跑、能解释的基线实验
 ---
@@ -45,7 +45,13 @@ python -m nanoscigpt.baseline --case lamost --out_root out/baseline
 
 能够读取文件时，先看列名、形状和少量样例，不让学生重复描述机器已经能看到的内容。表格任务确定目标列后，可运行 `python -m nanoscigpt.baseline --csv <CSV绝对路径> --target <目标列> --task <classification或regression> --out_root out/baseline`。不能上传时，仍可把“样本是什么、输入是什么、输出是什么”整理清楚，但停在设计，不生成分数。
 
-当前课程命令行能直接运行的是带标签 CSV 的分类或回归，包括仓库内的 LAMOST 示例。时序、普通图像和 FITS 可以先完成任务识别与方案整理，但尚不能直接运行这条 baseline 命令；不要因为仓库里有 GRU、EfficientNet 等教学模板，就声称已经读取或训练了这些格式。学生给出 FITS 图像时，先说明这一边界，再只问一个会决定后续接入的问题，例如“标签文件中的哪一列对应图像文件名？”。
+当前课程命令行能直接运行带标签 CSV 的分类或回归，包括仓库内的 LAMOST 示例。单条数值时序保存在 CSV 中时，也能用已有行顺序或指定时间列运行 GRU：
+
+```powershell
+python -m nanoscigpt.baseline --series-csv <CSV绝对路径> --value-column <数值列> --time-column <时间列> --out_root out/baseline
+```
+
+若没有明确时间列，省略`--time-column`，此时按CSV现有行顺序建立时间窗口；要把这个选择如实告诉学生。普通图像和 FITS 目前可以完成任务识别与方案整理，但尚不能直接运行；不要因为仓库里有 EfficientNet 教学模板，就声称已经读取或训练了这些格式。学生给出 FITS 图像时，先说明这一边界，再只问一个会决定后续接入的问题，例如“标签文件中的哪一列对应图像文件名？”。
 
 根据数据问题选择第一个容易复查的做法：表格分类/回归先用 RandomForest；时序先用朴素预测或 GRU；普通图像先用预训练特征或 EfficientNet。需要更细的选择时再读 `references/problem-to-data-routing.md` 和 `references/framework-selection.md`。
 

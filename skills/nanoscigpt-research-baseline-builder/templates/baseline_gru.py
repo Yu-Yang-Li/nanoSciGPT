@@ -101,7 +101,7 @@ def evaluate(model, ld, crit, scaler):
 
 
 # ---------- 4. 主流程 ----------
-def run(series, cfg, data_mode="demo", source=None):
+def run(series, cfg, data_mode="demo", source=None, time_column=None):
     log_lines = []
     emit(f"[数据模式] {data_mode}：{'当前使用合成正弦序列，不代表用户真实数据结果。' if data_mode == 'demo' else '当前使用用户提供的数据文件。'}", log_lines)
     tr_ld, te_ld, scaler, in_f = make_loaders(series, cfg)
@@ -128,6 +128,8 @@ def run(series, cfg, data_mode="demo", source=None):
         "task": "time_series_forecast",
         "device": str(DEVICE),
         "series_length": int(len(series)),
+        "time_column": time_column,
+        "time_order": "sorted_by_column" if time_column else "row_order",
         "seq_len": cfg["seq_len"],
         "horizon": cfg["horizon"],
         "epochs": cfg["epochs"],
@@ -146,10 +148,14 @@ def load_demo(n=2000):
     return pd.Series(np.sin(t) + 0.1*np.random.randn(n).astype(np.float32), name="signal")
 
 
-def load_csv(csv_path: Path, value_column: str):
+def load_csv(csv_path: Path, value_column: str, time_column: str | None = None):
     data = pd.read_csv(csv_path)
     if value_column not in data.columns:
         raise ValueError(f"value column not found: {value_column}")
+    if time_column:
+        if time_column not in data.columns:
+            raise ValueError(f"time column not found: {time_column}")
+        data = data.sort_values(time_column, kind="stable")
     return pd.Series(data[value_column].astype(float).to_numpy(), name=value_column)
 
 def main():
@@ -158,13 +164,20 @@ def main():
     ap.add_argument("--seq_len", type=int, default=CONFIG["seq_len"])
     ap.add_argument("--csv", type=Path, help="可选：用户 CSV 时序数据路径。")
     ap.add_argument("--value-column", help="CSV 中作为预测目标的数值列。")
+    ap.add_argument("--time-column", help="可选：先按这一列排序；不填则沿用 CSV 行顺序。")
     args = ap.parse_args()
     cfg = {**CONFIG, "epochs": args.epochs, "seq_len": args.seq_len}
     print(f"[设备] {DEVICE}")
     if args.csv:
         if not args.value_column:
             ap.error("--csv requires --value-column")
-        run(load_csv(args.csv, args.value_column), cfg, data_mode="user_csv", source=args.csv)
+        run(
+            load_csv(args.csv, args.value_column, args.time_column),
+            cfg,
+            data_mode="user_csv",
+            source=args.csv,
+            time_column=args.time_column,
+        )
     else:
         run(load_demo(), cfg, data_mode="demo")
 

@@ -13,6 +13,7 @@ def test_baseline_skill_is_namespaced_and_states_its_runnable_boundary():
     skill = skill_path.read_text(encoding="utf-8")
     assert "name: nanoscigpt-research-baseline-builder" in skill
     assert "python -m nanoscigpt.baseline --case lamost" in skill
+    assert "python -m nanoscigpt.baseline --series-csv" in skill
     assert "FITS" in skill
     assert "不能直接运行" in skill
 

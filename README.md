@@ -29,6 +29,11 @@
 python -m pip install -e .
 nanoscigpt-doctor
 
+# 有标签课程基线：LAMOST、普通表格或单条数值时序
+nanoscigpt-baseline --case lamost --out_root out/baseline
+nanoscigpt-baseline --csv <数据.csv> --target <目标列> --task regression --out_root out/baseline
+nanoscigpt-baseline --series-csv <时序.csv> --value-column <数值列> --time-column <时间列> --out_root out/baseline
+
 # 查看当前真正能运行的十个选择
 python -m nanoscigpt.classroom --list
 

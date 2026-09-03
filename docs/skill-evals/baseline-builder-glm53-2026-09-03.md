@@ -29,6 +29,10 @@
 
 第三个并发测试在SCNet本地代理从WebSocket回退后长时间没有返回，已人工终止；没有把它计入Skill行为通过项。仓库自身的CSV命令由自动化测试覆盖，模型回答仍需在服务稳定时补做一次。
 
+### 学生给出带时间列的单变量时序
+
+> 我理解为：sensor.csv 是一条按小时的温度序列，timestamp 是时间列，temperature 是数值列，目标是预测下一小时。第一步先跑时序基线：`python -m nanoscigpt.baseline --series-csv <sensor.csv绝对路径> --value-column temperature --time-column timestamp --out_root out/baseline`，这一步还没有运行。跑完把 metrics.json、baseline_summary.json 和 train_log.txt 带回来，我们再看下一小时误差能说明什么。
+
 ## 当前判断
 
-命名冲突已经消除。GLM-5.3能够对可直接运行的LAMOST示例和暂不能直接运行的FITS数据给出不同回答，并且不会假装已经训练。当前仍需分别补齐通用时序、普通图像和FITS的数据加载器，才能扩大“可直接运行”的范围。
+命名冲突已经消除。GLM-5.3能够对可直接运行的LAMOST示例和暂不能直接运行的FITS数据给出不同回答，并且不会假装已经训练。随后已补入单条数值时序CSV入口，可指定时间列排序或明确沿用现有行顺序；普通图像和FITS仍需数据加载器。
