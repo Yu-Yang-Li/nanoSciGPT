@@ -77,6 +77,22 @@
 
 这一命令包含解析器要求的全部参数，并且没有把未执行的操作说成已经完成。
 
+### 学生有晶体周期图数组，但没有说明形成能单位
+
+晶体NPZ入口加入后，第一次GLM-5.3复测直接生成了命令，并自行把单位写成`eV`：
+
+> 你的晶体数据符合周期图NPZ合同，形成能是一维回归目标。在仓库根目录运行：`python -m nanoscigpt.prepare_structured --domain crystal --npz D:\data\crystals.npz --out-dir out/student-data/crystal --task-name "形成能回归" --target-unit eV`。完成后把输出发我。
+
+这条命令既缺少必填的`--sample-unit`，又猜测了学生未提供的形成能单位。Skill随后明确：目标单位属于运行证据；`eV/atom`、`eV/cell`等不能混用，缺失时只追问单位，单位已知后才给出完整命令。
+
+同一缺单位提示复测后，GLM-5.3停止生成命令，只追问当前缺口：
+
+> 你手里的 `D:\data\crystals.npz` 已按晶体周期图合同备齐原子序数、分数坐标、掩码、晶格矩阵和 train/val_y，可以直接接入形成能回归。先确认一件事：形成能标签的单位是什么？是 eV/atom、eV/cell 还是其他？
+
+补充“标签单位是eV/atom”后再次复测，得到可直接复制的完整准备命令：
+
+> 你的晶体符合周期图NPZ合同，形成能按eV/atom回归。运行：`python -m nanoscigpt.prepare_structured --domain crystal --npz D:\data\crystals.npz --out-dir out/student-data/crystal --task-name “形成能回归” --sample-unit “一个周期晶胞” --target-unit “eV/atom”`。完成后发我输出。
+
 ## 当前判断
 
-Skill现在能稳定做到：已有信息不重复问；自有数据与内置样例分开；目标未知时只追问当前缺口；结构化样例的预训练说法与实际代码一致。蛋白质与DNA的自备FASTA、学生自己的SMILES表已经可以完成数据准备和小型预训练；天气、图像、光谱、连续场和三维点集可通过明确的NPZ合同进入预训练与一维回归任务。晶体、FITS和原始仪器格式仍需另行接入。
+Skill现在能稳定做到：已有信息不重复问；自有数据与内置样例分开；目标未知时只追问当前缺口；结构化样例的预训练说法与实际代码一致。蛋白质与DNA的自备FASTA、学生自己的SMILES表已经可以完成数据准备和小型预训练；天气、晶体、图像、光谱、连续场和三维点集可通过明确的NPZ合同进入预训练与一维回归任务。FITS和原始仪器格式仍需先整理，不能直接运行。

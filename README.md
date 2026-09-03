@@ -34,7 +34,7 @@ nanoscigpt-baseline --case lamost --out_root out/baseline
 nanoscigpt-baseline --csv <数据.csv> --target <目标列> --task regression --out_root out/baseline
 nanoscigpt-baseline --series-csv <时序.csv> --value-column <数值列> --time-column <时间列> --out_root out/baseline
 
-# 已整理成训练/验证数组的天气、图像、光谱、连续场和三维点集
+# 已整理成训练/验证数组的天气、晶体、图像、光谱、连续场和三维点集
 nanoscigpt-prepare-structured --help
 
 # 查看当前真正能运行的十个选择

@@ -49,6 +49,48 @@ def test_structured_user_contract_rejects_non_numeric_arrays():
         validate_arrays("spectrum", arrays, 1)
 
 
+def crystal_arrays(train_samples=8, val_samples=3, nodes=4):
+    rng = np.random.default_rng(17)
+
+    def split(count):
+        atomic_numbers = rng.integers(1, 15, size=(count, nodes), dtype=np.int64)
+        fractional = rng.random((count, nodes, 3), dtype=np.float32)
+        mask = np.ones((count, nodes), dtype=bool)
+        lattice = np.repeat(np.eye(3, dtype=np.float32)[None, :, :], count, axis=0)
+        target = atomic_numbers.mean(axis=1).astype(np.float32)
+        return atomic_numbers, fractional, mask, lattice, target
+
+    train = split(train_samples)
+    val = split(val_samples)
+    return {
+        "train_atomic_numbers": train[0],
+        "val_atomic_numbers": val[0],
+        "train_fractional": train[1],
+        "val_fractional": val[1],
+        "train_mask": train[2],
+        "val_mask": val[2],
+        "train_lattice": train[3],
+        "val_lattice": val[3],
+        "train_y": train[4],
+        "val_y": val[4],
+    }
+
+
+def test_crystal_user_contract_accepts_periodic_graph_arrays():
+    from nanoscigpt.prepare_structured import validate_arrays
+
+    validate_arrays("crystal", crystal_arrays(), patch_size=1)
+
+
+def test_crystal_user_contract_rejects_invalid_atomic_numbers():
+    from nanoscigpt.prepare_structured import validate_arrays
+
+    arrays = crystal_arrays()
+    arrays["train_atomic_numbers"][0, 0] = 119
+    with pytest.raises(ValueError, match="1 through 118"):
+        validate_arrays("crystal", arrays, patch_size=1)
+
+
 def test_student_spectrum_npz_runs_with_user_labels_and_provenance(tmp_path):
     source = tmp_path / "spectra.npz"
     rng = np.random.default_rng(42)
@@ -133,3 +175,70 @@ def test_student_spectrum_npz_runs_with_user_labels_and_provenance(tmp_path):
     assert result["label_source"] == "user_provided"
     assert result["teaching_only"] is False
     assert result["task_name"] == "stellar temperature regression"
+
+
+def test_student_crystal_npz_runs_with_user_labels_and_provenance(tmp_path):
+    source = tmp_path / "crystals.npz"
+    np.savez_compressed(source, **crystal_arrays())
+    data_root = tmp_path / "prepared"
+    prepared = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "nanoscigpt.prepare_structured",
+            "--domain",
+            "crystal",
+            "--npz",
+            str(source),
+            "--out-dir",
+            str(data_root / "crystal"),
+            "--task-name",
+            "formation energy regression",
+            "--sample-unit",
+            "one periodic crystal cell",
+            "--target-unit",
+            "eV per atom",
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        timeout=60,
+    )
+
+    assert prepared.returncode == 0, prepared.stdout + prepared.stderr
+    run = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "nanoscigpt.classroom",
+            "--domain",
+            "crystal",
+            "--data_root",
+            str(data_root),
+            "--profile",
+            "smoke",
+            "--out_root",
+            str(tmp_path / "runs"),
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        timeout=120,
+    )
+
+    assert run.returncode == 0, run.stdout + run.stderr
+    report = json.loads(
+        (tmp_path / "runs" / "crystal" / "run_report.json").read_text(encoding="utf-8")
+    )
+    result = json.loads(
+        (tmp_path / "runs" / "crystal" / "downstream" / "downstream_result.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert report["preflight"]["source_name"] == str(source.resolve())
+    assert report["preflight"]["source_kind"] == "user_file"
+    assert result["label_source"] == "user_provided"
+    assert result["teaching_only"] is False
+    assert result["task_name"] == "formation energy regression"

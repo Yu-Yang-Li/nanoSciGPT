@@ -12,8 +12,9 @@
 | DNA FASTA | `nanoscigpt.domains.dna.prepare --fasta` | 可在自有序列上预训练；无目标标签时可加`--skip-downstream` |
 | SMILES CSV | `nanoscigpt.domains.smiles.prepare --csv` | 可在自有分子字符串上预训练；ESOL水溶解度标签不会自动借给用户数据 |
 | 天气/图像/光谱/连续场/三维点集NPZ | `nanoscigpt-prepare-structured` | 需提供`train_x/val_x/train_y/val_y`；当前下游为回归 |
+| 晶体NPZ | `nanoscigpt-prepare-structured --domain crystal` | 需提供原子序数、分数坐标、有效原子掩码、晶格矩阵和回归标签 |
 
-晶体的周期邻域和原子掩码合同仍需单独接入。学生数据不满足上述现成格式时，需按下列五个接口实现，不能直接套用内置样例的结果。
+学生数据不满足上述现成格式时，需按下列五个接口实现，不能直接套用内置样例的结果。FITS、实验仪器原始文件和材料数据库导出格式不会被自动猜测，需先整理成对应合同。
 
 ## 五个必需接口
 

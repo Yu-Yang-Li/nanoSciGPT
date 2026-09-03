@@ -11,17 +11,75 @@ import numpy as np
 from .domains.registry import get_domain_spec
 
 
-SUPPORTED_DOMAINS = ("weather", "image", "spectrum", "field", "structure3d")
+SUPPORTED_DOMAINS = ("weather", "crystal", "image", "spectrum", "field", "structure3d")
 PRETRAINING_NAMES = {
     "weather": "masked patch reconstruction",
+    "crystal": "masked atomic-number reconstruction",
     "image": "masked image-patch reconstruction",
     "spectrum": "masked wavelength-patch reconstruction",
     "field": "masked field-patch reconstruction",
     "structure3d": "masked distance-row reconstruction",
 }
 
+CRYSTAL_ARRAYS = {
+    "train_atomic_numbers",
+    "val_atomic_numbers",
+    "train_fractional",
+    "val_fractional",
+    "train_mask",
+    "val_mask",
+    "train_lattice",
+    "val_lattice",
+    "train_y",
+    "val_y",
+}
+
+
+def validate_crystal_arrays(arrays: dict[str, np.ndarray]) -> None:
+    missing = CRYSTAL_ARRAYS - set(arrays)
+    if missing:
+        raise ValueError(f"crystal NPZ missing arrays: {sorted(missing)}")
+
+    for split in ("train", "val"):
+        atomic_numbers = arrays[f"{split}_atomic_numbers"]
+        fractional = arrays[f"{split}_fractional"]
+        mask = arrays[f"{split}_mask"]
+        lattice = arrays[f"{split}_lattice"]
+        target = arrays[f"{split}_y"]
+        if atomic_numbers.ndim != 2:
+            raise ValueError(f"{split}_atomic_numbers expects (samples, max_atoms)")
+        samples, max_atoms = atomic_numbers.shape
+        if fractional.shape != (samples, max_atoms, 3):
+            raise ValueError(f"{split}_fractional must match atomic numbers with xyz coordinates")
+        if mask.shape != atomic_numbers.shape or mask.dtype != np.bool_:
+            raise ValueError(f"{split}_mask must be a boolean array matching atomic numbers")
+        if lattice.shape != (samples, 3, 3):
+            raise ValueError(f"{split}_lattice expects (samples, 3, 3)")
+        if target.shape != (samples,):
+            raise ValueError(f"{split}_y must be a one-dimensional regression target")
+        if samples == 0 or max_atoms == 0 or not mask.any(axis=1).all():
+            raise ValueError(f"{split} must contain samples with at least one active atom")
+        if not np.issubdtype(atomic_numbers.dtype, np.integer):
+            raise ValueError(f"{split}_atomic_numbers must use an integer dtype")
+        active_numbers = atomic_numbers[mask]
+        if np.any((active_numbers < 1) | (active_numbers > 118)):
+            raise ValueError("active atomic numbers must be 1 through 118")
+        if np.any(atomic_numbers[~mask] != 0):
+            raise ValueError("padded atomic-number positions must be zero")
+        for name, value in (("fractional", fractional), ("lattice", lattice), ("y", target)):
+            if not np.issubdtype(value.dtype, np.number) or not np.isfinite(value).all():
+                raise ValueError(f"{split}_{name} must contain finite numeric values")
+        if np.any(np.abs(np.linalg.det(lattice)) < 1e-8):
+            raise ValueError(f"{split}_lattice contains a singular cell")
+
+    if arrays["train_atomic_numbers"].shape[1] != arrays["val_atomic_numbers"].shape[1]:
+        raise ValueError("train and validation crystals must use the same max_atoms width")
+
 
 def validate_arrays(domain: str, arrays: dict[str, np.ndarray], patch_size: int) -> None:
+    if domain == "crystal":
+        validate_crystal_arrays(arrays)
+        return
     required = {"train_x", "val_x", "train_y", "val_y"}
     missing = required - set(arrays)
     if missing:

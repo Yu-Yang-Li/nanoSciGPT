@@ -75,13 +75,21 @@ python -m nanoscigpt.domains.smiles.prepare --csv <CSV绝对路径> --smiles-col
 
 天气、图像、光谱、连续场和三维点集可以通过一个明确的NPZ合同接入。文件必须已经包含`train_x`、`val_x`、`train_y`和`val_y`，其中标签是一维回归目标。模型输入形状分别是：天气/图像`(样本, 通道, 高, 宽)`，光谱/连续场`(样本, 通道, 长度)`，三维点集`(样本, 点, 3)`。
 
+晶体也走同一个准备命令，但使用周期图合同：`train/val_atomic_numbers`、`train/val_fractional`、`train/val_mask`、`train/val_lattice`和`train/val_y`。有效原子的原子序数为1—118；补齐位置的掩码为false且原子序数为0；每个晶格矩阵必须可逆。
+
+目标单位是运行证据的一部分，不能根据任务名称猜测。学生只说“形成能”但没说标签采用`eV/atom`、`eV/cell`或其他单位时，这一轮只问“形成能标签的单位是什么？”，不附命令。单位已知后使用完整命令：
+
+```powershell
+python -m nanoscigpt.prepare_structured --domain crystal --npz <NPZ绝对路径> --out-dir out/student-data/crystal --task-name "形成能回归" --sample-unit "一个周期晶胞" --target-unit "eV/atom"
+```
+
 下面以光谱为例，先准备数据：
 
 ```powershell
 python -m nanoscigpt.prepare_structured --domain spectrum --npz <NPZ绝对路径> --out-dir out/student-data/spectrum --patch-size 8 --task-name "恒星温度回归" --sample-unit "一条归一化光谱" --target-unit kelvin
 ```
 
-再运行`python -m nanoscigpt.classroom --domain spectrum --data_root out/student-data --profile classroom --out_root out/student-runs`。输出会把标签来源记为`user_provided`，不会继续沿用生成夹具的标签说明。晶体的周期邻域合同不同，目前不走这个入口。
+再运行`python -m nanoscigpt.classroom --domain spectrum --data_root out/student-data --profile classroom --out_root out/student-runs`。输出会把标签来源记为`user_provided`，不会继续沿用生成夹具的标签说明。晶体把`--domain`改为`crystal`，同时沿用上述周期图数组名。
 
 ## 怎样读运行结果
 
@@ -92,11 +100,12 @@ python -m nanoscigpt.prepare_structured --domain spectrum --npz <NPZ绝对路径
 
 验证损失下降只代表这个小模型按预定目标学到了东西，不等于发现了科学机制。天气、晶体、三维结构、图像、光谱和物理场是仓库生成的教学夹具；蛋白质、DNA、SMILES与文本来自列明来源的课程子集。介绍数据时读取 `data/manifest.json`，用“课程样例”“生成夹具”或“真实来源子集”说清身份。
 
-学生提到自己的数据时，第一句话同时说清两件事：已经识别的科学对象，以及当前有没有对应加载器。蛋白质和DNA的FASTA、SMILES表可以先准备后运行；天气、图像、光谱、连续场和三维点集可以按NPZ合同接入；普通表格与单条数值时序交给`nanoscigpt-research-baseline-builder`；晶体等尚未接入的格式停在设计。除非已经实际读到文件，否则只说“你的是……”或“你手里有……”，不说“已经收到数据”。
+学生提到自己的数据时，第一句话同时说清两件事：已经识别的科学对象，以及当前有没有对应加载器。蛋白质和DNA的FASTA、SMILES表可以先准备后运行；天气、晶体、图像、光谱、连续场和三维点集可以按各自NPZ合同接入；普通表格与单条数值时序交给`nanoscigpt-research-baseline-builder`。FITS、实验仪器原始文件和未整理的数据库导出格式先停在数据整理，不能假装加载器会自动识别。除非已经实际读到文件，否则只说“你的是……”或“你手里有……”，不说“已经收到数据”。
 
 接下来按这个形状回复：
 
 - 学生明确说“先只做预训练”，且文件格式、路径和必要列名已经给出：把预训练本身视为这一轮目标，直接给当前数据准备命令，不再追问下游任务。
+- 学生要运行结构化回归，但目标单位没有说明：只问目标单位，不能根据领域惯例自行补写。
 - 最终任务还没说清：只问“最后想预测、生成或模拟什么？”，这一轮不附命令。
 - 最终任务已经说清但表示仍不明确：只问一个会改变表示的问题，这一轮不附命令。
 - 学生明确选择内置样例：只给当前一条命令，并说明带回哪个结果，不再追加新问题。
