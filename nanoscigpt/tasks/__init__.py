@@ -1,1 +1,1 @@
-"""Downstream tasks: frozen-representation probes (A2) and multi-task heads (A3)."""
+"""Downstream tasks: a text fine-tuning warm-up and frozen scientific probes."""

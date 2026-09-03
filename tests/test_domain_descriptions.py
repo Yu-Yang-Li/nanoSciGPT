@@ -30,6 +30,18 @@ def test_structured_descriptions_match_masked_reconstruction_implementation():
     assert crystal.pretraining_objective == "判断被遮住位置的原子种类"
 
 
+def test_domain_cards_distinguish_fine_tuning_from_frozen_probes():
+    from nanoscigpt.classroom import describe_domain
+
+    text = describe_domain("text", DATA)
+    protein = describe_domain("protein", DATA)
+    spectrum = describe_domain("spectrum", DATA)
+
+    assert text["downstream_training"] == "full_fine_tune"
+    assert protein["downstream_training"] == "frozen_probe"
+    assert spectrum["downstream_training"] == "frozen_probe"
+
+
 def test_describe_domain_distinguishes_bundled_example_from_student_data():
     from nanoscigpt.classroom import describe_domain
 

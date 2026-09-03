@@ -13,7 +13,7 @@
 学生按照同一份结果逐步向后推进：
 
 1. `research-baseline-builder`：有标签科学数据的第一份基线；
-2. `nanogpt-pretraining`：文本预训练与任务头；
+2. `nanogpt-pretraining`：文本预训练与微调；
 3. `nanoscigpt-scientific-language`：把同一思路迁移到科学数据；
 4. `autoresearch-model-iteration`：完成一次V0到V1的同口径比较；
 5. `ai-scientist-v1-workflow`：把单路线实验整理成可复查材料；

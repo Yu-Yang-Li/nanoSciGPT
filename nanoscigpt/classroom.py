@@ -286,6 +286,8 @@ def run_domain(domain, profile, data_root, out_root, cwd=None, overwrite=False):
         "--max_samples",
         settings["task_samples"],
     ]
+    if domain == "text":
+        downstream_command.append("--fine_tune")
     run_command(downstream_command, cwd)
     commands.append(downstream_command)
     downstream_task = "completed"
@@ -304,6 +306,11 @@ def run_domain(domain, profile, data_root, out_root, cwd=None, overwrite=False):
             "train_log": str(model_dir / "train_log.json"),
             "samples": str(samples_path),
             "downstream": str(downstream_dir / "downstream_result.json"),
+            **(
+                {"finetuned_checkpoint": str(downstream_dir / "finetuned_ckpt.pt")}
+                if domain == "text"
+                else {}
+            ),
         },
         "commands": [[str(part) for part in command] for command in commands],
     }
@@ -344,6 +351,7 @@ def describe_domain(domain, data_root="data"):
         "preserved_relations": spec.preserved_relations,
         "pretraining_objective": spec.pretraining_objective,
         "downstream_task": spec.task_name,
+        "downstream_training": spec.downstream_training,
         "source_kind": spec.source_kind,
         "source_name": source["source_name"],
         "source_note": source["source_note"],
