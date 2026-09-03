@@ -9,6 +9,16 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def test_baseline_child_process_forces_utf8_output(monkeypatch):
+    from nanoscigpt.baseline import subprocess_environment
+
+    monkeypatch.setenv("PYTHONIOENCODING", "cp1252")
+    environment = subprocess_environment()
+
+    assert environment["PYTHONUTF8"] == "1"
+    assert environment["PYTHONIOENCODING"] == "utf-8"
+
+
 def test_project_dependencies_cover_the_bundled_lamost_baseline():
     project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]
     names = {item.split(">=")[0].lower() for item in project["dependencies"]}

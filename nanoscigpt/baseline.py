@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -17,6 +18,13 @@ WORKFLOW = (
     / "run_research_baseline_workflow.py"
 )
 LAMOST = ROOT / "data" / "course" / "lamost_atlas_a_teff_2000.csv"
+
+
+def subprocess_environment() -> dict[str, str]:
+    environment = os.environ.copy()
+    environment["PYTHONUTF8"] = "1"
+    environment["PYTHONIOENCODING"] = "utf-8"
+    return environment
 
 
 def build_command(args: argparse.Namespace) -> list[str]:
@@ -75,7 +83,9 @@ def main() -> int:
     if args.case == "lamost" and not LAMOST.is_file():
         parser.error(f"bundled LAMOST data not found: {LAMOST}")
 
-    completed = subprocess.run(build_command(args), cwd=ROOT)
+    completed = subprocess.run(
+        build_command(args), cwd=ROOT, env=subprocess_environment()
+    )
     return completed.returncode
 
 
