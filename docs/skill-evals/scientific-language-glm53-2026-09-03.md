@@ -93,6 +93,14 @@
 
 > 你的晶体符合周期图NPZ合同，形成能按eV/atom回归。运行：`python -m nanoscigpt.prepare_structured --domain crystal --npz D:\data\crystals.npz --out-dir out/student-data/crystal --task-name “形成能回归” --sample-unit “一个周期晶胞” --target-unit “eV/atom”`。完成后发我输出。
 
+### 学生只有无标签光谱，只想先做预训练
+
+结构化课堂路径原先强制要求`train_y/val_y`，与课程“先利用大量未订正数据”的入口不一致。加入无标签模式并实际跑通后，GLM-5.3面对只有`train_x/val_x`的学生请求，直接返回第一条准备命令：
+
+> 无标签也能先做掩码重建预训练，不必补 train_y/val_y。`python -m nanoscigpt.prepare_structured --domain spectrum --npz D:\data\unlabeled-spectra.npz --out-dir out/student-data/spectrum --patch-size 8 --sample-unit "一条归一化光谱" --skip-downstream`。完成后发我输出。
+
+实际课堂测试确认随后运行`nanoscigpt.classroom ... --skip-downstream`只生成预训练检查点、损失记录和表示预览，`run_report.json`写入`downstream_task=not_requested`，没有生成回归分数或假标签。
+
 ## 当前判断
 
 Skill现在能稳定做到：已有信息不重复问；自有数据与内置样例分开；目标未知时只追问当前缺口；结构化样例的预训练说法与实际代码一致。蛋白质与DNA的自备FASTA、学生自己的SMILES表已经可以完成数据准备和小型预训练；天气、晶体、图像、光谱、连续场和三维点集可通过明确的NPZ合同进入预训练与一维回归任务。FITS和原始仪器格式仍需先整理，不能直接运行。

@@ -79,7 +79,12 @@ def validate_manifest_files(domain, data_root):
     return entry
 
 
-def validate_domain_data(domain, data_root="data", required_block_size=None):
+def validate_domain_data(
+    domain,
+    data_root="data",
+    required_block_size=None,
+    require_structured_labels=True,
+):
     if domain not in RUNNABLE_DOMAINS:
         raise ValueError(f"unknown classroom domain: {domain}")
     data_root = Path(data_root)
@@ -87,7 +92,11 @@ def validate_domain_data(domain, data_root="data", required_block_size=None):
     if domain in STRUCTURED_DOMAINS:
         from .tasks.structured_demo import validate_structured_fixture
 
-        report = validate_structured_fixture(domain, data_root)
+        report = validate_structured_fixture(
+            domain,
+            data_root,
+            require_labels=require_structured_labels,
+        )
         if manifest_entry:
             report["source_name"] = manifest_entry.get("source_name")
             report["source_kind"] = get_domain_spec(domain).source_kind
@@ -208,12 +217,11 @@ def run_domain(
         domain,
         data_root,
         required_block_size=settings["block_size"],
+        require_structured_labels=not skip_downstream,
     )
     started = time.perf_counter()
 
     if domain in STRUCTURED_DOMAINS:
-        if skip_downstream:
-            raise ValueError("--skip-downstream is currently available only for sequence domains")
         command = [
             sys.executable,
             "-m",
@@ -229,7 +237,19 @@ def run_domain(
             "--task_steps",
             settings["structured_task_steps"],
         ]
+        if skip_downstream:
+            command.append("--skip-downstream")
         run_command(command, cwd)
+        downstream_task = "not_requested" if skip_downstream else "completed"
+        artifacts = {
+            "checkpoint": str(out_dir / "model" / "ckpt.pt"),
+            "train_log": str(out_dir / "model" / "train_log.json"),
+            "representation_preview": str(out_dir / "representation_preview.json"),
+        }
+        if not skip_downstream:
+            artifacts["downstream"] = str(
+                out_dir / "downstream" / "downstream_result.json"
+            )
         report = {
             "status": "completed",
             "lesson_stage": "nanoscigpt",
@@ -237,14 +257,9 @@ def run_domain(
             "profile": profile,
             "device": settings["device"],
             "preflight": preflight,
-            "downstream_task": "completed",
+            "downstream_task": downstream_task,
             "elapsed_seconds": round(time.perf_counter() - started, 3),
-            "artifacts": {
-                "checkpoint": str(out_dir / "model" / "ckpt.pt"),
-                "train_log": str(out_dir / "model" / "train_log.json"),
-                "downstream": str(out_dir / "downstream" / "downstream_result.json"),
-                "representation_preview": str(out_dir / "representation_preview.json"),
-            },
+            "artifacts": artifacts,
             "commands": [[str(part) for part in command]],
         }
         report_path.write_text(

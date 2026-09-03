@@ -62,6 +62,8 @@ def test_scientific_language_skill_can_use_student_protein_fasta_without_overcla
     assert "train/val_atomic_numbers" in skill
     assert "形成能标签的单位是什么" in skill
     assert "--sample-unit \"一个周期晶胞\"" in skill
+    assert "不要求他补造" in skill
+    assert "最终报告只有预训练产物" in skill
 
 
 def test_autoresearch_model_iteration_is_packaged_as_its_own_lesson():

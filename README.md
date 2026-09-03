@@ -37,6 +37,10 @@ nanoscigpt-baseline --series-csv <时序.csv> --value-column <数值列> --time-
 # 已整理成训练/验证数组的天气、晶体、图像、光谱、连续场和三维点集
 nanoscigpt-prepare-structured --help
 
+# 只有无标签结构化数据时，准备和课堂运行都明确跳过具体任务
+nanoscigpt-prepare-structured --domain spectrum --npz <数据.npz> --out-dir out/student-data/spectrum --patch-size 8 --sample-unit <一条样本是什么> --skip-downstream
+python -m nanoscigpt.classroom --domain spectrum --data_root out/student-data --out_root out/student-runs --skip-downstream
+
 # 查看当前真正能运行的十个选择
 python -m nanoscigpt.classroom --list
 

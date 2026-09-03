@@ -35,6 +35,29 @@ def test_structured_user_contract_accepts_each_supported_shape(
     validate_arrays(domain, arrays, patch_size)
 
 
+@pytest.mark.parametrize(
+    ("domain", "sample_shape", "patch_size"),
+    [
+        ("weather", (4, 8, 8), 4),
+        ("image", (1, 8, 8), 4),
+        ("spectrum", (1, 16), 4),
+        ("field", (4, 16), 4),
+        ("structure3d", (10, 3), 1),
+    ],
+)
+def test_structured_user_contract_accepts_unlabeled_pretraining_arrays(
+    domain, sample_shape, patch_size
+):
+    from nanoscigpt.prepare_structured import validate_arrays
+
+    arrays = {
+        "train_x": np.ones((5, *sample_shape), dtype=np.float32),
+        "val_x": np.ones((2, *sample_shape), dtype=np.float32),
+    }
+
+    validate_arrays(domain, arrays, patch_size, require_labels=False)
+
+
 def test_structured_user_contract_rejects_non_numeric_arrays():
     from nanoscigpt.prepare_structured import validate_arrays
 
@@ -80,6 +103,15 @@ def test_crystal_user_contract_accepts_periodic_graph_arrays():
     from nanoscigpt.prepare_structured import validate_arrays
 
     validate_arrays("crystal", crystal_arrays(), patch_size=1)
+
+
+def test_crystal_user_contract_accepts_unlabeled_pretraining_arrays():
+    from nanoscigpt.prepare_structured import validate_arrays
+
+    arrays = crystal_arrays()
+    arrays.pop("train_y")
+    arrays.pop("val_y")
+    validate_arrays("crystal", arrays, patch_size=1, require_labels=False)
 
 
 def test_crystal_user_contract_rejects_invalid_atomic_numbers():
@@ -175,6 +207,76 @@ def test_student_spectrum_npz_runs_with_user_labels_and_provenance(tmp_path):
     assert result["label_source"] == "user_provided"
     assert result["teaching_only"] is False
     assert result["task_name"] == "stellar temperature regression"
+
+
+def test_student_unlabeled_spectrum_npz_can_run_pretraining_only(tmp_path):
+    source = tmp_path / "unlabeled-spectra.npz"
+    rng = np.random.default_rng(43)
+    np.savez_compressed(
+        source,
+        train_x=rng.normal(size=(20, 1, 32)).astype(np.float32),
+        val_x=rng.normal(size=(6, 1, 32)).astype(np.float32),
+    )
+    data_root = tmp_path / "prepared"
+    prepared = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "nanoscigpt.prepare_structured",
+            "--domain",
+            "spectrum",
+            "--npz",
+            str(source),
+            "--out-dir",
+            str(data_root / "spectrum"),
+            "--patch-size",
+            "8",
+            "--sample-unit",
+            "one normalized spectrum",
+            "--skip-downstream",
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        timeout=60,
+    )
+
+    assert prepared.returncode == 0, prepared.stdout + prepared.stderr
+    meta = json.loads((data_root / "spectrum" / "meta.json").read_text(encoding="utf-8"))
+    assert meta["has_labels"] is False
+    assert "task_name" not in meta
+    assert "label_source" not in meta
+
+    run = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "nanoscigpt.classroom",
+            "--domain",
+            "spectrum",
+            "--data_root",
+            str(data_root),
+            "--profile",
+            "smoke",
+            "--out_root",
+            str(tmp_path / "runs"),
+            "--skip-downstream",
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        timeout=120,
+    )
+
+    assert run.returncode == 0, run.stdout + run.stderr
+    report = json.loads(
+        (tmp_path / "runs" / "spectrum" / "run_report.json").read_text(encoding="utf-8")
+    )
+    assert report["downstream_task"] == "not_requested"
+    assert "downstream" not in report["artifacts"]
+    assert not (tmp_path / "runs" / "spectrum" / "downstream").exists()
 
 
 def test_student_crystal_npz_runs_with_user_labels_and_provenance(tmp_path):

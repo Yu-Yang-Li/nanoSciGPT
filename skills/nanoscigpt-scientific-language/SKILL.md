@@ -73,7 +73,7 @@ python -m nanoscigpt.domains.smiles.prepare --csv <CSV绝对路径> --smiles-col
 
 ### 学生自己的连续或结构化数组
 
-天气、图像、光谱、连续场和三维点集可以通过一个明确的NPZ合同接入。文件必须已经包含`train_x`、`val_x`、`train_y`和`val_y`，其中标签是一维回归目标。模型输入形状分别是：天气/图像`(样本, 通道, 高, 宽)`，光谱/连续场`(样本, 通道, 长度)`，三维点集`(样本, 点, 3)`。
+天气、图像、光谱、连续场和三维点集可以通过一个明确的NPZ合同接入。只做预训练时需要`train_x`和`val_x`；接入当前回归任务时再提供一维的`train_y`和`val_y`。模型输入形状分别是：天气/图像`(样本, 通道, 高, 宽)`，光谱/连续场`(样本, 通道, 长度)`，三维点集`(样本, 点, 3)`。
 
 晶体也走同一个准备命令，但使用周期图合同：`train/val_atomic_numbers`、`train/val_fractional`、`train/val_mask`、`train/val_lattice`和`train/val_y`。有效原子的原子序数为1—118；补齐位置的掩码为false且原子序数为0；每个晶格矩阵必须可逆。
 
@@ -91,6 +91,15 @@ python -m nanoscigpt.prepare_structured --domain spectrum --npz <NPZ绝对路径
 
 再运行`python -m nanoscigpt.classroom --domain spectrum --data_root out/student-data --profile classroom --out_root out/student-runs`。输出会把标签来源记为`user_provided`，不会继续沿用生成夹具的标签说明。晶体把`--domain`改为`crystal`，同时沿用上述周期图数组名。
 
+学生只有无标签结构化数据时，不要求他补造`train_y/val_y`。准备和运行都明确跳过具体任务：
+
+```powershell
+python -m nanoscigpt.prepare_structured --domain spectrum --npz <NPZ绝对路径> --out-dir out/student-data/spectrum --patch-size 8 --sample-unit "一条归一化光谱" --skip-downstream
+python -m nanoscigpt.classroom --domain spectrum --data_root out/student-data --profile classroom --out_root out/student-runs --skip-downstream
+```
+
+第一条命令只整理数据；本轮先给第一条，学生返回准备结果后再给第二条。最终报告只有预训练产物，不应出现回归分数。
+
 ## 怎样读运行结果
 
 一轮训练以后，先看 `out/classroom/<domain>/run_report.json`，再沿其中的路径看训练记录、生成样例或表示预览，以及 `downstream_result.json`。用两句话把两段训练分开：
@@ -104,7 +113,7 @@ python -m nanoscigpt.prepare_structured --domain spectrum --npz <NPZ绝对路径
 
 接下来按这个形状回复：
 
-- 学生明确说“先只做预训练”，且文件格式、路径和必要列名已经给出：把预训练本身视为这一轮目标，直接给当前数据准备命令，不再追问下游任务。
+- 学生明确说“先只做预训练”，且文件格式、路径和必要列名已经给出：把预训练本身视为这一轮目标，直接给带`--skip-downstream`的数据准备命令，不再追问下游任务或要求制造标签。
 - 学生要运行结构化回归，但目标单位没有说明：只问目标单位，不能根据领域惯例自行补写。
 - 最终任务还没说清：只问“最后想预测、生成或模拟什么？”，这一轮不附命令。
 - 最终任务已经说清但表示仍不明确：只问一个会改变表示的问题，这一轮不附命令。
