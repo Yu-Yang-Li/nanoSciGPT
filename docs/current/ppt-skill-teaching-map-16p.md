@@ -75,9 +75,10 @@
 ### P11｜从The AI Scientist v1到v2
 
 - 讲清：从一条研究路线扩展为多条可比较路线，并使用同一个评价器取舍。
-- 你可以这样说：`沿用同一个V0和评价指标，先建立两条路线，不要运行。`
-- 接续：`ai-scientist-v2-tree-search`运行`python -m autoresearch.v2 init --from-v1 out/ai-scientist-v1/protein/workflow_state.json --out-root out/ai-scientist-v2`。
-- 留下：`tree_state.json`。序列示例可批准第二路线；结构化领域没有第二个安全变量时停在`design_only`。
+- 课堂展示：打开已实测记录`docs/skill-evals/ai-scientist-v2-glm53-2026-09-03.md`，对照同一个V0、评价指标和门槛，看两条路线怎样并列和取舍。
+- 接续：本页不新增课堂命令。课后希望继续时，再使用`ai-scientist-v2-tree-search`建立并执行第二路线。
+- 课后入口：`python -m autoresearch.v2 init --from-v1 out/ai-scientist-v1/protein/workflow_state.json --out-root out/ai-scientist-v2`。
+- 留下：单路线与多路线的区别。结构化领域没有第二个安全变量时停在`design_only`，不为了展示“树”而伪造可执行路线。
 
 ### P12｜2004—2020，自动化实验
 

@@ -85,7 +85,7 @@ bash scripts/install_skills.sh "$HOME/.codex/skills"
 
 | 选择 | 内置数据 | 课堂运行内容 | 具体任务 |
 |---|---|---|---|
-| `text` | tiny Shakespeare | 字符预训练与采样 | 语言模型热身，不另接任务 |
+| `text` | tiny Shakespeare | 字符预训练与采样 | 标点密度教学分类，并更新预训练参数 |
 | `protein` | 500条UniProtKB reviewed记录 | 氨基酸序列预训练 | 蛋白质组成属性教学分类 |
 | `dna` | hg38 chr21教学切片 | 单碱基序列预训练 | GC含量教学分类 |
 | `smiles` | 1128条Delaney ESOL记录 | SMILES字符预训练 | 实测水溶解度教学回归 |
