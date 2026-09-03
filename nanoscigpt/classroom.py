@@ -10,7 +10,12 @@ from pathlib import Path
 
 import numpy as np
 
-from .domains.registry import RUNNABLE_DOMAINS, SEQUENCE_DOMAINS, STRUCTURED_DOMAINS
+from .domains.registry import (
+    RUNNABLE_DOMAINS,
+    SEQUENCE_DOMAINS,
+    STRUCTURED_DOMAINS,
+    get_domain_spec,
+)
 
 DEFAULT_PROFILE = "classroom"
 CPU_PROFILES = {
@@ -323,26 +328,59 @@ def list_domains(data_root):
     return ready
 
 
+def describe_domain(domain, data_root="data"):
+    """Return the teaching semantics and exact identity of one bundled example."""
+    spec = get_domain_spec(domain)
+    readiness = validate_domain_data(domain, data_root)
+    manifest_path = Path(data_root) / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    source = manifest["domains"][domain]
+    return {
+        "status": readiness["status"],
+        "domain": domain,
+        "family": spec.family,
+        "representation": spec.representation,
+        "model_unit": spec.model_unit,
+        "preserved_relations": spec.preserved_relations,
+        "pretraining_objective": spec.pretraining_objective,
+        "downstream_task": spec.task_name,
+        "source_kind": spec.source_kind,
+        "source_name": source["source_name"],
+        "source_note": source["source_note"],
+        "student_data_loaded": False,
+        "support_level": "bundled_example_only",
+    }
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Run an offline, CPU-first nanoSciGPT classroom example."
     )
-    parser.add_argument("--domain", choices=RUNNABLE_DOMAINS + ("all",))
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--domain", choices=RUNNABLE_DOMAINS + ("all",))
+    mode.add_argument("--list", action="store_true", help="show only choices that are ready")
+    mode.add_argument(
+        "--describe",
+        choices=RUNNABLE_DOMAINS,
+        help="show how one bundled example is represented and trained without running it",
+    )
     parser.add_argument("--profile", choices=tuple(CPU_PROFILES), default=DEFAULT_PROFILE)
     parser.add_argument("--data_root", default="data")
     parser.add_argument("--out_root", default="out/classroom")
     parser.add_argument(
         "--overwrite", action="store_true", help="replace a finished run in the target directory"
     )
-    parser.add_argument("--list", action="store_true", help="show only choices that are ready")
     args = parser.parse_args()
 
     if args.list:
         list_domains(args.data_root)
         return
+    if args.describe:
+        print(json.dumps(describe_domain(args.describe, args.data_root), ensure_ascii=False, indent=2))
+        return
     if not args.domain:
         parser.error(
-            "choose a domain reported by --list, choose --domain all, or use --list"
+            "choose --list, --describe DOMAIN, --domain DOMAIN, or --domain all"
         )
     domains = RUNNABLE_DOMAINS if args.domain == "all" else (args.domain,)
     for domain in domains:

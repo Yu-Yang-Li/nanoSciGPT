@@ -12,6 +12,9 @@ class DomainSpec:
     name: str
     family: str
     representation: str
+    model_unit: str
+    preserved_relations: str
+    pretraining_objective: str
     task_name: str
     source_kind: str
 
@@ -26,16 +29,46 @@ def build_registry(specs: Iterable[DomainSpec]):
 
 
 DOMAIN_SPECS = (
-    DomainSpec("text", "sequence", "character_tokens", "punctuation-density teaching classification", "public_source"),
-    DomainSpec("protein", "sequence", "amino_acid_tokens", "protein composition teaching classification", "public_source"),
-    DomainSpec("dna", "sequence", "nucleotide_tokens", "DNA GC-content teaching classification", "public_source"),
-    DomainSpec("smiles", "sequence", "SMILES_tokens", "ESOL aqueous-solubility teaching regression", "public_source"),
-    DomainSpec("weather", "structured", "spatiotemporal_patches", "advection speed teaching regression", "synthetic_fixture"),
-    DomainSpec("crystal", "structured", "periodic_graph", "unit-cell mass density proxy regression", "synthetic_fixture"),
-    DomainSpec("structure3d", "structured", "pairwise_distance_tokens", "helix pitch teaching regression", "synthetic_fixture"),
-    DomainSpec("image", "structured", "image_patches", "astronomical source-count teaching regression", "synthetic_fixture"),
-    DomainSpec("spectrum", "structured", "wavelength_patches", "blackbody temperature teaching regression", "synthetic_fixture"),
-    DomainSpec("field", "structured", "space_time_patches", "diffusion coefficient teaching regression", "synthetic_fixture"),
+    DomainSpec(
+        "text", "sequence", "character_tokens", "字符", "字符顺序和上下文",
+        "预测下一个字符", "punctuation-density teaching classification", "public_source",
+    ),
+    DomainSpec(
+        "protein", "sequence", "amino_acid_tokens", "氨基酸", "序列顺序和每条序列的边界",
+        "预测下一个氨基酸", "protein composition teaching classification", "public_source",
+    ),
+    DomainSpec(
+        "dna", "sequence", "nucleotide_tokens", "碱基", "局部基序和长区段顺序",
+        "预测下一个碱基", "DNA GC-content teaching classification", "public_source",
+    ),
+    DomainSpec(
+        "smiles", "sequence", "SMILES_tokens", "SMILES标记", "原子和键在线性记法中的顺序",
+        "预测下一个SMILES标记", "ESOL aqueous-solubility teaching regression", "public_source",
+    ),
+    DomainSpec(
+        "weather", "structured", "spatiotemporal_patches", "时空网格块", "空间邻域和时间先后",
+        "重建被遮住的时空网格块", "advection speed teaching regression", "synthetic_fixture",
+    ),
+    DomainSpec(
+        "crystal", "structured", "periodic_graph", "原子与周期邻域", "晶格周期、距离和邻接",
+        "判断被遮住位置的原子种类", "unit-cell mass density proxy regression", "synthetic_fixture",
+    ),
+    DomainSpec(
+        "structure3d", "structured", "pairwise_distance_tokens", "点之间的距离", "三维邻近关系和刚体变换不变性",
+        "重建被遮住的距离片段", "helix pitch teaching regression", "synthetic_fixture",
+    ),
+    DomainSpec(
+        "image", "structured", "image_patches", "二维图像块", "二维空间邻域",
+        "重建被遮住的图像块", "astronomical source-count teaching regression", "synthetic_fixture",
+    ),
+    DomainSpec(
+        "spectrum", "structured", "wavelength_patches", "连续波长区间", "波长顺序和局部谱线形状",
+        "重建被遮住的连续波长区间", "blackbody temperature teaching regression", "synthetic_fixture",
+    ),
+    DomainSpec(
+        "field", "structured", "space_time_patches", "时空场片段", "空间邻域、时间变化和边界",
+        "重建被遮住的场片段", "diffusion coefficient teaching regression", "synthetic_fixture",
+    ),
 )
 
 DOMAIN_REGISTRY = build_registry(DOMAIN_SPECS)

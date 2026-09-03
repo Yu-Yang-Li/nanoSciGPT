@@ -14,9 +14,11 @@
 ## 代码与证据
 
 - `python -m nanoscigpt.classroom --list`：检查十类内置数据。
+- `python -m nanoscigpt.classroom --describe spectrum`：查看一种数据的课程表示、训练目标和样例身份，不启动训练。
 - `python -m nanoscigpt.classroom --domain protein`：运行一个课堂示例。
 - `python -m nanoscigpt.evidence_pack --help`：查看结课证据包命令。
 - [上游项目与适配边界](upstream-adaptation.md)：说明哪些代码来自或参考外部项目。
+- [Scientific Language Skill的GLM-5.3实测](skill-evals/scientific-language-glm53-2026-09-03.md)：无Skill对照、修改前失败与修改后回答。
 - [AI Scientist旧研究指南](ai-scientist-guide.md)：保留为研究档案，不作为当前六Skill的学生入口。
 
 ## 研究档案

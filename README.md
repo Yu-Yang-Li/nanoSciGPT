@@ -32,6 +32,9 @@ nanoscigpt-doctor
 # 查看当前真正能运行的十个选择
 python -m nanoscigpt.classroom --list
 
+# 先看一种数据在课程代码里实际怎样表示和训练；这一步不训练模型
+python -m nanoscigpt.classroom --describe spectrum
+
 # 任选一个；默认classroom配置约几十秒
 python -m nanoscigpt.classroom --domain protein
 python -m nanoscigpt.classroom --domain weather
@@ -49,6 +52,8 @@ nanoscigpt-classroom --domain protein
 ```
 
 `nanoscigpt-doctor`只检查当前Python、四个依赖、十类数据和六个Skill，不修改环境。检查未通过时，先解决它列出的缺项，不直接开始训练。
+
+`--describe`返回模型处理单位、保留关系、实际预训练目标、下游任务和样例身份。它同时明确标记`student_data_loaded=false`，避免把内置教学结果写到学生数据上。
 
 ### 把六个Skill安装到Codex
 
