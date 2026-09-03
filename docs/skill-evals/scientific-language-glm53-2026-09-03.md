@@ -57,6 +57,12 @@
 
 > 你手里是约一万条蛋白质序列，FASTA加载器可直接接入；没有EC或功能标签，这轮先做预训练、跳过下游，酶功能预测要等有标签另接。请运行：`python -m nanoscigpt.domains.protein.prepare --fasta D:\data\enzymes.fasta --out_dir out/student-data/protein`。把输出发我。
 
+### 学生有自己的SMILES表，只想先预训练
+
+第一次复测仍追问“最后想预测、生成或模拟什么”，尽管学生已经明确只做预训练。收紧交互规则后，GLM-5.3直接给出当前一步：
+
+> 你手里是SMILES分子串，仓库已支持，没标签就先只做预训练。请运行：`python -m nanoscigpt.domains.smiles.prepare --csv D:\data\molecules.csv --smiles-column molecule --out_dir out/student-data/smiles`，跑完把输出贴给我。
+
 ## 当前判断
 
 Skill现在能稳定做到：已有信息不重复问；自有数据与内置样例分开；目标未知时只追问当前缺口；结构化样例的预训练说法与实际代码一致。蛋白质与DNA的自备FASTA已经可以完成数据准备和小型预训练；学生自己的功能标签、天气网格、图像、光谱等仍需另行接入。

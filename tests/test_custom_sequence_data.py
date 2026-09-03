@@ -131,3 +131,82 @@ def test_student_dna_fasta_keeps_its_source_identity_and_runs_pretraining(tmp_pa
     assert report["preflight"]["source_kind"] == "user_file"
     assert report["preflight"]["source_name"] == str(fasta.resolve())
     assert report["downstream_task"] == "not_requested"
+
+
+def test_student_smiles_csv_can_pretrain_without_borrowing_esol_labels(tmp_path):
+    csv_path = tmp_path / "molecules.csv"
+    csv_path.write_text(
+        "molecule\n"
+        + "\n".join(
+            [
+                "CCO",
+                "CCN",
+                "CCC",
+                "CCCl",
+                "CCBr",
+                "COC",
+                "CNC",
+                "CC(=O)O",
+                "CC(C)O",
+                "CC(C)N",
+            ]
+            * 2
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    data_root = tmp_path / "prepared"
+    prepared = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "nanoscigpt.domains.smiles.prepare",
+            "--csv",
+            str(csv_path),
+            "--smiles-column",
+            "molecule",
+            "--out_dir",
+            str(data_root / "smiles"),
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        timeout=60,
+    )
+
+    assert prepared.returncode == 0, prepared.stdout + prepared.stderr
+    meta = json.loads((data_root / "smiles" / "meta.json").read_text(encoding="utf-8"))
+    assert meta["source_kind"] == "user_file"
+    assert meta["source"] == str(csv_path.resolve())
+    assert meta["smiles_column"] == "molecule"
+
+    run = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "nanoscigpt.classroom",
+            "--domain",
+            "smiles",
+            "--data_root",
+            str(data_root),
+            "--profile",
+            "smoke",
+            "--out_root",
+            str(tmp_path / "runs"),
+            "--skip-downstream",
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        timeout=120,
+    )
+
+    assert run.returncode == 0, run.stdout + run.stderr
+    report = json.loads(
+        (tmp_path / "runs" / "smiles" / "run_report.json").read_text(encoding="utf-8")
+    )
+    assert report["preflight"]["source_kind"] == "user_file"
+    assert report["preflight"]["source_name"] == str(csv_path.resolve())
+    assert report["downstream_task"] == "not_requested"

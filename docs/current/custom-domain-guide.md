@@ -10,6 +10,7 @@
 | 单条数值时序CSV | `nanoscigpt-baseline --series-csv` | 单变量预测；指定时间列或明确沿用行顺序 |
 | 蛋白质FASTA | `nanoscigpt.domains.protein.prepare --fasta` | 可在自有序列上预训练；无功能标签时运行课程命令需加`--skip-downstream` |
 | DNA FASTA | `nanoscigpt.domains.dna.prepare --fasta` | 可在自有序列上预训练；无目标标签时可加`--skip-downstream` |
+| SMILES CSV | `nanoscigpt.domains.smiles.prepare --csv` | 可在自有分子字符串上预训练；ESOL水溶解度标签不会自动借给用户数据 |
 
 天气网格、晶体、三维结构、图像、光谱和连续物理场目前仍只提供内置教学夹具。学生自己的这些数据需按下列五个接口接入，不能直接套用内置样例的结果。
 

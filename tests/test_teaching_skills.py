@@ -53,6 +53,9 @@ def test_scientific_language_skill_can_use_student_protein_fasta_without_overcla
     assert "--skip-downstream" in skill
     assert "功能标签" in skill
     assert "组成分类" in skill
+    assert "nanoscigpt.domains.smiles.prepare --csv" in skill
+    assert "ESOL" in skill
+    assert "先只做预训练" in skill
 
 
 def test_autoresearch_model_iteration_is_packaged_as_its_own_lesson():
