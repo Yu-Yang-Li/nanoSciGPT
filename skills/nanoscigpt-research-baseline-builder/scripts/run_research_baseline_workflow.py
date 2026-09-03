@@ -93,6 +93,8 @@ def baseline_command(script_name: str, args: argparse.Namespace) -> list[str] | 
         cmd = base + ["--epochs", str(args.epochs), "--seq_len", str(args.seq_len)]
         if args.csv:
             cmd += ["--csv", str(args.csv), "--value-column", args.value_column]
+            if args.time_column:
+                cmd += ["--time-column", args.time_column]
         return cmd
     return None
 
@@ -112,6 +114,7 @@ def main() -> None:
     parser.add_argument("--csv", type=Path, help="表格/时序 CSV。表格任务需配 --target；时序任务需配 --value-column。")
     parser.add_argument("--target", help="表格 CSV 的目标列。")
     parser.add_argument("--value-column", help="时序 CSV 的数值列。")
+    parser.add_argument("--time-column", help="时序 CSV 的排序列；不填则沿用现有行顺序。")
     parser.add_argument("--n_trials", type=int, default=2)
     parser.add_argument("--epochs", type=int, default=2)
     parser.add_argument("--seq_len", type=int, default=12)

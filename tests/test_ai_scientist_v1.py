@@ -40,7 +40,7 @@ def completed_autoresearch(tmp_path_factory):
     return autoresearch_root / "text"
 
 
-def _run_v1(autoresearch_dir, out_dir, mode):
+def _run_v1(autoresearch_dir, out_dir, mode, *extra):
     return subprocess.run(
         [
             sys.executable,
@@ -53,6 +53,7 @@ def _run_v1(autoresearch_dir, out_dir, mode):
             "--out-dir",
             str(out_dir),
             mode,
+            *extra,
         ],
         cwd=ROOT,
         capture_output=True,
@@ -71,6 +72,13 @@ def test_v1_plan_contains_one_route_and_offline_related_work(completed_autoresea
     related = json.loads((out_dir / "related_work.json").read_text(encoding="utf-8"))
     assert plan["route_count"] == 1
     assert plan["route"]["changed"]["field"] == "max_iters"
+    assert plan["research_question"] == (
+        "在其余设置不变时，把预训练步数从2增加到4，验证损失是否进一步降低？"
+    )
+    assert plan["display_names"] == {
+        "changed_field": "预训练步数",
+        "primary_metric": "验证损失",
+    }
     assert related["novelty_assessment"] == "not_performed_offline"
     assert related["sources"]
     assert not (out_dir / "draft.md").exists()
@@ -109,6 +117,8 @@ def test_v1_confirm_uses_existing_evidence_and_writes_traceable_outputs(
     assert review["official_v1_reviewer_reproduced"] is False
     assert workflow["route_count"] == 1
     assert workflow["implementation"]["reproduces_original_system"] is False
+    assert "验证损失" in draft
+    assert "best_val_loss" not in draft
     if not results["criterion_passed"]:
         assert "未达到" in draft
 
@@ -161,3 +171,31 @@ def test_v1_cli_help_is_domain_neutral():
     )
     assert completed.returncode == 0
     assert "AI Scientist v1 classroom workflow" in completed.stdout
+
+
+def test_v1_refuses_to_overwrite_completed_workflow_without_explicit_flag(
+    completed_autoresearch, tmp_path
+):
+    out_dir = tmp_path / "v1"
+    first = _run_v1(completed_autoresearch, out_dir, "--confirm-plan")
+    assert first.returncode == 0, first.stdout + first.stderr
+    original = (out_dir / "workflow_state.json").read_text(encoding="utf-8")
+
+    repeated = _run_v1(completed_autoresearch, out_dir, "--confirm-plan")
+
+    assert repeated.returncode == 2
+    assert "--overwrite" in repeated.stderr
+    assert (out_dir / "workflow_state.json").read_text(encoding="utf-8") == original
+
+
+def test_v1_can_confirm_an_unchanged_plan_in_the_same_directory(
+    completed_autoresearch, tmp_path
+):
+    out_dir = tmp_path / "v1"
+    planned = _run_v1(completed_autoresearch, out_dir, "--plan-only")
+    assert planned.returncode == 0, planned.stdout + planned.stderr
+
+    confirmed = _run_v1(completed_autoresearch, out_dir, "--confirm-plan")
+
+    assert confirmed.returncode == 0, confirmed.stdout + confirmed.stderr
+    assert (out_dir / "workflow_state.json").is_file()

@@ -1,0 +1,55 @@
+name: Test nanoSciGPT course
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    name: Smoke (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install course package
+        run: python -m pip install -e ".[dev]"
+      - name: Check environment, data and skills
+        run: python -m nanoscigpt.doctor
+      - name: Run release and installer tests
+        run: >-
+          python -m pytest
+          tests/test_course_release.py
+          tests/test_doctor.py
+          tests/test_skill_installers.py
+          tests/test_teaching_skills.py
+          tests/test_baseline_cli.py
+          -q
+      - name: Run every bundled domain in smoke mode
+        run: python -m nanoscigpt.classroom --domain all --profile smoke --out_root out/ci-smoke
+
+  classroom:
+    name: Complete classroom profile
+    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install course package
+        run: python -m pip install -e ".[dev]"
+      - name: Verify all classroom examples
+        run: python -m pytest tests/test_classroom.py -q

@@ -23,6 +23,9 @@ nanoscigpt-baseline = "nanoscigpt.baseline:main"
 nanoscigpt-autoresearch = "autoresearch.experiment:main"
 nanoscigpt-ai-scientist-v1 = "autoresearch.v1:main"
 nanoscigpt-ai-scientist-v2 = "autoresearch.v2:main"
+nanoscigpt-evidence-pack = "nanoscigpt.evidence_pack:main"
+nanoscigpt-doctor = "nanoscigpt.doctor:main"
+nanoscigpt-prepare-structured = "nanoscigpt.prepare_structured:main"
 
 [tool.setuptools.packages.find]
 include = ["nanoscigpt*", "autoresearch*"]

@@ -5,13 +5,43 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import shutil
 from pathlib import Path
 
-from nanoscigpt.classroom import RUNNABLE_DOMAINS
+from nanoscigpt.domains.registry import RUNNABLE_DOMAINS, STRUCTURED_DOMAINS
 
 
 ROOT = Path(__file__).resolve().parent.parent
 LITERATURE = ROOT / "data" / "course" / "ai_scientist_v1_literature.json"
+STRUCTURED_REPRESENTATION_ROUTES = {
+    "weather": "spatiotemporal_patch_or_variable_grouping",
+    "crystal": "neighbor_radius_or_graph_edges",
+    "structure3d": "distance_or_angle_features",
+    "image": "patch_size_or_augmentation",
+    "spectrum": "wavelength_binning_or_normalization",
+    "field": "spatial_resolution_or_boundary_encoding",
+}
+GENERATED_OUTPUTS = {
+    "plan.json",
+    "related_work.json",
+    "results.json",
+    "results.csv",
+    "evidence_map.json",
+    "draft.md",
+    "review.json",
+    "claim_boundary.md",
+    "workflow_state.json",
+    "workflow_status.json",
+    "figures",
+}
+FIELD_DISPLAY_NAMES = {
+    "max_iters": "预训练步数",
+    "pretrain_steps": "预训练步数",
+}
+METRIC_DISPLAY_NAMES = {
+    "best_val_loss": "验证损失",
+    "pretrain_val_loss": "预训练验证损失",
+}
 
 
 def read_json(path: Path) -> dict:
@@ -22,6 +52,44 @@ def read_json(path: Path) -> dict:
 
 def write_json(path: Path, payload: dict) -> None:
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def prepare_output_dir(
+    out_dir: Path, *, plan_only: bool, overwrite: bool, plan: dict, sources: dict
+) -> None:
+    if not out_dir.exists():
+        out_dir.mkdir(parents=True)
+        return
+    existing = {path.name for path in out_dir.iterdir()}
+    if not existing:
+        return
+
+    unchanged_plan = False
+    if existing <= {"plan.json", "related_work.json"} and existing == {
+        "plan.json",
+        "related_work.json",
+    }:
+        try:
+            unchanged_plan = (
+                read_json(out_dir / "plan.json") == plan
+                and read_json(out_dir / "related_work.json") == sources
+            )
+        except (json.JSONDecodeError, OSError):
+            unchanged_plan = False
+    if not plan_only and unchanged_plan:
+        return
+    if not overwrite:
+        raise FileExistsError(
+            f"output directory already contains workflow material: {out_dir}; "
+            "use a new --out-dir or pass --overwrite"
+        )
+
+    for name in GENERATED_OUTPUTS:
+        path = out_dir / name
+        if path.is_dir():
+            shutil.rmtree(path)
+        else:
+            path.unlink(missing_ok=True)
 
 
 def load_inputs(domain: str, autoresearch_dir: Path) -> dict:
@@ -47,6 +115,8 @@ def build_plan(inputs: dict) -> dict:
         raise ValueError("iteration_spec.json has no single changed field")
     if not metric:
         raise ValueError("iteration_spec.json has no primary metric")
+    field_label = FIELD_DISPLAY_NAMES.get(changed["field"], changed["field"])
+    metric_label = METRIC_DISPLAY_NAMES.get(metric, metric)
     return {
         "schema_version": "nanoscigpt.ai_scientist_v1.plan.v1",
         "implementation": {
@@ -56,7 +126,14 @@ def build_plan(inputs: dict) -> dict:
         },
         "domain": inputs["domain"],
         "route_count": 1,
-        "research_question": f"改变 {changed['field']} 是否改善 {metric}？",
+        "research_question": (
+            f"在其余设置不变时，把{field_label}从{changed['from']}增加到"
+            f"{changed['to']}，{metric_label}是否进一步降低？"
+        ),
+        "display_names": {
+            "changed_field": field_label,
+            "primary_metric": metric_label,
+        },
         "route": {
             "id": "route-1",
             "status": "planned",
@@ -102,10 +179,12 @@ def evidence_errors(inputs: dict) -> list[str]:
 
 def build_results(inputs: dict) -> dict:
     comparison = inputs["comparison"]
+    metric = comparison["primary_metric"]
     return {
         "schema_version": "nanoscigpt.ai_scientist_v1.results.v1",
         "domain": inputs["domain"],
-        "metric": comparison["primary_metric"],
+        "metric": metric,
+        "metric_label": METRIC_DISPLAY_NAMES.get(metric, metric),
         "baseline": comparison["baseline"],
         "candidate": comparison["candidate"],
         "delta": comparison["delta"],
@@ -141,7 +220,7 @@ def write_svg(path: Path, results: dict) -> None:
     svg = (
         '<svg xmlns="http://www.w3.org/2000/svg" width="720" height="380" viewBox="0 0 720 380">'
         '<rect width="720" height="380" fill="#fbfaf6"/>'
-        f'<text x="360" y="40" text-anchor="middle" font-size="22">{results["metric"]}</text>'
+        f'<text x="360" y="40" text-anchor="middle" font-size="22">{results["metric_label"]}</text>'
         '<line x1="100" y1="300" x2="620" y2="300" stroke="#47555a"/>'
         + "".join(bars)
         + "</svg>"
@@ -183,11 +262,11 @@ def draft_text(plan: dict, results: dict, sources: dict) -> str:
 
 ## 实验设置
 
-只改变 `{plan['route']['changed']['field']}`：从 {plan['route']['changed']['from']} 调整为 {plan['route']['changed']['to']}；其余记录在 `plan.json`。
+只改变{plan['display_names']['changed_field']}（记录字段为 `{plan['route']['changed']['field']}`）：从 {plan['route']['changed']['from']} 调整为 {plan['route']['changed']['to']}；其余记录在 `plan.json`。
 
 ## 结果
 
-V0 的 {results['metric']} 为 {results['baseline']:.4f}，V1 为 {results['candidate']:.4f}，按“V0减V1”计算的差值为 {results['delta']:.4f}，门槛为 {results['threshold']:.4f}。{outcome}
+V0 的{results['metric_label']}为 {results['baseline']:.4f}，V1 为 {results['candidate']:.4f}，按“V0减V1”计算的差值为 {results['delta']:.4f}，门槛为 {results['threshold']:.4f}。{outcome}
 
 ## 讨论
 
@@ -201,12 +280,39 @@ V0 的 {results['metric']} 为 {results['baseline']:.4f}，V1 为 {results['cand
 
 def build_workflow_state(plan: dict, results: dict, inputs: dict) -> dict:
     changed = plan["route"]["changed"]
-    alternate_to = changed["from"] * 3 if isinstance(changed.get("from"), int) else changed["to"]
+    domain = inputs["domain"]
+    if domain in STRUCTURED_DOMAINS:
+        alternate = {
+            "id": "route-2",
+            "status": "held",
+            "execution_mode": "design_only",
+            "design_reason": (
+                "the current structured classroom command exposes only training budget; "
+                "a second representation route must be implemented before execution"
+            ),
+            "change": {
+                "field": "scientific_representation",
+                "from": "bundled_baseline",
+                "to": STRUCTURED_REPRESENTATION_ROUTES[domain],
+            },
+        }
+    else:
+        block_size = int(plan["route"]["fixed_arguments"]["block_size"])
+        alternate = {
+            "id": "route-2",
+            "status": "held",
+            "execution_mode": "executable",
+            "change": {
+                "field": "block_size",
+                "from": block_size,
+                "to": block_size * 2,
+            },
+        }
     return {
         "schema_version": "nanoscigpt.ai_scientist_v1.workflow.v1",
         "implementation": plan["implementation"],
         "status": "evaluated",
-        "domain": inputs["domain"],
+        "domain": domain,
         "route_count": 1,
         "research_question": plan["research_question"],
         "baseline_run": plan["route"]["baseline_run"],
@@ -217,7 +323,7 @@ def build_workflow_state(plan: dict, results: dict, inputs: dict) -> dict:
             "minimum_delta": results["threshold"],
         },
         "route": {"id": "route-1", "status": "completed", "change": changed, "run_report": str(inputs["candidate_path"]), "result": results},
-        "candidate_backlog": [{"id": "route-2", "status": "held", "change": {"field": changed["field"], "from": changed["from"], "to": alternate_to}}],
+        "candidate_backlog": [alternate],
     }
 
 
@@ -263,6 +369,11 @@ def main() -> int:
     parser.add_argument("--domain", required=True, choices=RUNNABLE_DOMAINS)
     parser.add_argument("--autoresearch-dir", required=True, type=Path)
     parser.add_argument("--out-dir", required=True, type=Path)
+    parser.add_argument(
+        "--overwrite",
+        action="store_true",
+        help="replace only files generated by this classroom workflow",
+    )
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--plan-only", action="store_true")
     mode.add_argument("--confirm-plan", action="store_true")
@@ -274,7 +385,16 @@ def main() -> int:
     except (FileNotFoundError, KeyError, ValueError, json.JSONDecodeError) as error:
         parser.error(str(error))
     out_dir = args.out_dir.resolve()
-    out_dir.mkdir(parents=True, exist_ok=True)
+    try:
+        prepare_output_dir(
+            out_dir,
+            plan_only=args.plan_only,
+            overwrite=args.overwrite,
+            plan=plan,
+            sources=sources,
+        )
+    except (FileExistsError, OSError, json.JSONDecodeError) as error:
+        parser.error(str(error))
     write_json(out_dir / "plan.json", plan)
     write_json(out_dir / "related_work.json", sources)
     if args.plan_only:

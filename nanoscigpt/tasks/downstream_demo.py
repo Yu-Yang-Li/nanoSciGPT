@@ -16,11 +16,10 @@ import numpy as np
 import torch
 import torch.nn as nn
 
+from ..domains.registry import SEQUENCE_DOMAINS
+
 from ..core.gpt import GPT, GPTConfig
 from ..core.tokenizer import CharTokenizer
-
-
-RUNNABLE_DOMAINS = ("text", "protein", "dna", "smiles")
 
 
 def load_checkpoint(ckpt_path):
@@ -43,19 +42,22 @@ def pad_sequences(sequences, block_size, pad_id):
     return x, pad
 
 
+def pooled_features(model, x, pad):
+    positions = torch.arange(x.size(1))
+    hidden = model.transformer.wte(x) + model.transformer.wpe(positions)
+    for block in model.transformer.h:
+        hidden = block(hidden, pad)
+    hidden = model.transformer.ln_f(hidden)
+    keep = (~pad).float().unsqueeze(-1)
+    return (hidden * keep).sum(dim=1) / keep.sum(dim=1).clamp(min=1)
+
+
 def extract_features(model, sequences, block_size, pad_id, batch_size=64):
     outputs = []
     with torch.no_grad():
         for start in range(0, len(sequences), batch_size):
             x, pad = pad_sequences(sequences[start : start + batch_size], block_size, pad_id)
-            positions = torch.arange(x.size(1))
-            hidden = model.transformer.wte(x) + model.transformer.wpe(positions)
-            for block in model.transformer.h:
-                hidden = block(hidden, pad)
-            hidden = model.transformer.ln_f(hidden)
-            keep = (~pad).float().unsqueeze(-1)
-            pooled = (hidden * keep).sum(dim=1) / keep.sum(dim=1).clamp(min=1)
-            outputs.append(pooled)
+            outputs.append(pooled_features(model, x, pad))
     return torch.cat(outputs, dim=0)
 
 
@@ -207,8 +209,68 @@ def fit_regression(train_x, train_y, val_x, val_y, epochs, seed):
     return "mae", round(mae, 4)
 
 
-def run_downstream(domain, ckpt_path, data_root, out_dir, epochs=20, max_samples=128, seed=1337):
-    if domain not in RUNNABLE_DOMAINS:
+def fine_tune_classification(
+    model,
+    checkpoint,
+    train_sequences,
+    train_y,
+    val_sequences,
+    val_y,
+    block_size,
+    pad_id,
+    epochs,
+    seed,
+    out_dir,
+):
+    torch.manual_seed(seed)
+    before = {name: parameter.detach().clone() for name, parameter in model.named_parameters()}
+    train_x, train_pad = pad_sequences(train_sequences, block_size, pad_id)
+    val_x, val_pad = pad_sequences(val_sequences, block_size, pad_id)
+    targets = torch.as_tensor(train_y, dtype=torch.long)
+    head = nn.Linear(model.config.n_embd, 2)
+    optimizer = torch.optim.Adam(
+        list(model.parameters()) + list(head.parameters()), lr=0.003
+    )
+    model.train()
+    for _ in range(epochs):
+        optimizer.zero_grad()
+        loss = nn.functional.cross_entropy(
+            head(pooled_features(model, train_x, train_pad)), targets
+        )
+        loss.backward()
+        optimizer.step()
+    model.eval()
+    with torch.no_grad():
+        predictions = head(pooled_features(model, val_x, val_pad)).argmax(dim=1)
+        score = (predictions == torch.as_tensor(val_y)).float().mean().item()
+    updated = any(
+        not torch.equal(before[name], parameter.detach())
+        for name, parameter in model.named_parameters()
+    )
+    fine_checkpoint = dict(checkpoint)
+    fine_checkpoint.update(
+        {
+            "model": model.state_dict(),
+            "task_head": head.state_dict(),
+            "training_mode": "full_fine_tune",
+        }
+    )
+    path = Path(out_dir) / "finetuned_ckpt.pt"
+    torch.save(fine_checkpoint, path)
+    return "accuracy", round(score, 4), updated, path
+
+
+def run_downstream(
+    domain,
+    ckpt_path,
+    data_root,
+    out_dir,
+    epochs=20,
+    max_samples=128,
+    seed=1337,
+    fine_tune=False,
+):
+    if domain not in SEQUENCE_DOMAINS:
         raise ValueError(f"downstream classroom task is unavailable for domain={domain}")
     model, config, checkpoint = load_checkpoint(ckpt_path)
     if checkpoint.get("domain") != domain:
@@ -225,12 +287,37 @@ def run_downstream(domain, ckpt_path, data_root, out_dir, epochs=20, max_samples
         payload = load_smiles_task(data_dir, max_samples)
     train_sequences, train_y, val_sequences, val_y, pad_id, task_meta = payload
 
-    train_x = extract_features(model, train_sequences, config.block_size, pad_id)
-    val_x = extract_features(model, val_sequences, config.block_size, pad_id)
-    if task_meta["task_type"] == "classification":
-        metric_name, metric_value = fit_classification(train_x, train_y, val_x, val_y, epochs, seed)
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    finetuned_checkpoint = None
+    if fine_tune:
+        if task_meta["task_type"] != "classification":
+            raise ValueError("full fine-tuning is currently available for classification tasks")
+        metric_name, metric_value, updated, finetuned_checkpoint = fine_tune_classification(
+            model,
+            checkpoint,
+            train_sequences,
+            train_y,
+            val_sequences,
+            val_y,
+            config.block_size,
+            pad_id,
+            epochs,
+            seed,
+            out_dir,
+        )
     else:
-        metric_name, metric_value = fit_regression(train_x, train_y, val_x, val_y, epochs, seed)
+        train_x = extract_features(model, train_sequences, config.block_size, pad_id)
+        val_x = extract_features(model, val_sequences, config.block_size, pad_id)
+        if task_meta["task_type"] == "classification":
+            metric_name, metric_value = fit_classification(
+                train_x, train_y, val_x, val_y, epochs, seed
+            )
+        else:
+            metric_name, metric_value = fit_regression(
+                train_x, train_y, val_x, val_y, epochs, seed
+            )
+        updated = False
 
     result = {
         "status": "completed",
@@ -240,12 +327,13 @@ def run_downstream(domain, ckpt_path, data_root, out_dir, epochs=20, max_samples
         "metric_value": metric_value,
         "train_samples": len(train_sequences),
         "val_samples": len(val_sequences),
-        "encoder_frozen": True,
-        "pretrained_parameters_updated": False,
+        "training_mode": "full_fine_tune" if fine_tune else "frozen_probe",
+        "encoder_frozen": not fine_tune,
+        "pretrained_parameters_updated": updated,
         "teaching_only": True,
     }
-    out_dir = Path(out_dir)
-    out_dir.mkdir(parents=True, exist_ok=True)
+    if finetuned_checkpoint is not None:
+        result["finetuned_checkpoint"] = str(finetuned_checkpoint.resolve())
     result_path = out_dir / "downstream_result.json"
     result_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
     print("downstream task: completed")
@@ -256,13 +344,18 @@ def run_downstream(domain, ckpt_path, data_root, out_dir, epochs=20, max_samples
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--domain", required=True, choices=RUNNABLE_DOMAINS)
+    parser.add_argument("--domain", required=True, choices=SEQUENCE_DOMAINS)
     parser.add_argument("--ckpt", required=True)
     parser.add_argument("--data_root", default="data")
     parser.add_argument("--out_dir", default=None)
     parser.add_argument("--epochs", type=int, default=20)
     parser.add_argument("--max_samples", type=int, default=128)
     parser.add_argument("--seed", type=int, default=1337)
+    parser.add_argument(
+        "--fine_tune",
+        action="store_true",
+        help="update the pretrained encoder together with the task head",
+    )
     args = parser.parse_args()
     out_dir = args.out_dir or Path("out") / "classroom" / args.domain / "downstream"
     run_downstream(
@@ -273,6 +366,7 @@ def main():
         epochs=args.epochs,
         max_samples=args.max_samples,
         seed=args.seed,
+        fine_tune=args.fine_tune,
     )
 
 

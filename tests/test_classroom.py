@@ -23,6 +23,25 @@ RUNNABLE = (
 )
 
 
+def test_run_command_prints_child_error_before_raising(monkeypatch, capsys, tmp_path):
+    from nanoscigpt.classroom import run_command
+
+    def failed(command, **kwargs):
+        assert kwargs["check"] is False
+        return subprocess.CompletedProcess(
+            command, 1, stdout="child stdout\n", stderr="child stderr\n"
+        )
+
+    monkeypatch.setattr(subprocess, "run", failed)
+
+    with pytest.raises(subprocess.CalledProcessError):
+        run_command(["python", "broken.py"], tmp_path)
+
+    captured = capsys.readouterr()
+    assert "child stdout" in captured.out
+    assert "child stderr" in captured.err
+
+
 def test_bundled_data_manifest_covers_every_runnable_domain():
     manifest = json.loads((DATA_ROOT / "manifest.json").read_text(encoding="utf-8"))
 
@@ -74,6 +93,22 @@ def test_preflight_rejects_a_choice_when_a_manifest_file_is_missing(tmp_path):
 
     with pytest.raises(FileNotFoundError, match="delaney-processed.csv"):
         validate_domain_data("smiles", tmp_path)
+
+
+def test_preflight_explains_when_a_stream_is_too_short_for_the_profile(tmp_path):
+    from nanoscigpt.classroom import validate_domain_data
+
+    data_dir = tmp_path / "dna"
+    data_dir.mkdir(parents=True)
+    (data_dir / "meta.json").write_text(
+        json.dumps({"mode": "stream", "vocab_size": 5}), encoding="utf-8"
+    )
+    (data_dir / "tokenizer.json").write_text("{}", encoding="utf-8")
+    (data_dir / "train.bin").write_bytes(b"\x00\x00" * 80)
+    (data_dir / "val.bin").write_bytes(b"\x00\x00" * 32)
+
+    with pytest.raises(ValueError, match="validation stream has 32 tokens.*more than 32"):
+        validate_domain_data("dna", tmp_path, required_block_size=32)
 
 
 @pytest.mark.parametrize("domain", RUNNABLE)
@@ -187,7 +222,9 @@ def test_classroom_list_only_offers_domains_that_pass_preflight():
         assert f"{domain}: ready" in completed.stdout
 
 
-def test_text_lesson_keeps_training_history_sample_and_task_head_identity(tmp_path):
+def test_text_lesson_keeps_training_history_and_runs_real_fine_tuning(tmp_path):
+    import torch
+
     from nanoscigpt.classroom import run_domain
 
     report = run_domain("text", "smoke", DATA_ROOT, tmp_path, cwd=ROOT)
@@ -204,6 +241,31 @@ def test_text_lesson_keeps_training_history_sample_and_task_head_identity(tmp_pa
     assert {"iter", "train_loss", "val_loss"} <= set(train_log["history"][0])
     assert (model_dir / "samples.txt").is_file()
     assert report["artifacts"]["samples"].endswith("samples.txt")
+    assert task["training_mode"] == "full_fine_tune"
+    assert task["encoder_frozen"] is False
+    assert task["pretrained_parameters_updated"] is True
+    fine_path = tmp_path / "text" / "downstream" / "finetuned_ckpt.pt"
+    assert fine_path.is_file()
+    assert report["artifacts"]["finetuned_checkpoint"].endswith("finetuned_ckpt.pt")
+    pretrained = torch.load(model_dir / "ckpt.pt", map_location="cpu", weights_only=False)
+    finetuned = torch.load(fine_path, map_location="cpu", weights_only=False)
+    assert any(
+        not torch.equal(pretrained["model"][name], finetuned["model"][name])
+        for name in pretrained["model"]
+    )
+
+
+def test_scientific_sequence_lesson_keeps_the_frozen_probe_boundary(tmp_path):
+    from nanoscigpt.classroom import run_domain
+
+    run_domain("protein", "smoke", DATA_ROOT, tmp_path, cwd=ROOT)
+    task = json.loads(
+        (tmp_path / "protein" / "downstream" / "downstream_result.json").read_text(
+            encoding="utf-8"
+        )
+    )
+
+    assert task["training_mode"] == "frozen_probe"
     assert task["encoder_frozen"] is True
     assert task["pretrained_parameters_updated"] is False
 

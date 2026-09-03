@@ -22,7 +22,8 @@ import subprocess
 import sys
 from pathlib import Path
 
-from nanoscigpt.classroom import RUNNABLE_DOMAINS, validate_domain_data
+from nanoscigpt.classroom import validate_domain_data
+from nanoscigpt.domains.registry import RUNNABLE_DOMAINS, STRUCTURED_DOMAINS
 
 from .evaluator import CRITERIA, evaluate_loss_gain, evaluate_train, evaluate_train_gain
 from .state import ResearchState
@@ -30,9 +31,6 @@ from .tools import CONTRACTS, run_tool
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-STRUCTURED_DOMAINS = {"weather", "crystal", "structure3d", "image", "spectrum", "field"}
-
-
 def command_options(command):
     """Return simple --name value options from a recorded classroom command."""
     options = {}
@@ -428,7 +426,7 @@ class ExperimentLoop:
             else:
                 result = evaluate_train_gain(self.domain, self.v0_loss)
         elif tool == "sample":
-            if self.domain in {"weather", "crystal", "structure3d", "image", "spectrum", "field"}:
+            if self.domain in STRUCTURED_DOMAINS:
                 reason = "representation preview and task artifact inspected"
             else:
                 reason = "checkpoint generated samples"

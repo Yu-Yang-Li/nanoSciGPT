@@ -4,6 +4,20 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def test_baseline_skill_is_namespaced_and_states_its_runnable_boundary():
+    skill_path = (
+        ROOT / "skills" / "nanoscigpt-research-baseline-builder" / "SKILL.md"
+    )
+
+    assert skill_path.is_file()
+    skill = skill_path.read_text(encoding="utf-8")
+    assert "name: nanoscigpt-research-baseline-builder" in skill
+    assert "python -m nanoscigpt.baseline --case lamost" in skill
+    assert "python -m nanoscigpt.baseline --series-csv" in skill
+    assert "FITS" in skill
+    assert "不能直接运行" in skill
+
+
 def test_nanogpt_pretraining_skill_is_packaged_as_its_own_lesson():
     skill_path = ROOT / "skills" / "nanogpt-pretraining" / "SKILL.md"
 
@@ -28,6 +42,28 @@ def test_nanogpt_and_nanoscigpt_skills_have_distinct_triggers():
     assert "text" in nanogpt_description.lower()
     assert "text" not in nanoscigpt_description.lower()
     assert "fine-tuning" not in nanoscigpt_description.lower()
+
+
+def test_scientific_language_skill_can_use_student_protein_fasta_without_overclaiming_labels():
+    skill = (
+        ROOT / "skills" / "nanoscigpt-scientific-language" / "SKILL.md"
+    ).read_text(encoding="utf-8")
+
+    assert "nanoscigpt.domains.protein.prepare --fasta" in skill
+    assert "--skip-downstream" in skill
+    assert "功能标签" in skill
+    assert "组成分类" in skill
+    assert "nanoscigpt.domains.smiles.prepare --csv" in skill
+    assert "ESOL" in skill
+    assert "先只做预训练" in skill
+    assert "nanoscigpt.prepare_structured" in skill
+    assert "train_x" in skill
+    assert "val_y" in skill
+    assert "train/val_atomic_numbers" in skill
+    assert "形成能标签的单位是什么" in skill
+    assert "--sample-unit \"一个周期晶胞\"" in skill
+    assert "不要求他补造" in skill
+    assert "最终报告只有预训练产物" in skill
 
 
 def test_autoresearch_model_iteration_is_packaged_as_its_own_lesson():

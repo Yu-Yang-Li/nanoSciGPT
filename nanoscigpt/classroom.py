@@ -10,10 +10,13 @@ from pathlib import Path
 
 import numpy as np
 
+from .domains.registry import (
+    RUNNABLE_DOMAINS,
+    SEQUENCE_DOMAINS,
+    STRUCTURED_DOMAINS,
+    get_domain_spec,
+)
 
-SEQUENCE_DOMAINS = ("text", "protein", "dna", "smiles")
-STRUCTURED_DOMAINS = ("weather", "crystal", "structure3d", "image", "spectrum", "field")
-RUNNABLE_DOMAINS = SEQUENCE_DOMAINS + STRUCTURED_DOMAINS
 DEFAULT_PROFILE = "classroom"
 CPU_PROFILES = {
     "smoke": {
@@ -76,7 +79,12 @@ def validate_manifest_files(domain, data_root):
     return entry
 
 
-def validate_domain_data(domain, data_root="data"):
+def validate_domain_data(
+    domain,
+    data_root="data",
+    required_block_size=None,
+    require_structured_labels=True,
+):
     if domain not in RUNNABLE_DOMAINS:
         raise ValueError(f"unknown classroom domain: {domain}")
     data_root = Path(data_root)
@@ -84,8 +92,14 @@ def validate_domain_data(domain, data_root="data"):
     if domain in STRUCTURED_DOMAINS:
         from .tasks.structured_demo import validate_structured_fixture
 
-        report = validate_structured_fixture(domain, data_root)
-        report["source_name"] = manifest_entry.get("source_name") if manifest_entry else None
+        report = validate_structured_fixture(
+            domain,
+            data_root,
+            require_labels=require_structured_labels,
+        )
+        if manifest_entry:
+            report["source_name"] = manifest_entry.get("source_name")
+            report["source_kind"] = get_domain_spec(domain).source_kind
         return report
     data_dir = data_root / domain
     meta_path = data_dir / "meta.json"
@@ -102,6 +116,17 @@ def validate_domain_data(domain, data_root="data"):
         train = np.memmap(train_path, dtype=np.uint16, mode="r")
         val = np.memmap(val_path, dtype=np.uint16, mode="r")
         train_items, val_items = len(train), len(val)
+        if required_block_size is not None:
+            for split_name, item_count in (
+                ("training", train_items),
+                ("validation", val_items),
+            ):
+                if item_count <= required_block_size:
+                    raise ValueError(
+                        f"{domain} {split_name} stream has {item_count} tokens; "
+                        f"the selected profile needs more than {required_block_size}. "
+                        "Add more source data or choose a smaller profile."
+                    )
         max_token = max(int(train.max()), int(val.max()))
     elif mode == "independent":
         train_path = data_dir / "train_seqs.npy"
@@ -129,7 +154,16 @@ def validate_domain_data(domain, data_root="data"):
         "val_items": val_items,
         "vocab_size": int(meta["vocab_size"]),
         "data_dir": str(data_dir.resolve()),
-        "source_name": manifest_entry.get("source_name") if manifest_entry else None,
+        "source_name": (
+            manifest_entry.get("source_name")
+            if manifest_entry
+            else meta.get("source")
+        ),
+        "source_kind": (
+            get_domain_spec(domain).source_kind
+            if manifest_entry
+            else meta.get("source_kind", "user_prepared")
+        ),
     }
 
 
@@ -140,7 +174,7 @@ def run_command(command, cwd):
     completed = subprocess.run(
         [str(part) for part in command],
         cwd=cwd,
-        check=True,
+        check=False,
         capture_output=True,
         text=True,
         encoding="utf-8",
@@ -151,10 +185,19 @@ def run_command(command, cwd):
         print(completed.stdout.rstrip(), flush=True)
     if completed.stderr:
         print(completed.stderr.rstrip(), file=sys.stderr, flush=True)
+    completed.check_returncode()
     return completed
 
 
-def run_domain(domain, profile, data_root, out_root, cwd=None, overwrite=False):
+def run_domain(
+    domain,
+    profile,
+    data_root,
+    out_root,
+    cwd=None,
+    overwrite=False,
+    skip_downstream=False,
+):
     if profile not in CPU_PROFILES:
         raise ValueError(f"unknown profile={profile}; choose from {tuple(CPU_PROFILES)}")
     settings = CPU_PROFILES[profile]
@@ -170,7 +213,12 @@ def run_domain(domain, profile, data_root, out_root, cwd=None, overwrite=False):
     downstream_dir = out_dir / "downstream"
     out_dir.mkdir(parents=True, exist_ok=True)
     cwd = Path(cwd or Path.cwd()).resolve()
-    preflight = validate_domain_data(domain, data_root)
+    preflight = validate_domain_data(
+        domain,
+        data_root,
+        required_block_size=settings["block_size"],
+        require_structured_labels=not skip_downstream,
+    )
     started = time.perf_counter()
 
     if domain in STRUCTURED_DOMAINS:
@@ -189,7 +237,19 @@ def run_domain(domain, profile, data_root, out_root, cwd=None, overwrite=False):
             "--task_steps",
             settings["structured_task_steps"],
         ]
+        if skip_downstream:
+            command.append("--skip-downstream")
         run_command(command, cwd)
+        downstream_task = "not_requested" if skip_downstream else "completed"
+        artifacts = {
+            "checkpoint": str(out_dir / "model" / "ckpt.pt"),
+            "train_log": str(out_dir / "model" / "train_log.json"),
+            "representation_preview": str(out_dir / "representation_preview.json"),
+        }
+        if not skip_downstream:
+            artifacts["downstream"] = str(
+                out_dir / "downstream" / "downstream_result.json"
+            )
         report = {
             "status": "completed",
             "lesson_stage": "nanoscigpt",
@@ -197,14 +257,9 @@ def run_domain(domain, profile, data_root, out_root, cwd=None, overwrite=False):
             "profile": profile,
             "device": settings["device"],
             "preflight": preflight,
-            "downstream_task": "completed",
+            "downstream_task": downstream_task,
             "elapsed_seconds": round(time.perf_counter() - started, 3),
-            "artifacts": {
-                "checkpoint": str(out_dir / "model" / "ckpt.pt"),
-                "train_log": str(out_dir / "model" / "train_log.json"),
-                "downstream": str(out_dir / "downstream" / "downstream_result.json"),
-                "representation_preview": str(out_dir / "representation_preview.json"),
-            },
+            "artifacts": artifacts,
             "commands": [[str(part) for part in command]],
         }
         report_path.write_text(
@@ -266,26 +321,42 @@ def run_domain(domain, profile, data_root, out_root, cwd=None, overwrite=False):
     samples_path.write_text(sampler_result.stdout, encoding="utf-8")
 
     commands = [trainer_command, sampler_command]
-    downstream_command = [
-        sys.executable,
-        "-m",
-        "nanoscigpt.tasks.downstream_demo",
-        "--domain",
-        domain,
-        "--ckpt",
-        model_dir / "ckpt.pt",
-        "--data_root",
-        data_root,
-        "--out_dir",
-        downstream_dir,
-        "--epochs",
-        settings["task_epochs"],
-        "--max_samples",
-        settings["task_samples"],
-    ]
-    run_command(downstream_command, cwd)
-    commands.append(downstream_command)
-    downstream_task = "completed"
+    downstream_task = "not_requested"
+    if not skip_downstream:
+        downstream_command = [
+            sys.executable,
+            "-m",
+            "nanoscigpt.tasks.downstream_demo",
+            "--domain",
+            domain,
+            "--ckpt",
+            model_dir / "ckpt.pt",
+            "--data_root",
+            data_root,
+            "--out_dir",
+            downstream_dir,
+            "--epochs",
+            settings["task_epochs"],
+            "--max_samples",
+            settings["task_samples"],
+        ]
+        if domain == "text":
+            downstream_command.append("--fine_tune")
+        run_command(downstream_command, cwd)
+        commands.append(downstream_command)
+        downstream_task = "completed"
+
+    artifacts = {
+        "checkpoint": str(model_dir / "ckpt.pt"),
+        "train_log": str(model_dir / "train_log.json"),
+        "samples": str(samples_path),
+    }
+    if not skip_downstream:
+        artifacts["downstream"] = str(downstream_dir / "downstream_result.json")
+        if domain == "text":
+            artifacts["finetuned_checkpoint"] = str(
+                downstream_dir / "finetuned_ckpt.pt"
+            )
 
     report = {
         "status": "completed",
@@ -296,12 +367,7 @@ def run_domain(domain, profile, data_root, out_root, cwd=None, overwrite=False):
         "preflight": preflight,
         "downstream_task": downstream_task,
         "elapsed_seconds": round(time.perf_counter() - started, 3),
-        "artifacts": {
-            "checkpoint": str(model_dir / "ckpt.pt"),
-            "train_log": str(model_dir / "train_log.json"),
-            "samples": str(samples_path),
-            "downstream": str(downstream_dir / "downstream_result.json"),
-        },
+        "artifacts": artifacts,
         "commands": [[str(part) for part in command] for command in commands],
     }
     report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -325,26 +391,65 @@ def list_domains(data_root):
     return ready
 
 
+def describe_domain(domain, data_root="data"):
+    """Return the teaching semantics and exact identity of one bundled example."""
+    spec = get_domain_spec(domain)
+    readiness = validate_domain_data(domain, data_root)
+    manifest_path = Path(data_root) / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    source = manifest["domains"][domain]
+    return {
+        "status": readiness["status"],
+        "domain": domain,
+        "family": spec.family,
+        "representation": spec.representation,
+        "model_unit": spec.model_unit,
+        "preserved_relations": spec.preserved_relations,
+        "pretraining_objective": spec.pretraining_objective,
+        "downstream_task": spec.task_name,
+        "downstream_training": spec.downstream_training,
+        "source_kind": spec.source_kind,
+        "source_name": source["source_name"],
+        "source_note": source["source_note"],
+        "student_data_loaded": False,
+        "support_level": "bundled_example_only",
+    }
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Run an offline, CPU-first nanoSciGPT classroom example."
     )
-    parser.add_argument("--domain", choices=RUNNABLE_DOMAINS + ("all",))
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--domain", choices=RUNNABLE_DOMAINS + ("all",))
+    mode.add_argument("--list", action="store_true", help="show only choices that are ready")
+    mode.add_argument(
+        "--describe",
+        choices=RUNNABLE_DOMAINS,
+        help="show how one bundled example is represented and trained without running it",
+    )
     parser.add_argument("--profile", choices=tuple(CPU_PROFILES), default=DEFAULT_PROFILE)
     parser.add_argument("--data_root", default="data")
     parser.add_argument("--out_root", default="out/classroom")
     parser.add_argument(
         "--overwrite", action="store_true", help="replace a finished run in the target directory"
     )
-    parser.add_argument("--list", action="store_true", help="show only choices that are ready")
+    parser.add_argument(
+        "--skip-downstream",
+        action="store_true",
+        help="for sequence domains, run pretraining and sampling without a teaching task",
+    )
     args = parser.parse_args()
 
     if args.list:
         list_domains(args.data_root)
         return
+    if args.describe:
+        print(json.dumps(describe_domain(args.describe, args.data_root), ensure_ascii=False, indent=2))
+        return
     if not args.domain:
         parser.error(
-            "choose a domain reported by --list, choose --domain all, or use --list"
+            "choose --list, --describe DOMAIN, --domain DOMAIN, or --domain all"
         )
     domains = RUNNABLE_DOMAINS if args.domain == "all" else (args.domain,)
     for domain in domains:
@@ -355,8 +460,9 @@ def main():
                 args.data_root,
                 args.out_root,
                 overwrite=args.overwrite,
+                skip_downstream=args.skip_downstream,
             )
-        except FileExistsError as error:
+        except (FileExistsError, ValueError) as error:
             parser.error(str(error))
 
 

@@ -62,6 +62,12 @@ def test_v2_init_creates_two_sibling_routes_without_running_a_model(completed_v1
     assert state["nodes"]["route-1"]["status"] == "completed"
     assert state["nodes"]["route-1"]["evaluation"]["passed"] is state["nodes"]["route-1"]["evaluation"]["criterion_passed"]
     assert state["nodes"]["route-2"]["status"] == "planned"
+    assert state["nodes"]["route-1"]["change"]["field"] == "max_iters"
+    assert state["nodes"]["route-2"]["change"]["field"] == "block_size"
+    assert state["nodes"]["route-1"]["change_label"] == "预训练步数"
+    assert state["nodes"]["route-2"]["change_label"] == "一次可见的上下文长度"
+    assert state["root"]["evaluator"]["metric_label"] == "验证损失"
+    assert state["nodes"]["route-2"]["execution_mode"] == "executable"
     assert state["frontier"] == ["route-2"]
     assert not (out_root / "text" / "nodes" / "route-2" / "model").exists()
 
@@ -84,6 +90,7 @@ def test_v2_runs_one_route_recovers_state_and_makes_a_formal_decision(
 
     status = _run("status", "--state", state_path)
     assert status.returncode == 0
+    assert "一次可见的上下文长度 32→64" in status.stdout
     unchanged = json.loads(state_path.read_text(encoding="utf-8"))
     assert unchanged["nodes"]["route-2"]["attempts"] == 1
 
@@ -95,6 +102,9 @@ def test_v2_runs_one_route_recovers_state_and_makes_a_formal_decision(
     final_state = json.loads(state_path.read_text(encoding="utf-8"))
     assert decision["evaluator_id"] == final_state["root"]["evaluator"]["id"]
     assert decision["retained"] in {"baseline", "route-1", "route-2"}
+    assert decision["metric_label"] == "验证损失"
+    assert decision["rule_id"] == "lowest_passing_loss_else_baseline"
+    assert "若均未达到，则保留V0" in decision["rule"]
     assert final_state["next_action"] == "complete"
     assert all(node["status"] in {"retained", "stopped"} for node in final_state["nodes"].values())
 
@@ -142,3 +152,125 @@ def test_v2_cli_help_is_available():
     completed = _run("--help")
     assert completed.returncode == 0
     assert "AI Scientist v2 classroom tree" in completed.stdout
+
+
+def test_v2_records_subprocess_exception_as_failed_state(
+    completed_v1, tmp_path, monkeypatch
+):
+    from autoresearch import v2
+
+    state_path = v2.init_tree(completed_v1, tmp_path / "v2")
+
+    def fail_to_start(*args, **kwargs):
+        raise OSError("training process could not start")
+
+    monkeypatch.setattr(v2.subprocess, "run", fail_to_start)
+
+    result = v2.run_next(state_path, approved=True)
+
+    assert result == 1
+    state = json.loads(state_path.read_text(encoding="utf-8"))
+    route = state["nodes"]["route-2"]
+    assert route["status"] == "failed"
+    assert route["attempts"] == 1
+    assert route["failure"]["kind"] == "process_error"
+    assert state["frontier"] == []
+    assert state["next_action"] == "inspect_failure"
+    report = json.loads(Path(route["run_report"]).read_text(encoding="utf-8"))
+    assert report["status"] == "failed"
+
+
+def test_v2_records_missing_metric_as_failed_state(
+    completed_v1, tmp_path, monkeypatch
+):
+    from autoresearch import v2
+
+    state_path = v2.init_tree(completed_v1, tmp_path / "v2")
+
+    def finish_without_metric(command, **kwargs):
+        options = v2.command_options(command)
+        model_dir = Path(options["out_dir"])
+        model_dir.mkdir(parents=True, exist_ok=True)
+        (model_dir / "train_log.json").write_text(
+            json.dumps({"some_other_metric": 1.0}), encoding="utf-8"
+        )
+        return subprocess.CompletedProcess(command, 0, stdout="done", stderr="")
+
+    monkeypatch.setattr(v2.subprocess, "run", finish_without_metric)
+
+    result = v2.run_next(state_path, approved=True)
+
+    assert result == 1
+    state = json.loads(state_path.read_text(encoding="utf-8"))
+    route = state["nodes"]["route-2"]
+    assert route["status"] == "failed"
+    assert route["failure"]["kind"] == "missing_metric"
+    assert state["frontier"] == []
+    assert state["next_action"] == "inspect_failure"
+
+
+def test_v2_rejects_two_routes_that_change_the_same_research_variable(
+    completed_v1, tmp_path
+):
+    from autoresearch import v2
+
+    copied = tmp_path / "same-field-v1.json"
+    state = json.loads(completed_v1.read_text(encoding="utf-8"))
+    state["candidate_backlog"][0]["change"] = dict(state["route"]["change"])
+    copied.write_text(json.dumps(state), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="different research variables"):
+        v2.init_tree(copied, tmp_path / "v2")
+
+
+def test_v2_keeps_unsupported_structured_route_as_design_only(tmp_path):
+    from autoresearch import v2
+
+    v1_path = tmp_path / "weather-v1.json"
+    v1_path.write_text(
+        json.dumps(
+            {
+                "status": "evaluated",
+                "route_count": 1,
+                "domain": "weather",
+                "baseline_run": "unused-for-init.json",
+                "evaluator": {
+                    "id": "pretrain_loss_gain.v1",
+                    "metric": "pretrain_val_loss",
+                    "direction": "lower_is_better",
+                    "minimum_delta": 0.01,
+                },
+                "route": {
+                    "id": "route-1",
+                    "change": {"field": "pretrain_steps", "from": 2, "to": 4},
+                    "run_report": "route-1.json",
+                    "result": {
+                        "criterion_passed": False,
+                        "candidate": 1.2,
+                    },
+                },
+                "candidate_backlog": [
+                    {
+                        "id": "route-2",
+                        "execution_mode": "design_only",
+                        "design_reason": "current classroom command has no second safe lever",
+                        "change": {
+                            "field": "spatiotemporal_representation",
+                            "from": "bundled_baseline",
+                            "to": "alternative_patch_or_variable_grouping",
+                        },
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    state_path = v2.init_tree(v1_path, tmp_path / "v2")
+
+    state = json.loads(state_path.read_text(encoding="utf-8"))
+    route = state["nodes"]["route-2"]
+    assert route["status"] == "design_only"
+    assert route["execution_mode"] == "design_only"
+    assert state["frontier"] == []
+    assert state["next_action"] == "review_design_only_route"

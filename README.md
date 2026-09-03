@@ -1,199 +1,224 @@
 # nanoSciGPT
 
-> **配套课程**：科学模型专题实训（二）——如何构建领域基座模型与 AI Scientist 系统。  
-> 课程大纲、逐级操作讲稿与调研全景见 [docs/](docs/) 目录，入口：[课程大纲](docs/course-outline.md)。
+“科学模型专题实训（二）”的CPU课堂仓库。学生从一条命令开始，依次看到：
 
-一个面向教学的"科学领域语言模型"最小整合框架：同一套 GPT 核心代码，通过替换 **tokenizer + 数据准备** 即可从文本迁移到蛋白质、DNA、分子（SMILES）等科学对象。
-
-## 教学定位
-
-这门课不是教你怎么写 Transformer，而是回答三个问题：
-
-1. **预训练到底在做什么？** —— 下一 token 预测为什么能学到有用的表征；
-2. **科学对象怎么"语言化"？** —— 氨基酸序列、DNA 碱基、SMILES 字符串本质上都是离散符号序列，可以用同一套方法处理；
-3. **什么时候值得做基座模型？** —— 数据规模、任务复用、迁移收益决定你该用专用模型还是预训练基座。
-
-## 架构：共享核心 + 领域专用
-
+```text
+内置数据 → 科学对象表示 → 小型预训练 → 具体任务 → 模型V0 → V0到V1迭代记录
 ```
+
+当前正式课堂材料是 [16页大纲](docs/current/course-outline-16p.md)、[16页页面文字](docs/current/slide-copy-16p.md) 和 [16页讲稿](docs/current/speaker-script-16p.md)。课程先用LAMOST光谱参数估计走一遍有标签科学数据的标准流程，再进入nanoSciGPT与AI Scientist。换成自己的数据前，请先看[自定义科学数据接入说明](docs/current/custom-domain-guide.md)。其他材料的当前/档案身份见[资料导航](docs/README.md)。
+
+## 六个课堂 Skill
+
+学生按照同一份结果逐步向后推进：
+
+1. `nanoscigpt-research-baseline-builder`：有标签科学数据的第一份基线；
+2. `nanogpt-pretraining`：文本预训练与微调；
+3. `nanoscigpt-scientific-language`：把同一思路迁移到科学数据；
+4. `autoresearch-model-iteration`：完成一次V0到V1的同口径比较；
+5. `ai-scientist-v1-workflow`：把单路线实验整理成可复查材料；
+6. `ai-scientist-v2-tree-search`：比较多条研究路线并保留取舍依据。
+
+各Skill的使用边界和入口见[六个课堂Skill索引](skills/README.md)。
+
+## 先跑起来
+
+需要Python 3.10或更高版本。默认只用CPU，仓库已经带好课堂数据，不要求学生临时下载。
+
+```bash
+python -m pip install -e .
+nanoscigpt-doctor
+
+# 有标签课程基线：LAMOST、普通表格或单条数值时序
+nanoscigpt-baseline --case lamost --out_root out/baseline
+nanoscigpt-baseline --csv <数据.csv> --target <目标列> --task regression --out_root out/baseline
+nanoscigpt-baseline --series-csv <时序.csv> --value-column <数值列> --time-column <时间列> --out_root out/baseline
+
+# 已整理成训练/验证数组的天气、晶体、图像、光谱、连续场和三维点集
+nanoscigpt-prepare-structured --help
+
+# 只有无标签结构化数据时，准备和课堂运行都明确跳过具体任务
+nanoscigpt-prepare-structured --domain spectrum --npz <数据.npz> --out-dir out/student-data/spectrum --patch-size 8 --sample-unit <一条样本是什么> --skip-downstream
+python -m nanoscigpt.classroom --domain spectrum --data_root out/student-data --out_root out/student-runs --skip-downstream
+
+# 查看当前真正能运行的十个选择
+python -m nanoscigpt.classroom --list
+
+# 先看一种数据在课程代码里实际怎样表示和训练；这一步不训练模型
+python -m nanoscigpt.classroom --describe spectrum
+
+# 任选一个；默认classroom配置约几十秒
+python -m nanoscigpt.classroom --domain protein
+python -m nanoscigpt.classroom --domain weather
+python -m nanoscigpt.classroom --domain crystal
+python -m nanoscigpt.classroom --domain spectrum
+
+# 只检查环境和代码链路时用更短配置
+python -m nanoscigpt.classroom --domain protein --profile smoke
+```
+
+安装后也可以使用：
+
+```bash
+nanoscigpt-classroom --domain protein
+```
+
+`nanoscigpt-doctor`只检查当前Python、四个依赖、十类数据和六个Skill，不修改环境。检查未通过时，先解决它列出的缺项，不直接开始训练。
+
+`--describe`返回模型处理单位、保留关系、实际预训练目标、下游任务和样例身份。它同时明确标记`student_data_loaded=false`，避免把内置教学结果写到学生数据上。
+
+### 把六个Skill安装到Codex
+
+Windows PowerShell：
+
+```powershell
+pwsh -NoProfile -File scripts/install_skills.ps1 -Destination (Join-Path $env:USERPROFILE ".codex\skills")
+```
+
+Linux或macOS：
+
+```bash
+bash scripts/install_skills.sh "$HOME/.codex/skills"
+```
+
+安装脚本只复制[课程索引](skills/README.md)列出的六个Skill。目标位置已有同名Skill时会停止，不会静默覆盖；安装完成后在新的Codex会话中使用。模型和数据仍从本仓库根目录运行。
+
+## 学生可以选择什么
+
+`--list`只展示已经随仓库提供数据、通过CPU端到端测试的领域。
+
+| 选择 | 内置数据 | 课堂运行内容 | 具体任务 |
+|---|---|---|---|
+| `text` | tiny Shakespeare | 字符预训练与采样 | 标点密度教学分类，并更新预训练参数 |
+| `protein` | 500条UniProtKB reviewed记录 | 氨基酸序列预训练 | 蛋白质组成属性教学分类 |
+| `dna` | hg38 chr21教学切片 | 单碱基序列预训练 | GC含量教学分类 |
+| `smiles` | 1128条Delaney ESOL记录 | SMILES字符预训练 | 实测水溶解度教学回归 |
+| `weather` | 96组移动标量场 | 时空patch掩码重建 | 移动速度教学回归 |
+| `crystal` | 96个周期晶胞 | 周期图上的原子掩码恢复 | 晶胞质量密度代理回归 |
+| `structure3d` | 96组三维螺旋坐标 | 距离行掩码重建 | 螺距教学回归 |
+| `image` | 96张天文点源小图 | 图像patch掩码重建 | 源数量教学回归 |
+| `spectrum` | 96条黑体连续谱 | 波长patch掩码重建 | 温度教学回归 |
+| `field` | 96组一维扩散场 | 时空patch掩码重建 | 扩散系数教学回归 |
+
+protein和DNA的标签是透明的课堂标签，只用来演示“预训练后怎样接任务头”；SMILES使用ESOL中的实测水溶解度列。六个结构化样例的标签来自确定性生成器中记录的参数。它们都不是论文benchmark，也不用于比较模型优劣。
+
+十个入口并不共用同一种表示：离散序列使用小型因果Transformer；天气、图像、光谱和连续场使用数值patch；晶体使用周期图消息传递；三维结构使用刚体变换不变的距离表示。
+
+## 默认CPU配置
+
+| 配置 | 训练步数 | 模型 | 用途 |
+|---|---:|---|---|
+| `smoke` | 2 | 1层、16维 | 安装后快速检查 |
+| `classroom`（默认） | 30 | 2层、64维 | 课堂演示与学生跟练 |
+
+表中训练步数对应四个离散序列领域。六类其他科学数据的`smoke`配置运行2步预训练和2步具体任务，默认`classroom`配置各运行20步。两类配置都固定使用CPU。
+
+每次运行单独写到：
+
+```text
+out/classroom/<domain>/
+├── model/
+│   ├── ckpt.pt
+│   └── train_log.json
+├── downstream/
+│   └── downstream_result.json
+└── run_report.json
+```
+
+`run_report.json`记录实际命令、设备、数据预检、耗时和产物路径，便于学生把运行过程交回来检查。
+
+## 数据和离线运行
+
+十类课程数据都在 [data/](data/) 中并纳入版本管理。来源、用途和必要文件见 [data/manifest.json](data/manifest.json) 与 [data/README.md](data/README.md)。
+
+默认课堂命令只读取这些文件，不访问网络。只有教师主动运行各领域的`prepare.py`且原始文件不存在时，text、protein和SMILES才会访问公开来源；DNA不会静默生成合成数据。
+
+## 代码结构
+
+```text
 nanoscigpt/
-├── core/                    # 【全部领域共享】
-│   ├── gpt.py               # GPT decoder（causal attention）
-│   ├── trainer.py           # 训练循环：batch、loss、ckpt、eval
-│   ├── sampler.py           # 自回归采样
-│   ├── tokenizer.py         # 字符级 tokenizer 基类
-│   └── dataset.py           # memmap 数据集 + 变长序列 padding
-├── domains/                 # 【每个领域必须自己写】
-│   ├── text/                # Shakespeare（教学基线）
-│   ├── protein/             # UniProt / PDB 氨基酸序列
-│   ├── dna/                 # 基因组 FASTA
-│   └── smiles/              # 分子 SMILES
-└── tasks/                   # 下游探针（迁移评测）
+├── classroom.py             # 学生统一入口、数据预检、CPU配置、运行报告
+├── evidence_pack.py         # 把已有运行、评价和停止记录整理成Markdown
+├── core/
+│   ├── gpt.py               # 小型因果Transformer
+│   ├── trainer.py           # 四个离散序列域共享训练循环
+│   ├── sampler.py           # 采样
+│   ├── tokenizer.py         # 字符级tokenizer
+│   └── dataset.py           # 流式数据与独立变长序列
+├── domains/
+│   ├── text/
+│   ├── protein/
+│   ├── dna/
+│   └── smiles/
+├── scientific/
+│   ├── adapters.py         # 数值patch、周期距离、三维距离表示
+│   └── models.py           # patch Transformer与周期图网络
+└── tasks/
+    ├── downstream_demo.py   # 四种离散序列的CPU具体任务
+    └── structured_demo.py   # 六种结构化对象的预训练与任务
 
-autoresearch/                # 【B线：与仓库互动的虚拟 AI Scientist】
-├── tools.py                 # 工具合同：唯一允许的操作入口
-├── evaluator.py             # 形式化评价器：design/ran/evaluated 证据分级
-├── state.py                 # 跨轮研究状态：假设、证据、未决问题
-└── run.py                   # 主循环：反馈改变下一步 + 人工授权门
+autoresearch/                # 从一次结果继续安排下一轮实验
 ```
 
-**核心设计原则**（也是课堂上要讲的）：已核实的三个 nanoGPT 魔改案例（prot-gpt、nanoGPT-DNA、dnaGPT）的全部差异都落在 tokenizer、数据准备、变长处理、评测四处；模型结构、训练循环、采样逻辑完全不变。所以本框架把前者做成每领域必写的"领域插件"，后者做成共享核心。
+## 与开源项目的关系
 
-## 快速开始
+- 小型GPT核心和`prepare/train/sample`教学分工来自 [karpathy/nanoGPT](https://github.com/karpathy/nanoGPT) 的MIT代码传统。nanoGPT上游已说明项目较旧；本仓库仍采用它，是因为课堂要看清最小结构，而不是复现当前大规模训练栈。
+- protein的独立序列和padding思路参考 [prot-gpt](https://github.com/hrzn/prot-gpt)；DNA数据边界参考 [nanoGPT-DNA](https://github.com/diego-taquiri/nanoGPT-DNA)。这两个仓库未见明确许可证，因此只参考公开技术描述，没有复制其源码。
+- SMILES标签来自DeepChem分发的Delaney ESOL数据；本仓库不依赖DeepChem或RDKit。
+- EarthPT、AstroPT、GPTCast、CGCNN等项目用于确定数值patch、图结构和连续观测的适配边界；本仓库没有复制其源码或训练数据，只实现独立的小型CPU教学版。
+
+逐项说明见 [上游项目与适配边界](docs/upstream-adaptation.md)。
+
+## 手动运行底层步骤
+
+课堂外需要拆开看时：
 
 ```bash
-# 1. 安装（只需 torch + numpy，无需 GPU）
-pip install -e .
+# 预训练
+python -m nanoscigpt.core.trainer --domain protein --out_dir out/manual/protein --max_iters 30 --eval_interval 15 --eval_iters 5 --block_size 64 --batch_size 8 --n_layer 2 --n_head 2 --n_embd 64
 
-# 2. 准备数据（以 text 为例）
-python -m nanoscigpt.domains.text.prepare
+# 接一个具体任务
+python -m nanoscigpt.tasks.downstream_demo --domain protein --ckpt out/manual/protein/ckpt.pt --out_dir out/manual/protein-task
 
-# 3. 训练（CPU 几分钟）
-python -m nanoscigpt.core.trainer --domain text --max_iters 2000
+# 查看结构化对象怎样完成表示、预训练和具体任务
+python -m nanoscigpt.tasks.structured_demo --domain weather --out_dir out/manual/weather
 
-# 4. 采样
-python -m nanoscigpt.core.sampler --domain text
+# 先读取A线的模型V0，只生成迭代设置
+python -m autoresearch.experiment --domain protein --baseline_run out/classroom/protein/run_report.json --out_root out/autoresearch --plan_only
+
+# 确认设置后，运行V1并与V0比较
+python -m autoresearch.experiment --domain protein --baseline_run out/classroom/protein/run_report.json --out_root out/autoresearch --auto_approve
 ```
 
-## 四个领域的最小可运行链路
+第一条命令不会启动训练，只写`iteration_spec.json`。第二条命令读取同一份V0，跳过重复训练V0，写出`comparison.json`和同目录下的研究状态。已有候选结果时应使用新的`--out_root`，不覆盖旧实验。
 
-| 领域 | 数据 | 模式 | prepare 命令 | train 命令 |
-|---|---|---|---|---|
-| 文本 | tiny Shakespeare（1MB，自动下载） | 流式 | `python -m nanoscigpt.domains.text.prepare` | `python -m nanoscigpt.core.trainer --domain text` |
-| 蛋白 | UniProt reviewed（在线取前 N 条） | 独立序列 | `python -m nanoscigpt.domains.protein.prepare --size 500` | `python -m nanoscigpt.core.trainer --domain protein` |
-| DNA | 本地 FASTA（如 chr21.fa 切片） | 流式 | `python -m nanoscigpt.domains.dna.prepare --fasta <path>` | `python -m nanoscigpt.core.trainer --domain dna` |
-| SMILES | DeepChem ESOL（1128 条分子） | 独立序列 | `python -m nanoscigpt.domains.smiles.prepare` | `python -m nanoscigpt.core.trainer --domain smiles` |
+## 把已有结果整理成证据包
 
-## 实测结果（本机 CPU，2026-08-28）
-
-四个领域均在本机 Python 3.12 + torch 2.12 CPU 环境完成端到端验证（数据准备 → 100 iter 训练 → 采样）：
-
-| 领域 | 词表 | 数据量 | 100 iter val loss | 采样样例 |
-|---|---:|---|---:|---|
-| 文本 | 65 | 1.1M chars | 4.20 → **2.66** | 伪莎士比亚字符流 |
-| 蛋白 | 22 | 500 条 UniProt | 3.10 → **2.84** | 真实氨基酸序列 |
-| DNA | 4 | 350k bases | 1.40 → **1.32** | 碱基序列 |
-| SMILES | 33 | 1128 条分子 | 3.40 → **1.68** | 合法 SMILES 字符 |
-
-所有命令均可在普通学生电脑 CPU 上几分钟内完成，无需 GPU。
-
-## 教学叙事：从 nanoGPT 到科学基座
-
-这门课的 A 线（领域基座模型）用这个仓库贯穿：
-
-1. **A-V0 专用模型**：在 10 个 CIF 上训练 CGCNN——没有预训练，因为数据太少；这解释了"专用模型为什么是默认起点"。
-2. **A1 科学对象可预训练**：跑 text 域（和 nanoGPT 一样）+ protein/DNA/SMILES 域——同一个架构，换掉 tokenizer 和数据就完成了"科学对象语言化"。
-3. **A2 表征可迁移**：冻结预训练模型，取中间层 embedding 训练简单分类器——演示"预训练收益怎么度量"。
-4. **A3 基座能力统一**：多个领域共享同一个 core/，只在 domain 层扩展——这就是"基座"的最小结构隐喻：核心复用、领域插拔。
-
-## A线四级进阶实验（2026-08-28 实测）
-
-课程 A 线的完整阶梯，每一级都有可运行命令和实测结果：
-
-| 阶级 | 教学问题 | 命令 | 实测结果 |
-|---|---|---|---|
-| A1 科学对象语言化 | 换 tokenizer 就能换领域吗？ | 见上方四域表 | 四域全部跑通，loss 均下降 |
-| A2a 换预训练目标 | CLM 和 MLM 有什么区别？ | `python -m nanoscigpt.tasks.objective_contrast` | CLM 2.97→2.76；MLM 3.01→2.81（同一蛋白数据） |
-| A2b 表征迁移 | 我们的预训练到底带来什么？ | `python -m nanoscigpt.tasks.transfer_probe` | one-hot 100% / 随机编码器 98.3% / 预训练编码器 95%——迁移增益为负（诚实结果） |
-| A3a 多任务接口 | 共享编码器能否服务多任务？ | `python -m nanoscigpt.tasks.multihead` | 共享编码器：分类 100% + 回归 MAE 0.27（合成双任务） |
-| A3b 路线决策 | 什么时候不该训练基座？ | `python -m nanoscigpt.tasks.route_decision` | 五问决策链：数据不足→正确降级为专用模型 |
-
-**A2b 的核心教学价值**：迁移增益为负——450 条序列的"预训练"不如 one-hot。这不是失败，是课程要证明的事：数据规模不够时基座主张不成立。ESM 的 2.5 亿条序列与我们的 450 条相差六个数量级，"机制相同、规模决定成败"。
-
-## B线：autoresearch——三段式虚拟 AI Scientist
-
-A 线讲“模型怎么建”，B 线讲“科研过程怎么闭环”。`autoresearch/` 是一个**规则驱动**（刻意不用 LLM）的虚拟科学家，它只能通过声明过的工具合同操作本仓库，每一步都被形式化评价器检验，研究状态跨轮持久化。
-
-### 三段式架构（对应 AI Scientist 讲授时间线）
-
-| 段 | 能力 | 代码 | 参考系统 |
-|---|---|---|---|
-| S1 假设生成 | 想法→评分→专家验证→假设库 | `hypothesis.py` | AstroInsight (EPJ Data Science 2026) |
-| S2 实验闭环 | 计划→工具合同执行→评价器分析→反馈决定下一步 | `experiment.py` | StarWhisper Telescope (Comms Eng 2025) |
-| S3 论文工作流 | 证据组装→结构化审稿→逐条返修→事实审计 | `paper.py` | 讲师 agentic research 实践 |
-
-三段共用 `ResearchState`（`state.py`）——跨阶段的研究状态是三段成为一个系统的关键。
-
-完整讲义见 [docs/ai-scientist-guide.md](docs/ai-scientist-guide.md)。
-
-### 五个教学概念的落点
-
-| B线概念 | 代码落点 | 课堂观察点 |
-|---|---|---|
-| 可执行动作 | `tools.py` 的 `CONTRACTS` | 每个动作预先声明命令模板、产物、预算 |
-| 工具合同 | `run_tool()` | 不在合同里的操作被直接拒绝 |
-| 形式化评价器 | `evaluator.py` | design / ran / evaluated 三级，绝不混层 |
-| 反馈改变下一步 | `run.py` 轮次策略 | H1 失败→停止；H2 失败→记录为发现而非报错 |
-| 跨轮研究状态 | `state.py` + `research_state_<domain>.json` | 重跑不 `--fresh` 直接恢复终态 |
-| 人工授权与结论边界 | `--auto_approve` 门 + 结论轮 | 预算增加必须人工批准；结论写清“能声称什么/不能声称什么” |
-
-### 快速开始
+完成一次比较后运行：
 
 ```bash
-# 三段式全流程（推荐，约 20 秒）
-python -m autoresearch.pipeline --domain protein --fresh --auto_approve
-
-# 或分阶段演示
-python -m autoresearch.hypothesis --domain protein --auto_approve
-python -m autoresearch.experiment --domain protein --auto_approve
-python -m autoresearch.paper --domain protein
-
-# 旧接口（保留兼容）
-# 文本域全流程（约 20 秒/轮）
-python -m autoresearch.run --domain text --fresh --auto_approve
-
-# 蛋白域（含迁移探针，会出现“迁移增益为负”的诚实结果）
-python -m autoresearch.run --domain protein --fresh --auto_approve
-
-# 不带 --auto_approve：人工门会真实等待输入（课堂演示用）
-python -m autoresearch.run --domain text --fresh
-
-# 跨轮恢复：重跑同一域，直接到终态
-python -m autoresearch.run --domain text
+python -m nanoscigpt.evidence_pack --run-report out/classroom/protein/run_report.json --comparison out/autoresearch/protein/comparison.json --state out/autoresearch/protein/research_state.json --output out/evidence-packs/protein.md
 ```
 
-### 实测结果（本机 CPU，2026-08-29）
+这个入口只读取已有JSON，不重新训练。只有运行报告时可以省略比较结果和研究状态，输出会标为“已运行”；找不到运行报告时不会创建证据包。
 
-四个域均跑通完整闭环，且失败案例被正确记录为科学发现：
-
-| 域 | H1 预训练 | H2 预算加倍 | H3 迁移 |
-|---|---|---|---|
-| text | 支持（val 2.66） | 支持（+0.128） | 不适用（开放问题） |
-| protein | 支持（val 2.84） | **反驳**（+0.042 未达标） | **反驳**（delta −0.033，规模决定） |
-| dna | 支持（val 1.34） | 反驳（收益≈0） | 不适用（开放问题） |
-| smiles | 支持（val 1.68） | 支持（+0.214） | 不适用（开放问题） |
-
-蛋白域两个“失败”正是课程核心：**数据规模不够时，预算和迁移都不会产生基座收益**——这不是系统出错，是 AI Scientist 用证据得出的结论。
-
-## 诚实边界（课堂必须讲）
-
-- 所有四个域的数据都是**最小教学样例**，训练出的模型没有科学价值，只用于观察 loss 下降、生成行为和表征结构。
-- ESOL 只有 1128 条分子、UniProt 只取 500 条，预训练收益在这个规模**不会显现**；教材如实标注"演示预训练机制，不演示科学收益"。
-- DNA 领域跳过了 chr21 开头的 N 区（未测序端粒区），只取 35 万真实碱基作为流式教学样例。
-- 想看真实蛋白预训练收益，调用 ESM-2 8M 权重（A2 阶段），不要在这个仓库里追求。
-
-## 课程资料导航
-
-| 文档 | 身份 | 用途 |
-|---|---|---|
-| [docs/course-outline.md](docs/course-outline.md) | **课程大纲** | 90 分钟结构、两条时间线、案例与实践分工、作业评分 |
-| [docs/teaching-guide.md](docs/teaching-guide.md) | A 线操作讲稿 | 逐级现场命令、预期输出、停止边界 |
-| [docs/ai-scientist-guide.md](docs/ai-scientist-guide.md) | B 线操作讲稿 | autoresearch 三段式演示指南 |
-| [docs/gpt-like-science-landscape.md](docs/gpt-like-science-landscape.md) | 调研全景 | GPT-like 科学模型项目对比 |
-| [docs/research-notes.md](docs/research-notes.md) | 调研笔记 | 来源与证据记录 |
-
-## 课堂讲稿
-
-逐级操作讲稿见 [docs/teaching-guide.md](docs/teaching-guide.md)：每级的讲解要点、现场命令、预期输出、停止边界和学生动手点。
-
-## 一键运行全部领域
+## 测试
 
 ```bash
-python scripts/run_all.py   # 四个域依次执行 prepare -> train(100 iter) -> sample
+python -m pytest -q
+python -m pytest tests/test_classroom.py -q
 ```
 
-## 许可与致谢
+`tests/test_classroom.py`会真实启动十个CPU smoke run，并用课堂配置检查每个领域的训练趋势、模型文件、表示或生成样例、运行报告和具体任务结果。
 
-- 本仓库 MIT 许可。核心架构改编自 [karpathy/nanoGPT](https://github.com/karpathy/nanoGPT)（MIT）。
-- 思路参考：[hrzn/prot-gpt](https://github.com/hrzn/prot-gpt)（无 license，仅参考变长序列处理思想）、[diego-taquiri/nanoGPT-DNA](https://github.com/diego-taquiri/nanoGPT-DNA)（无 license，仅参考基因组数据加载思想）。
-- 数据：tiny Shakespeare（nanoGPT 自带）、UniProt reviewed、人类 chr21（UCSC）、DeepChem ESOL。
+## 课堂边界
+
+- loss下降只说明训练过程执行完成。
+- 课堂生成的蛋白质、DNA和SMILES样例没有经过结构、功能或化学有效性检查。
+- 教学分类标签不代替真实生物学标签；ESOL小回归也不代替正式分子性质评测。
+- 六个结构化样例是确定性方程或几何原型，不是观测数据、实验晶体库或PDB结构库。
+- 任何新增领域仍必须同时具备表示层、初始数据、CPU命令和端到端测试，才进入学生可选列表。
+
+## 许可
+
+本仓库采用MIT许可。nanoGPT原始版权告知、第三方技术参考和数据使用说明见[第三方告知](THIRD_PARTY_NOTICES.md)；逐项适配边界见[上游项目说明](docs/upstream-adaptation.md)与[数据清单](data/manifest.json)。

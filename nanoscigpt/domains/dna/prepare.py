@@ -35,11 +35,15 @@ def main():
     domain_dir.mkdir(parents=True, exist_ok=True)
 
     if args.fasta:
-        fasta_path = Path(args.fasta)
+        fasta_path = Path(args.fasta).resolve()
         if not fasta_path.exists():
             raise SystemExit(f"FASTA not found: {fasta_path}")
+        source = str(fasta_path)
+        source_kind = "user_file"
     else:
         fasta_path = domain_dir / SLICE_NAME
+        source = str(fasta_path.resolve())
+        source_kind = "bundled_file"
 
     synthetic = False
     if fasta_path.exists():
@@ -55,6 +59,8 @@ def main():
     elif args.allow_synthetic_fallback:
         seq = synthetic_dna_fallback(args.num_bases)
         synthetic = True
+        source = "deterministic_synthetic_dna"
+        source_kind = "synthetic_fixture"
         print("WARNING: no FASTA found; using deterministic SYNTHETIC DNA (teaching only)")
     else:
         raise SystemExit(
@@ -70,8 +76,17 @@ def main():
     val_ids = np.array(tok.encode(seq[int(n * 0.9) :]), dtype=np.uint16)
     train_ids.tofile(domain_dir / "train.bin")
     val_ids.tofile(domain_dir / "val.bin")
-    with open(domain_dir / "meta.json", "w") as f:
-        json.dump({"vocab_size": tok.vocab_size, "mode": "stream", "synthetic": synthetic}, f)
+    with open(domain_dir / "meta.json", "w", encoding="utf-8") as f:
+        json.dump(
+            {
+                "vocab_size": tok.vocab_size,
+                "mode": "stream",
+                "synthetic": synthetic,
+                "source": source,
+                "source_kind": source_kind,
+            },
+            f,
+        )
     print(f"vocab={tok.vocab_size} train={len(train_ids):,} val={len(val_ids):,} -> {domain_dir}")
 
 

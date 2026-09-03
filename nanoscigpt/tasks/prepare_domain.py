@@ -3,7 +3,8 @@
 import argparse
 import json
 
-from ..classroom import RUNNABLE_DOMAINS, validate_domain_data
+from ..classroom import validate_domain_data
+from ..domains.registry import RUNNABLE_DOMAINS
 
 
 def main():

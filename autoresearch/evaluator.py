@@ -13,6 +13,8 @@ The evaluator returns structured results; it never invents numbers.
 import json
 from pathlib import Path
 
+from nanoscigpt.domains.registry import is_structured_domain
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 # acceptance thresholds - deliberately conservative teaching values
@@ -48,7 +50,7 @@ def _read_json(path):
 
 def evaluate_train(domain):
     """Did training actually run, and did it pass the loss criterion?"""
-    structured = domain in {"weather", "crystal", "structure3d", "image", "spectrum", "field"}
+    structured = is_structured_domain(domain)
     base = REPO_ROOT / "out" / domain
     log_path = base / "model" / "train_log.json" if structured else base / "train_log.json"
     ckpt_path = base / "model" / "ckpt.pt" if structured else base / "ckpt.pt"
@@ -68,7 +70,7 @@ def evaluate_train(domain):
 
 def evaluate_train_gain(domain, baseline_loss):
     """Did extending the budget improve on the V0 baseline by enough?"""
-    structured = domain in {"weather", "crystal", "structure3d", "image", "spectrum", "field"}
+    structured = is_structured_domain(domain)
     log_path = REPO_ROOT / "out" / domain
     log_path = log_path / "model" / "train_log.json" if structured else log_path / "train_log.json"
     log = _read_json(log_path)

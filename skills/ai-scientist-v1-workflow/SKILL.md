@@ -21,6 +21,8 @@ python -m autoresearch.v1 --domain protein --autoresearch-dir out/autoresearch/p
 
 查看 `plan.json` 和 `related_work.json`。相关工作来自仓库内已经列明来源的课程目录，`novelty_assessment` 固定为 `not_performed_offline`；它提供阅读入口，不代表完成新颖性检索。
 
+如果输出目录里已经有一份完成的研究材料，先请学生换一个新目录。确实要重做时才显式加入 `--overwrite`；该选项只替换本工作流生成的文件。由 `--plan-only` 生成且内容未变的计划，可以在同一目录继续 `--confirm-plan`。
+
 ## 确认路线以后整理结果
 
 学生确认这条路线后运行：
@@ -32,6 +34,8 @@ python -m autoresearch.v1 --domain protein --autoresearch-dir out/autoresearch/p
 这一步只整理已有证据。依次查看 `results.json`、`results.csv`、`figures/v0-v1.svg`、`evidence_map.json`、`draft.md`、`review.json` 和 `claim_boundary.md`。每个数字都回指同一份 `comparison.json`；没有 `evaluated` 结果时只留下 `workflow_status.json`，不会生成稿件。
 
 结果没有达到门槛也可以进入短稿，但必须写成这条路线的负结果或停止依据。规则审查的最高结论是 `ready_for_human_review`，表示材料可以交给人继续检查，不表示论文已经通过评审。
+
+`workflow_state.json` 还会留下一条供 v2 讨论的备选路线。序列数据比较“增加训练轮数”和“扩大一次看到的上下文”两种不同思路；天气、晶体等结构化示例目前没有第二个经过实现验证的控制变量，因此只保留表示方式的设计题，不会假装已经能够执行。
 
 学生说“把刚才结果接成 AI Scientist v1”时，可以这样回应：
 

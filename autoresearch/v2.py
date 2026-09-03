@@ -12,11 +12,28 @@ from pathlib import Path
 
 from .evaluator import evaluate_loss_gain
 from .experiment import (
-    STRUCTURED_DOMAINS,
     command_options,
     load_baseline_run,
     replace_option,
 )
+from nanoscigpt.domains.registry import STRUCTURED_DOMAINS
+
+
+FIELD_DISPLAY_NAMES = {
+    "max_iters": "预训练步数",
+    "pretrain_steps": "预训练步数",
+    "block_size": "一次可见的上下文长度",
+    "scientific_representation": "科学数据表示方式",
+    "spatiotemporal_representation": "时空数据表示方式",
+}
+METRIC_DISPLAY_NAMES = {
+    "best_val_loss": "验证损失",
+    "pretrain_val_loss": "预训练验证损失",
+}
+
+
+def display_name(field: str) -> str:
+    return FIELD_DISPLAY_NAMES.get(field, field)
 
 
 def read_json(path: Path) -> dict:
@@ -54,8 +71,17 @@ def init_tree(v1_state_path: Path, out_root: Path) -> Path:
         raise FileExistsError(f"tree state already exists: {state_path}")
     route1 = v1["route"]
     route2 = backlog[0]
+    route2_mode = route2.get("execution_mode", "executable")
+    if route2_mode not in {"executable", "design_only"}:
+        raise ValueError(f"unsupported route-2 execution_mode={route2_mode}")
+    if route1["change"]["field"] == route2["change"]["field"]:
+        raise ValueError("v2 routes must change different research variables")
     route1_evaluation = dict(route1["result"])
     route1_evaluation["passed"] = bool(route1_evaluation["criterion_passed"])
+    evaluator = dict(v1["evaluator"])
+    evaluator["metric_label"] = METRIC_DISPLAY_NAMES.get(
+        evaluator["metric"], evaluator["metric"]
+    )
     state = {
         "schema_version": "nanoscigpt.ai_scientist_v2.tree.v1",
         "implementation": {
@@ -67,7 +93,7 @@ def init_tree(v1_state_path: Path, out_root: Path) -> Path:
         "root": {
             "id": "root",
             "baseline_run": v1["baseline_run"],
-            "evaluator": v1["evaluator"],
+            "evaluator": evaluator,
             "source_v1_state": str(v1_path),
         },
         "nodes": {
@@ -77,19 +103,31 @@ def init_tree(v1_state_path: Path, out_root: Path) -> Path:
                 "status": "completed",
                 "attempts": 1,
                 "change": route1["change"],
+                "change_label": display_name(route1["change"]["field"]),
                 "run_report": route1["run_report"],
                 "evaluation": route1_evaluation,
             },
             "route-2": {
                 "id": "route-2",
                 "parent_id": "root",
-                "status": "planned",
+                "status": "planned" if route2_mode == "executable" else "design_only",
                 "attempts": 0,
                 "change": route2["change"],
+                "change_label": display_name(route2["change"]["field"]),
+                "execution_mode": route2_mode,
+                **(
+                    {"design_reason": route2["design_reason"]}
+                    if route2.get("design_reason")
+                    else {}
+                ),
             },
         },
-        "frontier": ["route-2"],
-        "next_action": "review_route-2_then_run-next",
+        "frontier": ["route-2"] if route2_mode == "executable" else [],
+        "next_action": (
+            "review_route-2_then_run-next"
+            if route2_mode == "executable"
+            else "review_design_only_route"
+        ),
     }
     atomic_write_json(state_path, state)
     return state_path
@@ -150,25 +188,14 @@ def run_next(state_path: Path, approved: bool) -> int:
     atomic_write_json(state_path, state)
 
     node_dir.mkdir(parents=True, exist_ok=True)
-    completed = subprocess.run(
-        run_spec["command"],
-        cwd=Path(__file__).resolve().parent.parent,
-        capture_output=True,
-        text=True,
-        encoding="utf-8",
-        errors="replace",
-    )
-    (node_dir / "stdout.txt").write_text(completed.stdout, encoding="utf-8")
-    (node_dir / "stderr.txt").write_text(completed.stderr, encoding="utf-8")
     report_path = (node_dir / "run_report.json").resolve()
     report = {
-        "status": "completed" if completed.returncode == 0 else "failed",
+        "status": "running",
         "domain": state["domain"],
         "route_id": node_id,
         "baseline_run": baseline["report_path"],
         "command": run_spec["command"],
         "change": node["change"],
-        "returncode": completed.returncode,
         "artifacts": {
             "model_dir": str(run_spec["model_dir"].resolve()),
             "train_log": str(run_spec["train_log"].resolve()),
@@ -176,37 +203,85 @@ def run_next(state_path: Path, approved: bool) -> int:
             "stderr": str((node_dir / "stderr.txt").resolve()),
         },
     }
-    if completed.returncode == 0 and run_spec["train_log"].is_file():
-        log = read_json(run_spec["train_log"])
-        metric = baseline["primary_metric"]
-        candidate = float(log[metric])
-        evaluation = evaluate_loss_gain(
-            baseline["baseline_value"],
-            candidate,
-            state["root"]["evaluator"]["minimum_delta"],
+
+    failure = None
+    exit_code = 1
+    try:
+        completed = subprocess.run(
+            run_spec["command"],
+            cwd=Path(__file__).resolve().parent.parent,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
         )
-        report["primary_metric"] = metric
-        report["primary_metric_value"] = candidate
-        report["evaluation"] = evaluation
-        node["status"] = "completed"
-        node["evaluation"] = evaluation
-    else:
+        (node_dir / "stdout.txt").write_text(completed.stdout, encoding="utf-8")
+        (node_dir / "stderr.txt").write_text(completed.stderr, encoding="utf-8")
+        report["returncode"] = completed.returncode
+        if completed.returncode != 0:
+            failure = {
+                "kind": "training_failed",
+                "message": f"training command returned {completed.returncode}",
+            }
+        elif not run_spec["train_log"].is_file():
+            failure = {
+                "kind": "missing_artifact",
+                "message": "training finished without train_log.json",
+            }
+        else:
+            log = read_json(run_spec["train_log"])
+            metric = baseline["primary_metric"]
+            if metric not in log:
+                failure = {
+                    "kind": "missing_metric",
+                    "message": f"train_log.json has no {metric}",
+                }
+            else:
+                candidate = float(log[metric])
+                evaluation = evaluate_loss_gain(
+                    baseline["baseline_value"],
+                    candidate,
+                    state["root"]["evaluator"]["minimum_delta"],
+                )
+                report["primary_metric"] = metric
+                report["primary_metric_value"] = candidate
+                report["evaluation"] = evaluation
+                report["status"] = "completed"
+                node["status"] = "completed"
+                node["evaluation"] = evaluation
+                exit_code = 0
+    except KeyboardInterrupt:
+        failure = {"kind": "interrupted", "message": "training was interrupted"}
+        exit_code = 130
+    except (OSError, ValueError, KeyError, json.JSONDecodeError) as error:
+        failure = {"kind": "process_error", "message": str(error)}
+
+    if failure is not None:
+        report["status"] = "failed"
+        report["failure"] = failure
         node["status"] = "failed"
-        node["failure"] = "training failed or train_log.json is missing"
+        node["failure"] = failure
     atomic_write_json(report_path, report)
     node["run_report"] = str(report_path)
     state["frontier"] = frontier[1:]
-    state["next_action"] = "decide" if not state["frontier"] else "run-next"
+    if node["status"] == "failed":
+        state["next_action"] = "inspect_failure"
+    else:
+        state["next_action"] = "decide" if not state["frontier"] else "run-next"
     atomic_write_json(state_path, state)
     print(f"{node_id} -> {report_path}")
-    return 0 if node["status"] == "completed" else 1
+    return exit_code
 
 
 def status_text(state: dict) -> str:
-    rows = [
-        f"{node_id}: {node['status']} (attempts={node['attempts']})"
-        for node_id, node in state["nodes"].items()
-    ]
+    rows = []
+    for node_id, node in state["nodes"].items():
+        change = node["change"]
+        label = node.get("change_label", display_name(change["field"]))
+        rows.append(
+            f"{node_id}: {node['status']} | {label} "
+            f"{change['from']}→{change['to']} (attempts={node['attempts']})"
+        )
     rows.append(f"next: {state['next_action']}")
     return "\n".join(rows)
 
@@ -217,7 +292,7 @@ def decide(state_path: Path) -> Path:
     unfinished = [
         node_id
         for node_id, node in state["nodes"].items()
-        if node["status"] not in {"completed", "failed"}
+        if node["status"] not in {"completed", "failed", "design_only"}
     ]
     if unfinished:
         raise ValueError(f"routes are not finished: {', '.join(unfinished)}")
@@ -239,18 +314,25 @@ def decide(state_path: Path) -> Path:
             node["stop_reason"] = None
         else:
             node["status"] = "stopped"
-            node["stop_reason"] = (
-                "dominated_under_same_evaluator"
-                if retained != "baseline" and node.get("evaluation", {}).get("passed")
-                else "criterion_not_met"
-            )
+            if node.get("execution_mode") == "design_only":
+                node["stop_reason"] = "not_executed_design_only"
+            else:
+                node["stop_reason"] = (
+                    "dominated_under_same_evaluator"
+                    if retained != "baseline" and node.get("evaluation", {}).get("passed")
+                    else "criterion_not_met"
+                )
     decision = {
         "schema_version": "nanoscigpt.ai_scientist_v2.decision.v1",
         "evaluator_id": state["root"]["evaluator"]["id"],
         "metric": state["root"]["evaluator"]["metric"],
+        "metric_label": state["root"]["evaluator"].get(
+            "metric_label", state["root"]["evaluator"]["metric"]
+        ),
         "baseline": baseline_value,
         "retained": retained,
-        "rule": "retain the lowest-loss route that clears the recorded threshold; otherwise retain baseline",
+        "rule_id": "lowest_passing_loss_else_baseline",
+        "rule": "在同一评价标准下，保留达到门槛且验证损失最低的路线；若均未达到，则保留V0",
         "merge_performed": False,
         "reproduces_original_system": False,
     }

@@ -10,9 +10,9 @@ import subprocess
 import sys
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
-STRUCTURED_DOMAINS = {"weather", "crystal", "structure3d", "image", "spectrum", "field"}
+from nanoscigpt.domains.registry import STRUCTURED_DOMAINS
 
+REPO_ROOT = Path(__file__).resolve().parent.parent
 _TRAIN_BASE = ["--block_size", "64", "--batch_size", "8",
                "--n_layer", "2", "--n_head", "2", "--n_embd", "64",
                "--eval_interval", "50", "--eval_iters", "10"]

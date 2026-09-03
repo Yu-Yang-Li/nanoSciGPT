@@ -42,6 +42,7 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("--data_root", default="data")
     p.add_argument("--out_dir", default=None)
+    p.add_argument("--fasta", type=Path, help="local protein FASTA; avoids network access")
     p.add_argument("--size", type=int, default=500)
     p.add_argument(
         "--max_len",
@@ -53,10 +54,19 @@ def main():
 
     domain_dir = Path(args.out_dir) if args.out_dir else Path(args.data_root) / "protein"
     domain_dir.mkdir(parents=True, exist_ok=True)
-    raw = domain_dir / "uniprot.fasta"
-    if not raw.exists():
-        print(f"downloading {args.size} reviewed UniProt entries...")
-        urllib.request.urlretrieve(URL.format(size=args.size), raw)
+    if args.fasta:
+        raw = args.fasta.resolve()
+        if not raw.is_file():
+            raise SystemExit(f"FASTA not found: {raw}")
+        source = str(raw)
+        source_kind = "user_file"
+    else:
+        raw = domain_dir / "uniprot.fasta"
+        if not raw.exists():
+            print(f"downloading {args.size} reviewed UniProt entries...")
+            urllib.request.urlretrieve(URL.format(size=args.size), raw)
+        source = URL.format(size=args.size)
+        source_kind = "public_source"
 
     seqs, rejected = parse_fasta_sequences(raw, max_len=args.max_len)
     print(
@@ -72,6 +82,8 @@ def main():
         return [np.array(tok.encode(s) + [tok.stoi["<eos>"]], dtype=np.uint16) for s in lst]
 
     n = len(seqs)
+    if n < 2:
+        raise SystemExit("protein FASTA must contain at least two canonical sequences")
     split = int(n * 0.9)
     train_arr = np.empty(split, dtype=object)
     val_arr = np.empty(n - split, dtype=object)
@@ -79,13 +91,14 @@ def main():
     val_arr[:] = encode_seqs(seqs[split:])
     np.save(domain_dir / "train_seqs.npy", train_arr, allow_pickle=True)
     np.save(domain_dir / "val_seqs.npy", val_arr, allow_pickle=True)
-    with open(domain_dir / "meta.json", "w") as f:
+    with open(domain_dir / "meta.json", "w", encoding="utf-8") as f:
         json.dump(
             {
                 "vocab_size": tok.vocab_size,
                 "mode": "independent",
                 "pad_id": pad_id,
-                "source": URL.format(size=args.size),
+                "source": source,
+                "source_kind": source_kind,
                 "raw_sequences": len(seqs) + rejected,
                 "accepted_sequences": len(seqs),
                 "rejected_noncanonical": rejected,
