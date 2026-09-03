@@ -22,6 +22,8 @@
 - [Scientific Language Skill的GLM-5.3实测](skill-evals/scientific-language-glm53-2026-09-03.md)：无Skill对照、修改前失败与修改后回答。
 - [nanoGPT预训练与微调Skill的GLM-5.3实测](skill-evals/nanogpt-pretraining-glm53-2026-09-03.md)：检查课堂所说的“微调”与模型参数是否真的更新。
 - [Baseline Builder Skill的GLM-5.3实测](skill-evals/baseline-builder-glm53-2026-09-03.md)：记录同名Skill冲突、FITS能力边界和修改后的课堂回答。
+- [AutoResearch Model Iteration Skill的GLM-5.3实测](skill-evals/autoresearch-model-iteration-glm53-2026-09-03.md)：从真实蛋白质V0生成计划、运行候选并保留停止依据。
+- [AI Scientist v1 Workflow Skill的GLM-5.3实测](skill-evals/ai-scientist-v1-glm53-2026-09-03.md)：把同一负结果接成单路线研究材料，并保留人工复核与查新边界。
 - [AI Scientist旧研究指南](ai-scientist-guide.md)：保留为研究档案，不作为当前六Skill的学生入口。
 
 ## 研究档案

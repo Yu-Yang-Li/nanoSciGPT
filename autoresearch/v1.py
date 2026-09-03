@@ -34,6 +34,14 @@ GENERATED_OUTPUTS = {
     "workflow_status.json",
     "figures",
 }
+FIELD_DISPLAY_NAMES = {
+    "max_iters": "预训练步数",
+    "pretrain_steps": "预训练步数",
+}
+METRIC_DISPLAY_NAMES = {
+    "best_val_loss": "验证损失",
+    "pretrain_val_loss": "预训练验证损失",
+}
 
 
 def read_json(path: Path) -> dict:
@@ -107,6 +115,8 @@ def build_plan(inputs: dict) -> dict:
         raise ValueError("iteration_spec.json has no single changed field")
     if not metric:
         raise ValueError("iteration_spec.json has no primary metric")
+    field_label = FIELD_DISPLAY_NAMES.get(changed["field"], changed["field"])
+    metric_label = METRIC_DISPLAY_NAMES.get(metric, metric)
     return {
         "schema_version": "nanoscigpt.ai_scientist_v1.plan.v1",
         "implementation": {
@@ -116,7 +126,14 @@ def build_plan(inputs: dict) -> dict:
         },
         "domain": inputs["domain"],
         "route_count": 1,
-        "research_question": f"改变 {changed['field']} 是否改善 {metric}？",
+        "research_question": (
+            f"在其余设置不变时，把{field_label}从{changed['from']}增加到"
+            f"{changed['to']}，{metric_label}是否进一步降低？"
+        ),
+        "display_names": {
+            "changed_field": field_label,
+            "primary_metric": metric_label,
+        },
         "route": {
             "id": "route-1",
             "status": "planned",
@@ -162,10 +179,12 @@ def evidence_errors(inputs: dict) -> list[str]:
 
 def build_results(inputs: dict) -> dict:
     comparison = inputs["comparison"]
+    metric = comparison["primary_metric"]
     return {
         "schema_version": "nanoscigpt.ai_scientist_v1.results.v1",
         "domain": inputs["domain"],
-        "metric": comparison["primary_metric"],
+        "metric": metric,
+        "metric_label": METRIC_DISPLAY_NAMES.get(metric, metric),
         "baseline": comparison["baseline"],
         "candidate": comparison["candidate"],
         "delta": comparison["delta"],
@@ -201,7 +220,7 @@ def write_svg(path: Path, results: dict) -> None:
     svg = (
         '<svg xmlns="http://www.w3.org/2000/svg" width="720" height="380" viewBox="0 0 720 380">'
         '<rect width="720" height="380" fill="#fbfaf6"/>'
-        f'<text x="360" y="40" text-anchor="middle" font-size="22">{results["metric"]}</text>'
+        f'<text x="360" y="40" text-anchor="middle" font-size="22">{results["metric_label"]}</text>'
         '<line x1="100" y1="300" x2="620" y2="300" stroke="#47555a"/>'
         + "".join(bars)
         + "</svg>"
@@ -243,11 +262,11 @@ def draft_text(plan: dict, results: dict, sources: dict) -> str:
 
 ## 实验设置
 
-只改变 `{plan['route']['changed']['field']}`：从 {plan['route']['changed']['from']} 调整为 {plan['route']['changed']['to']}；其余记录在 `plan.json`。
+只改变{plan['display_names']['changed_field']}（记录字段为 `{plan['route']['changed']['field']}`）：从 {plan['route']['changed']['from']} 调整为 {plan['route']['changed']['to']}；其余记录在 `plan.json`。
 
 ## 结果
 
-V0 的 {results['metric']} 为 {results['baseline']:.4f}，V1 为 {results['candidate']:.4f}，按“V0减V1”计算的差值为 {results['delta']:.4f}，门槛为 {results['threshold']:.4f}。{outcome}
+V0 的{results['metric_label']}为 {results['baseline']:.4f}，V1 为 {results['candidate']:.4f}，按“V0减V1”计算的差值为 {results['delta']:.4f}，门槛为 {results['threshold']:.4f}。{outcome}
 
 ## 讨论
 

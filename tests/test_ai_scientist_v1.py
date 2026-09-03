@@ -72,6 +72,13 @@ def test_v1_plan_contains_one_route_and_offline_related_work(completed_autoresea
     related = json.loads((out_dir / "related_work.json").read_text(encoding="utf-8"))
     assert plan["route_count"] == 1
     assert plan["route"]["changed"]["field"] == "max_iters"
+    assert plan["research_question"] == (
+        "在其余设置不变时，把预训练步数从2增加到4，验证损失是否进一步降低？"
+    )
+    assert plan["display_names"] == {
+        "changed_field": "预训练步数",
+        "primary_metric": "验证损失",
+    }
     assert related["novelty_assessment"] == "not_performed_offline"
     assert related["sources"]
     assert not (out_dir / "draft.md").exists()
@@ -110,6 +117,8 @@ def test_v1_confirm_uses_existing_evidence_and_writes_traceable_outputs(
     assert review["official_v1_reviewer_reproduced"] is False
     assert workflow["route_count"] == 1
     assert workflow["implementation"]["reproduces_original_system"] is False
+    assert "验证损失" in draft
+    assert "best_val_loss" not in draft
     if not results["criterion_passed"]:
         assert "未达到" in draft
 
