@@ -8,8 +8,8 @@
 |---|---|---|
 | 带标签表格CSV | `nanoscigpt-baseline --csv` | 分类或回归；需要明确目标列 |
 | 单条数值时序CSV | `nanoscigpt-baseline --series-csv` | 单变量预测；指定时间列或明确沿用行顺序 |
-| 蛋白质FASTA | `nanoscigpt.domains.protein.prepare --fasta` | 可在自有序列上预训练；课程组成分类不是用户功能标签 |
-| DNA FASTA | `nanoscigpt.domains.dna.prepare --fasta` | 可在自有序列上预训练；课程GC分类是教学任务 |
+| 蛋白质FASTA | `nanoscigpt.domains.protein.prepare --fasta` | 可在自有序列上预训练；无功能标签时运行课程命令需加`--skip-downstream` |
+| DNA FASTA | `nanoscigpt.domains.dna.prepare --fasta` | 可在自有序列上预训练；无目标标签时可加`--skip-downstream` |
 
 天气网格、晶体、三维结构、图像、光谱和连续物理场目前仍只提供内置教学夹具。学生自己的这些数据需按下列五个接口接入，不能直接套用内置样例的结果。
 

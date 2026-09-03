@@ -166,7 +166,15 @@ def run_command(command, cwd):
     return completed
 
 
-def run_domain(domain, profile, data_root, out_root, cwd=None, overwrite=False):
+def run_domain(
+    domain,
+    profile,
+    data_root,
+    out_root,
+    cwd=None,
+    overwrite=False,
+    skip_downstream=False,
+):
     if profile not in CPU_PROFILES:
         raise ValueError(f"unknown profile={profile}; choose from {tuple(CPU_PROFILES)}")
     settings = CPU_PROFILES[profile]
@@ -186,6 +194,8 @@ def run_domain(domain, profile, data_root, out_root, cwd=None, overwrite=False):
     started = time.perf_counter()
 
     if domain in STRUCTURED_DOMAINS:
+        if skip_downstream:
+            raise ValueError("--skip-downstream is currently available only for sequence domains")
         command = [
             sys.executable,
             "-m",
@@ -278,28 +288,42 @@ def run_domain(domain, profile, data_root, out_root, cwd=None, overwrite=False):
     samples_path.write_text(sampler_result.stdout, encoding="utf-8")
 
     commands = [trainer_command, sampler_command]
-    downstream_command = [
-        sys.executable,
-        "-m",
-        "nanoscigpt.tasks.downstream_demo",
-        "--domain",
-        domain,
-        "--ckpt",
-        model_dir / "ckpt.pt",
-        "--data_root",
-        data_root,
-        "--out_dir",
-        downstream_dir,
-        "--epochs",
-        settings["task_epochs"],
-        "--max_samples",
-        settings["task_samples"],
-    ]
-    if domain == "text":
-        downstream_command.append("--fine_tune")
-    run_command(downstream_command, cwd)
-    commands.append(downstream_command)
-    downstream_task = "completed"
+    downstream_task = "not_requested"
+    if not skip_downstream:
+        downstream_command = [
+            sys.executable,
+            "-m",
+            "nanoscigpt.tasks.downstream_demo",
+            "--domain",
+            domain,
+            "--ckpt",
+            model_dir / "ckpt.pt",
+            "--data_root",
+            data_root,
+            "--out_dir",
+            downstream_dir,
+            "--epochs",
+            settings["task_epochs"],
+            "--max_samples",
+            settings["task_samples"],
+        ]
+        if domain == "text":
+            downstream_command.append("--fine_tune")
+        run_command(downstream_command, cwd)
+        commands.append(downstream_command)
+        downstream_task = "completed"
+
+    artifacts = {
+        "checkpoint": str(model_dir / "ckpt.pt"),
+        "train_log": str(model_dir / "train_log.json"),
+        "samples": str(samples_path),
+    }
+    if not skip_downstream:
+        artifacts["downstream"] = str(downstream_dir / "downstream_result.json")
+        if domain == "text":
+            artifacts["finetuned_checkpoint"] = str(
+                downstream_dir / "finetuned_ckpt.pt"
+            )
 
     report = {
         "status": "completed",
@@ -310,17 +334,7 @@ def run_domain(domain, profile, data_root, out_root, cwd=None, overwrite=False):
         "preflight": preflight,
         "downstream_task": downstream_task,
         "elapsed_seconds": round(time.perf_counter() - started, 3),
-        "artifacts": {
-            "checkpoint": str(model_dir / "ckpt.pt"),
-            "train_log": str(model_dir / "train_log.json"),
-            "samples": str(samples_path),
-            "downstream": str(downstream_dir / "downstream_result.json"),
-            **(
-                {"finetuned_checkpoint": str(downstream_dir / "finetuned_ckpt.pt")}
-                if domain == "text"
-                else {}
-            ),
-        },
+        "artifacts": artifacts,
         "commands": [[str(part) for part in command] for command in commands],
     }
     report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -387,6 +401,11 @@ def main():
     parser.add_argument(
         "--overwrite", action="store_true", help="replace a finished run in the target directory"
     )
+    parser.add_argument(
+        "--skip-downstream",
+        action="store_true",
+        help="for sequence domains, run pretraining and sampling without a teaching task",
+    )
     args = parser.parse_args()
 
     if args.list:
@@ -408,8 +427,9 @@ def main():
                 args.data_root,
                 args.out_root,
                 overwrite=args.overwrite,
+                skip_downstream=args.skip_downstream,
             )
-        except FileExistsError as error:
+        except (FileExistsError, ValueError) as error:
             parser.error(str(error))
 
 

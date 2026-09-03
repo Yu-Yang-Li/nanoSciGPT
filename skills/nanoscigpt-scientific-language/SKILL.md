@@ -56,10 +56,10 @@ python -m nanoscigpt.domains.protein.prepare --fasta <FASTA绝对路径> --out_d
 再运行：
 
 ```powershell
-python -m nanoscigpt.classroom --domain protein --data_root out/student-data --profile classroom --out_root out/student-runs
+python -m nanoscigpt.classroom --domain protein --data_root out/student-data --profile classroom --out_root out/student-runs --skip-downstream
 ```
 
-这两条命令会在学生自己的序列上完成小型预训练。当前随后的组成分类使用从序列本身构造的教学标签；如果学生真正要预测蛋白质功能，还需要另接功能标签，不能把组成分类的结果写成功能预测结果。DNA也可由`nanoscigpt.domains.dna.prepare --fasta`接入自己的FASTA；其他数据格式仍按实际加载器边界处理。
+这两条命令会在学生自己的序列上完成小型预训练，并在没有功能标签时明确跳过下游任务。去掉`--skip-downstream`后，当前随后的组成分类使用从序列本身构造的教学标签；如果学生真正要预测蛋白质功能，还需要另接功能标签，不能把组成分类的结果写成功能预测结果。DNA也可由`nanoscigpt.domains.dna.prepare --fasta`接入自己的FASTA；其他数据格式仍按实际加载器边界处理。
 
 ## 怎样读运行结果
 

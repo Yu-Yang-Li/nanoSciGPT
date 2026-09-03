@@ -50,6 +50,7 @@ def test_scientific_language_skill_can_use_student_protein_fasta_without_overcla
     ).read_text(encoding="utf-8")
 
     assert "nanoscigpt.domains.protein.prepare --fasta" in skill
+    assert "--skip-downstream" in skill
     assert "功能标签" in skill
     assert "组成分类" in skill
 

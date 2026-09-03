@@ -54,6 +54,7 @@ def test_student_protein_fasta_can_prepare_and_run_without_course_data(tmp_path)
             "smoke",
             "--out_root",
             str(tmp_path / "runs"),
+            "--skip-downstream",
         ],
         cwd=ROOT,
         capture_output=True,
@@ -66,12 +67,8 @@ def test_student_protein_fasta_can_prepare_and_run_without_course_data(tmp_path)
     report = json.loads(
         (tmp_path / "runs" / "protein" / "run_report.json").read_text(encoding="utf-8")
     )
-    downstream = json.loads(
-        (tmp_path / "runs" / "protein" / "downstream" / "downstream_result.json").read_text(
-            encoding="utf-8"
-        )
-    )
     assert report["preflight"]["source_kind"] == "user_file"
     assert report["preflight"]["source_name"] == str(fasta.resolve())
-    assert downstream["label_source"] == "sequence-derived teaching label"
-    assert downstream["teaching_only"] is True
+    assert report["downstream_task"] == "not_requested"
+    assert "downstream" not in report["artifacts"]
+    assert not (tmp_path / "runs" / "protein" / "downstream").exists()
