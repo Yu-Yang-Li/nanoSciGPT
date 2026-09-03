@@ -23,6 +23,25 @@ RUNNABLE = (
 )
 
 
+def test_run_command_prints_child_error_before_raising(monkeypatch, capsys, tmp_path):
+    from nanoscigpt.classroom import run_command
+
+    def failed(command, **kwargs):
+        assert kwargs["check"] is False
+        return subprocess.CompletedProcess(
+            command, 1, stdout="child stdout\n", stderr="child stderr\n"
+        )
+
+    monkeypatch.setattr(subprocess, "run", failed)
+
+    with pytest.raises(subprocess.CalledProcessError):
+        run_command(["python", "broken.py"], tmp_path)
+
+    captured = capsys.readouterr()
+    assert "child stdout" in captured.out
+    assert "child stderr" in captured.err
+
+
 def test_bundled_data_manifest_covers_every_runnable_domain():
     manifest = json.loads((DATA_ROOT / "manifest.json").read_text(encoding="utf-8"))
 

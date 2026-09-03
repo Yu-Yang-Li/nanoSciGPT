@@ -152,7 +152,7 @@ def run_command(command, cwd):
     completed = subprocess.run(
         [str(part) for part in command],
         cwd=cwd,
-        check=True,
+        check=False,
         capture_output=True,
         text=True,
         encoding="utf-8",
@@ -163,6 +163,7 @@ def run_command(command, cwd):
         print(completed.stdout.rstrip(), flush=True)
     if completed.stderr:
         print(completed.stderr.rstrip(), file=sys.stderr, flush=True)
+    completed.check_returncode()
     return completed
 
 
