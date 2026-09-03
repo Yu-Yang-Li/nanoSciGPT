@@ -59,11 +59,11 @@
 - Consumes: 当前Python解释器、六个`skills/*/SKILL.md`和仓库数据清单。
 - Produces: `nanoscigpt-doctor`、六Skill安装脚本和双平台CI。
 
-- [ ] 编写失败测试，要求doctor返回Python/依赖/数据状态且安装脚本只复制六个Skill。
-- [ ] 实现只读doctor；缺依赖返回非零，完整环境列出十类`ready`。
-- [ ] 实现PowerShell与Bash安装脚本，目标目录显式传入，已有目录默认拒绝覆盖。
-- [ ] 新增Windows/Ubuntu安装与smoke CI，完整课堂测试单独运行。
-- [ ] 运行doctor、安装器沙箱测试和CI命令等价测试并提交。
+- [x] 编写失败测试，要求doctor返回Python/依赖/数据状态且安装脚本只复制六个Skill。
+- [x] 实现只读doctor；缺依赖返回非零，完整环境列出十类`ready`。
+- [x] 实现PowerShell与Bash安装脚本，目标目录显式传入，已有目录默认拒绝覆盖。
+- [x] 新增Windows/Ubuntu安装与smoke CI，完整课堂测试单独运行。
+- [x] 运行doctor、安装器沙箱测试和CI命令等价测试并提交。
 
 ### Task 3: 强化v1/v2状态安全
 

@@ -27,6 +27,7 @@
 
 ```bash
 python -m pip install -e .
+nanoscigpt-doctor
 
 # 查看当前真正能运行的十个选择
 python -m nanoscigpt.classroom --list
@@ -46,6 +47,24 @@ python -m nanoscigpt.classroom --domain protein --profile smoke
 ```bash
 nanoscigpt-classroom --domain protein
 ```
+
+`nanoscigpt-doctor`只检查当前Python、四个依赖、十类数据和六个Skill，不修改环境。检查未通过时，先解决它列出的缺项，不直接开始训练。
+
+### 把六个Skill安装到Codex
+
+Windows PowerShell：
+
+```powershell
+pwsh -NoProfile -File scripts/install_skills.ps1 -Destination (Join-Path $env:USERPROFILE ".codex\skills")
+```
+
+Linux或macOS：
+
+```bash
+bash scripts/install_skills.sh "$HOME/.codex/skills"
+```
+
+安装脚本只复制[课程索引](skills/README.md)列出的六个Skill。目标位置已有同名Skill时会停止，不会静默覆盖；安装完成后在新的Codex会话中使用。模型和数据仍从本仓库根目录运行。
 
 ## 学生可以选择什么
 

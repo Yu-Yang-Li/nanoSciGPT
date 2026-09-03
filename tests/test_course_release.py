@@ -62,6 +62,9 @@ def test_readme_points_to_current_course_and_six_skill_index() -> None:
         assert path in readme
     for stale in ("四个领域的最小可运行链路", "三段式虚拟 AI Scientist", "100 iter"):
         assert stale not in readme
+    assert "nanoscigpt-doctor" in readme
+    assert "scripts/install_skills.ps1" in readme
+    assert "scripts/install_skills.sh" in readme
 
 
 def test_evidence_pack_has_a_console_entry() -> None:
@@ -79,3 +82,18 @@ def test_student_navigation_has_no_broken_local_markdown_links() -> None:
                 continue
             resolved = (source.parent / target).resolve()
             assert resolved.exists(), f"{source.relative_to(ROOT)} -> {target}"
+
+
+def test_course_ci_covers_both_platforms_and_real_smoke_runs() -> None:
+    workflow = ROOT / ".github" / "workflows" / "test-course.yml"
+
+    assert workflow.is_file()
+    text = workflow.read_text(encoding="utf-8")
+    for expected in (
+        "ubuntu-latest",
+        "windows-latest",
+        "python -m nanoscigpt.doctor",
+        "--domain all --profile smoke",
+        "tests/test_classroom.py",
+    ):
+        assert expected in text

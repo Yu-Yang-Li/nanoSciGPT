@@ -12,3 +12,17 @@
 所有 Skill 都沿用学生已经提供的信息，每轮推进一项可检查的操作。课程数据与来源见 [`data/manifest.json`](../data/manifest.json)。
 
 当前实现的是普通电脑可运行的基础教学能力。The AI Scientist v1/v2 分别用于解释单路线计算研究和多路线比较，均不等同于原项目的完整复现。
+
+## 安装
+
+从仓库根目录运行对应平台的脚本，并显式给出Codex Skill目录：
+
+```powershell
+pwsh -NoProfile -File scripts/install_skills.ps1 -Destination (Join-Path $env:USERPROFILE ".codex\skills")
+```
+
+```bash
+bash scripts/install_skills.sh "$HOME/.codex/skills"
+```
+
+脚本会预先检查六个来源目录和六个目标目录。任何同名目标已经存在时，安装整体停止，不覆盖旧Skill。
