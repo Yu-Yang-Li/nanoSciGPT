@@ -22,3 +22,7 @@ python -m nanoscigpt.classroom --domain protein --profile smoke --out_root out/c
 - 运行没有读取开发目录的 `out/` 或 `.tmp/` 产物，所有输出都写入新克隆的 `out/clean-proof/`。
 
 这条检查只证明 GitHub 分支可独立复现两条最低教学路径；它不把课程规模 smoke 结果写成真实科学结论。
+
+## 最终 master 复测
+
+在文档审查提交 `0af722dc51196b4cb3e90854d926ce9f22d2f136` 的干净克隆中再次执行同样两条命令。`RUN_CWD` 明确为新克隆目录，LAMOST 的 `baseline_summary.json` 和 Protein 的 `run_report.json` 均从该目录生成；结果仍为 LAMOST `RMSE 83.4367` K、R² `0.9981`，Protein 预训练与下游任务 `completed`，设备 `cpu`。
