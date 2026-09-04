@@ -31,7 +31,7 @@ python -m nanoscigpt.classroom --domain protein --profile smoke --out_root out/c
 
 ## 当前发布头复测
 
-在最新 `master` 发布头 `ef389c2d96e3c19fe00c9d13d078f7511f225a55` 的全新克隆
+在发布头 `ef389c2d96e3c19fe00c9d13d078f7511f225a55` 的全新克隆
 `nanoscigpt-clean-proof-20260904-5` 中重新执行两条命令。`RUN_CWD` 明确位于该
 克隆目录，且克隆后工作树干净。LAMOST 输出的 `baseline_summary.json` 记录
 `test_rmse=83.43673513294728` K、`test_r2=0.99809165883606`；Protein smoke
