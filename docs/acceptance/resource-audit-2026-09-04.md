@@ -30,3 +30,9 @@
 - LAMOST与Palmer Penguins课程文件的SHA-256均与清单一致。
 - 十类数据是否能真正进入CPU流程另由`smoke-2026-09-03.md`和`test_classroom.py`验证，不以“文件存在”代替运行验收。
 - `data/precomputed_results/`逐领域保存真实`smoke`运行的可移植摘要；不含checkpoint和本机绝对路径。对应结构测试为`tests/test_precomputed_results.py`，当前通过。
+
+## 自动化复测
+
+- 三个 Skill 的 `quick_validate.py` 均输出 `Skill is valid!`。
+- 对话索引与十份 JSONL 的最终助手消息逐字一致，见 `tests/test_cli_dialogue_evidence.py`。
+- 复测命令 `python -m pytest -q`：`120 passed in 323.29s`；初次冷克隆的环境超时已在对话验收记录中保留并复测通过。

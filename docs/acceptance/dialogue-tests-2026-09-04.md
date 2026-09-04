@@ -4,6 +4,8 @@
 工作目录：仓库根目录  
 运行方式：每个场景均为新的 `codex exec --ephemeral` 会话；忽略项目外规则，只读取指定的仓库 Skill。为了允许助教实际检查文件和运行课程命令，使用 `--sandbox danger-full-access`；所有生成结果限制在本仓库的 `out/cli-dialogue/`。
 
+每个场景的学生原话和最终助手回复都保存在 [输入—输出索引](cli-dialogues/scenarios.json)；对应 JSONL 是不可改写的 CLI 事件记录，索引中的 `actual_output` 必须与该日志最后一条 `agent_message` 完全一致。这样可以从仓库直接复核“学生输入什么、Skill 实际回复什么”，而不是把理想对话当作测试结果。
+
 主测试使用本机 Codex CLI 默认模型 `gpt-5.6-sol`，将推理强度临时设为 `low`；兼容性复测显式使用 `scnet/GLM-5.3`。Skill本身没有绑定模型供应商。
 
 ## 验收结果
@@ -41,3 +43,7 @@ CLI还提示已安装Skill的描述超过上下文预算并进行了缩短。三
 - 学生文件与课程内置数据分开记录；课程结果没有移植到学生数据。
 - 不能上传、缺少标签或缺少完整运行报告时停在设计，不生成分数或研究结论。
 - AutoResearch只生成设置，尚未批准时不训练；没有跨过人工确认门。
+
+## 之后的自动化复测
+
+首次在新克隆上并行负载较高时，9 个动态用例曾因 `subprocess.TimeoutExpired` 结束；当时 Windows 总 CPU 约 97%，主要进程为系统 Defender 扫描。未修改代码、未重启用例，待负载回落后按相同命令复测：LAMOST 基线 1/1、十类 CPU smoke 10/10、基线/AutoResearch/v1/v2 20/20、完整 `python -m pytest -q` 120/120，均通过。这个记录保留超时事实，不把一次环境超时改写成代码通过。

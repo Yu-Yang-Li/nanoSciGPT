@@ -1,0 +1,92 @@
+[
+  {
+    "id": "baseline-course",
+    "skill": "research-baseline-builder",
+    "student_type": "course_example",
+    "model": "gpt-5.6-sol",
+    "student_input": "我想用课程里的LAMOST光谱示例估计恒星有效温度。",
+    "actual_output": "我理解为：用每条 LAMOST 光谱估计一颗恒星的有效温度；一条光谱就是一个样本。第一份 RandomForest 基线已经实际运行完成。\n\n课程数据共 2000 条光谱、每条 128 个流量特征；随机留出 400 条测试后，得到 RMSE 83.44 K、R² 0.9981。结果已写入 `out/cli-dialogue/default/baseline-course-recorded/LAMOST光谱有效温度回归/` 下的 `metrics.json`、`baseline_summary.json` 和 `train_log.txt`。这个结果只说明在同一课程数据范围内可以较好地预测，暂不能代表跨巡天、跨仪器或新分布的数据效果。\n\n下一条你可以直接告诉我：想先理解这两个分数，还是想看怎样用它估计一条光谱的温度。",
+    "log": "baseline-course.jsonl"
+  },
+  {
+    "id": "baseline-own",
+    "skill": "research-baseline-builder",
+    "student_type": "own_data",
+    "model": "gpt-5.6-sol",
+    "student_input": "我自己的分子表格在 .tmp/dialogue-fixtures/student-solubility.csv，每一行是一种分子；我要回归 measured log solubility in mols per litre。",
+    "actual_output": "我看过你的表格：1128 行，每行一种分子，目标是 measured log solubility in mols per litre。\n\n第一份 RandomForest 回归基线已经运行完成：测试集 RMSE 为 0.6766，R² 为 0.9032；结果保存在 `out/cli-dialogue/default/baseline-own/student-table`。不过 “ESOL predicted log solubility” 对结果贡献高达约 86%，可能让成绩显得过于乐观。\n\n你下一条告诉我：这个 ESOL 预测值是否允许作为输入；我们再决定是否排除它重跑。",
+    "log": "baseline-own.jsonl"
+  },
+  {
+    "id": "baseline-private",
+    "skill": "research-baseline-builder",
+    "student_type": "description_only",
+    "model": "gpt-5.6-sol",
+    "student_input": "我的材料实验数据在内网，不能上传；每一行是一种配方，目标是抗压强度。",
+    "actual_output": "明白：每一行是一种材料配方，目标是根据配方信息预测抗压强度。数据留在内网即可，我们先停在方案设计，不上传数据，也不虚构结果。\n\n现在只需要确认一件事：用于描述配方的输入信息大致有哪些？\n\n下一条消息只需写这些信息的名称，不要提供具体数值或敏感数据。",
+    "log": "baseline-private.jsonl"
+  },
+  {
+    "id": "science-course",
+    "skill": "nanoscigpt-scientific-language",
+    "student_type": "course_example",
+    "model": "gpt-5.6-sol",
+    "student_input": "我想先试蛋白质。",
+    "actual_output": "很好，蛋白质样例已通过预检：训练集 450 条、验证集 50 条，序列边界会独立保留。下一轮我们就开始蛋白质预训练。",
+    "log": "science-course.jsonl"
+  },
+  {
+    "id": "science-own",
+    "skill": "nanoscigpt-scientific-language",
+    "student_type": "own_data",
+    "model": "gpt-5.6-sol",
+    "student_input": "我自己的天气数据在 .tmp/dialogue-fixtures/student-weather.npz，是连续时刻的经纬度温度网格，目标是预测下一时刻温度场。",
+    "actual_output": "我看到 `train_x` 是 80 组连续 4 时刻的 16×16 网格，但 `train_y` 只有 80 个标量。你希望预测下一时刻的完整 16×16 温度场，还是每组数据的一个汇总温度值？",
+    "log": "science-own.jsonl"
+  },
+  {
+    "id": "science-private",
+    "skill": "nanoscigpt-scientific-language",
+    "student_type": "description_only",
+    "model": "gpt-5.6-sol",
+    "student_input": "我有两万条恒星光谱，每条4096个连续波长点，没有标签，数据不能上传；以后想用少量可靠标签估计温度。",
+    "actual_output": "可以先把每条光谱视为一个完整样本，按波长顺序读取4096个点；不能打乱谱线的局部形状，也要保留连续谱和不同谱线之间的整体关系。第一阶段不需要标签：遮住一小段连续波长，让程序根据两侧光谱恢复它，同时区分真实缺测、坏点和人为遮挡。以后有少量可靠温度标签时，再用这些样本建立温度估计，并留出一批恒星只作最终检验，避免同一颗恒星的重复观测同时出现在两边。整个过程可以在本地完成，不上传数据。\n\n下一步先确认一件事：这些光谱是否已经统一到相同的波长网格，并完成坏点标记和基本归一化？",
+    "log": "science-private.jsonl"
+  },
+  {
+    "id": "ai-course",
+    "skill": "ai-scientist-research-loop",
+    "student_type": "course_example",
+    "model": "gpt-5.6-sol",
+    "student_input": "我已经跑完text课程模型，运行报告在 out/acceptance-deep-text/text/run_report.json；请继续深入迭代优化。",
+    "actual_output": "已生成本轮迭代设置，尚未启动训练。\n\n当前使用 tiny Shakespeare 文本数据，基线最佳验证损失为 3.0929；教学分类准确率为 0.7812。本轮只把训练步数从 30 增加到 60，数据、划分、模型结构和评价方式均保持不变。\n\n你是否同意按这个设置运行一轮并比较结果？",
+    "log": "ai-course.jsonl"
+  },
+  {
+    "id": "ai-own",
+    "skill": "ai-scientist-research-loop",
+    "student_type": "own_data",
+    "model": "gpt-5.6-sol",
+    "student_input": "这是我自己的模型，结果只有 .tmp/dialogue-fixtures/student-model/metrics.json；我想让它自动继续优化。",
+    "actual_output": "我只看到一个 RMSE 为 0.42 的指标文件，它还不是可复查的完整运行记录，暂时不能据此自动优化。请告诉我：你平时用哪条命令运行模型并生成这个 `metrics.json`？",
+    "log": "ai-own.jsonl"
+  },
+  {
+    "id": "ai-private",
+    "skill": "ai-scientist-research-loop",
+    "student_type": "description_only",
+    "model": "gpt-5.6-sol",
+    "student_input": "模型和数据都在内网，不能上传；我只能告诉你当前验证误差是0.42，想继续优化。",
+    "actual_output": "先把验证误差 0.42 作为当前基准，只设计一轮“单一改动”的对照方案，暂不运行。你这一轮想只改模型结构，还是只改数据表示，并保持数据划分、训练预算和评价方法不变？",
+    "log": "ai-private.jsonl"
+  },
+  {
+    "id": "glm53-science-course",
+    "skill": "nanoscigpt-scientific-language",
+    "student_type": "compatibility_retest",
+    "model": "scnet/GLM-5.3",
+    "student_input": "我想先试蛋白质。",
+    "actual_output": "好，那就从蛋白质开始。这个模型会顺着氨基酸的排列一个一个读，保留序列原有的顺序和每条链的边界，训练时先让它练习预测下一个氨基酸。\n\n我刚才已经确认环境里 protein 这条数据是准备好的，可以直接跑：\n\n```\npython -m nanoscigpt.classroom --domain protein --profile classroom --out_root out/classroom\n```\n\n跑完后打开 `out/classroom/protein/run_report.json`，把里面预训练验证损失那几行和 `downstream_result.json` 的结果贴给我，我们再看它学到了什么。",
+    "log": "glm53-science-course.jsonl"
+  }
+]
