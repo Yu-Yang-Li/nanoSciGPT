@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "artifact_type": "precomputed_classroom_fallback",
+  "domain": "image",
+  "status": "completed",
+  "profile": "smoke",
+  "recorded_device": "cpu",
+  "recorded_on": "2026-09-04",
+  "teaching_only": true,
+  "evidence_status": "A portable summary of a completed repository smoke run; it is not evidence that the current student session ran.",
+  "source_data": {
+    "name": "deterministic astronomical-image teaching fixture",
+    "manifest_entry": "data/manifest.json#domains.image"
+  },
+  "pretraining": {
+    "name": "masked image-patch reconstruction",
+    "metrics": {
+      "pretrain_steps": 2,
+      "pretrain_loss_start": 1.277492,
+      "pretrain_loss_end": 1.095778,
+      "pretrain_val_loss": 0.903681
+    }
+  },
+  "downstream": {
+    "task_name": "astronomical source-count teaching regression",
+    "task_type": "regression",
+    "label_source": "recorded parameter from deterministic teaching generator",
+    "metric_name": "mae",
+    "metric_value": 0.660055,
+    "target_unit": "sources",
+    "train_samples": 80,
+    "val_samples": 16,
+    "encoder_frozen": true,
+    "pretrained_parameters_updated": false
+  },
+  "limitations": "See data/README.md for the domain-specific teaching boundary."
+}

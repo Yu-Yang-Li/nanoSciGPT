@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "artifact_type": "precomputed_classroom_fallback",
+  "domain": "spectrum",
+  "status": "completed",
+  "profile": "smoke",
+  "recorded_device": "cpu",
+  "recorded_on": "2026-09-04",
+  "teaching_only": true,
+  "evidence_status": "A portable summary of a completed repository smoke run; it is not evidence that the current student session ran.",
+  "source_data": {
+    "name": "deterministic blackbody-spectrum teaching fixture",
+    "manifest_entry": "data/manifest.json#domains.spectrum"
+  },
+  "pretraining": {
+    "name": "masked wavelength-patch reconstruction",
+    "metrics": {
+      "pretrain_steps": 2,
+      "pretrain_loss_start": 1.282782,
+      "pretrain_loss_end": 1.238267,
+      "pretrain_val_loss": 1.368275
+    }
+  },
+  "downstream": {
+    "task_name": "blackbody temperature teaching regression",
+    "task_type": "regression",
+    "label_source": "recorded parameter from deterministic teaching generator",
+    "metric_name": "mae",
+    "metric_value": 400.154938,
+    "target_unit": "kelvin",
+    "train_samples": 80,
+    "val_samples": 16,
+    "encoder_frozen": true,
+    "pretrained_parameters_updated": false
+  },
+  "limitations": "See data/README.md for the domain-specific teaching boundary."
+}

@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "artifact_type": "precomputed_classroom_fallback",
+  "domain": "smiles",
+  "status": "completed",
+  "profile": "smoke",
+  "recorded_device": "cpu",
+  "recorded_on": "2026-09-04",
+  "teaching_only": true,
+  "evidence_status": "A portable summary of a completed repository smoke run; it is not evidence that the current student session ran.",
+  "source_data": {
+    "name": "Delaney ESOL dataset distributed by DeepChem",
+    "manifest_entry": "data/manifest.json#domains.smiles"
+  },
+  "pretraining": {
+    "name": "next_token_prediction",
+    "metrics": {
+      "iters": 2,
+      "best_val_loss": 3.4085891246795654,
+      "history": [
+        {
+          "iter": 0,
+          "train_loss": 3.435055,
+          "val_loss": 3.477322
+        },
+        {
+          "iter": 1,
+          "train_loss": 3.467523,
+          "val_loss": 3.463793
+        },
+        {
+          "iter": 2,
+          "train_loss": 3.442678,
+          "val_loss": 3.408589
+        }
+      ]
+    }
+  },
+  "downstream": {
+    "task_name": "ESOL aqueous-solubility teaching regression",
+    "task_type": "regression",
+    "label_source": "measured log solubility in bundled Delaney ESOL data",
+    "metric_name": "mae",
+    "metric_value": 1.5806,
+    "train_samples": 32,
+    "val_samples": 16,
+    "encoder_frozen": true,
+    "pretrained_parameters_updated": false
+  },
+  "limitations": "See data/README.md for the domain-specific teaching boundary."
+}

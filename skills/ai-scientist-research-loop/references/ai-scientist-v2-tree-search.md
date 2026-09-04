@@ -37,6 +37,8 @@ python -m autoresearch.v2 status --state out/ai-scientist-v2/[领域]/tree_state
 
 `tree_state.json` 记录每条路线的状态和执行次数。已完成的路线不会再次执行。
 
+如果当前路线显示为 `running`，说明上一次进程可能在写出最终结果前中断。不要重新建立研究树；沿用同一份状态文件再次执行 `run-next --approve`。续跑后 `attempts` 会增加，并记录 `resumed_after_interruption: true`。
+
 ## 最后取舍
 
 ```powershell

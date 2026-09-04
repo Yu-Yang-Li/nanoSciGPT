@@ -139,8 +139,11 @@ def run_next(state_path: Path, approved: bool) -> int:
         raise ValueError("tree has no planned route")
     node_id = frontier[0]
     node = state["nodes"][node_id]
-    if node.get("status") != "planned":
-        raise ValueError(f"{node_id} is not planned")
+    node_status = node.get("status")
+    if node_status not in {"planned", "running"}:
+        raise ValueError(f"{node_id} is neither planned nor interrupted")
+    if node_status == "running":
+        node["resumed_after_interruption"] = True
 
     baseline = load_baseline_run(state["domain"], state["root"]["baseline_run"])
     node_dir = state_path.parent / "nodes" / node_id

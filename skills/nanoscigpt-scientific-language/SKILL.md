@@ -7,7 +7,7 @@ metadata:
 
 # nanoSciGPT Scientific Language
 
-这门实训不要求学生先会写 Transformer。和他一起选一种科学数据，先跑通一个很小的预训练模型，再把模型接到一个具体任务上。
+这门实训不要求学生先会写 Transformer。可以先用文本热身，也可以直接选一种科学数据；先跑通一个很小的预训练模型，再把模型接到一个具体任务上。
 
 ## 从学生已经选择的对象开始
 
@@ -15,13 +15,13 @@ metadata:
 
 > 你想先试哪一种数据？可以说蛋白质、DNA、分子、天气、晶体、三维结构、图像、光谱或连续物理场。
 
-蛋白质适合教师贯穿讲解，但不是默认答案。学生还只想理解文本语言模型时，交给 `nanogpt-pretraining`；已经选好科学对象时，直接进入相应示例。
+蛋白质适合教师贯穿讲解，但不是默认答案。学生还只想理解文本语言模型时，先运行`text`示例；已经选好科学对象时，直接进入相应示例。
 
 ## 把“科学语言”说具体
 
 运行以前，先用学生熟悉的话说明三件事：模型一次读什么单位、哪些关系不能被打散、训练时让它猜什么。例如蛋白质是氨基酸及其前后联系，天气是相邻网格和时间变化，光谱是连续波长上的谱线形状。这里的“语言”指可学习的排列与关系，不等于所有科学数据都要强行变成文字。
 
-仓库提供九个科学数据样例：`protein`、`dna`、`smiles`、`weather`、`crystal`、`structure3d`、`image`、`spectrum`、`field`。先在仓库根目录运行预检；列表中的 `text` 留给 nanoGPT 热身：
+仓库提供十个课堂样例：`text`、`protein`、`dna`、`smiles`、`weather`、`crystal`、`structure3d`、`image`、`spectrum`、`field`。先在仓库根目录运行预检：
 
 ```powershell
 python -m nanoscigpt.classroom --list
@@ -33,7 +33,13 @@ python -m nanoscigpt.classroom --list
 python -m nanoscigpt.classroom --domain protein --profile classroom --out_root out/classroom
 ```
 
-把 `protein` 换成学生选择的领域。使用能成功导入仓库依赖的 Python；默认 `python` 不可用时，可以运行 `scripts/find_course_python.ps1 -RequiredModules numpy,torch` 找到本机已有的课程环境。
+文本热身使用同一入口：
+
+```powershell
+python -m nanoscigpt.classroom --domain text --profile classroom --out_root out/classroom
+```
+
+把 `protein` 换成学生选择的领域；如果先做文本热身，就使用`--domain text`。使用能成功导入仓库依赖的 Python，默认`python`不可用时再运行`scripts/find_course_python.ps1 -RequiredModules numpy,torch`。
 
 ## 怎样读运行结果
 
@@ -43,6 +49,8 @@ python -m nanoscigpt.classroom --domain protein --profile classroom --out_root o
 - 下游结果说明这些表示是否能被一个具体任务使用。当前课程示例冻结预训练表示，只训练一个简单任务头；只有继续更新预训练模型参数时才称为微调。
 
 验证损失下降只代表这个小模型按预定目标学到了东西，不等于发现了科学机制。天气、晶体、三维结构、图像、光谱和物理场是仓库生成的教学夹具；蛋白质、DNA、SMILES与文本来自列明来源的课程子集。介绍数据时读取 `data/manifest.json`，用“课程样例”“生成夹具”或“真实来源子集”说清身份。
+
+如果现场运行中断，读取 `data/precomputed_results/<domain>.json` 继续解释结果格式，并明确说这是仓库预先保存的 `smoke` 备用结果，不能说成本次运行结果。保留本次失败日志，待环境恢复后再运行，不用备用指标覆盖失败记录。
 
 学生带来自己的数据时，先判断它能否接入现有领域接口。当前命令只会读取仓库准备好的数据；尚未完成适配时，先整理处理单位、上下文、预训练目标和下游任务，再决定是否修改 `nanoscigpt/domains/`。不要把课程样例的指标写成学生数据的结果。
 

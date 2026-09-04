@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "purpose": "Portable fallback summaries for teaching when a live smoke run cannot finish. These files must never be presented as a result from the current student session.",
+  "recorded_on": "2026-09-04",
+  "domains": {
+    "text": {
+      "result_file": "data/precomputed_results/text.json",
+      "source_run": "out/acceptance-smoke/text/run_report.json"
+    },
+    "dna": {
+      "result_file": "data/precomputed_results/dna.json",
+      "source_run": "out/acceptance-smoke/dna/run_report.json"
+    },
+    "protein": {
+      "result_file": "data/precomputed_results/protein.json",
+      "source_run": "out/acceptance-smoke/protein/run_report.json"
+    },
+    "smiles": {
+      "result_file": "data/precomputed_results/smiles.json",
+      "source_run": "out/acceptance-smoke/smiles/run_report.json"
+    },
+    "weather": {
+      "result_file": "data/precomputed_results/weather.json",
+      "source_run": "out/acceptance-smoke/weather/run_report.json"
+    },
+    "crystal": {
+      "result_file": "data/precomputed_results/crystal.json",
+      "source_run": "out/acceptance-smoke/crystal/run_report.json"
+    },
+    "structure3d": {
+      "result_file": "data/precomputed_results/structure3d.json",
+      "source_run": "out/acceptance-smoke/structure3d/run_report.json"
+    },
+    "image": {
+      "result_file": "data/precomputed_results/image.json",
+      "source_run": "out/acceptance-smoke/image/run_report.json"
+    },
+    "spectrum": {
+      "result_file": "data/precomputed_results/spectrum.json",
+      "source_run": "out/acceptance-smoke/spectrum/run_report.json"
+    },
+    "field": {
+      "result_file": "data/precomputed_results/field.json",
+      "source_run": "out/acceptance-smoke/field/run_report.json"
+    }
+  }
+}

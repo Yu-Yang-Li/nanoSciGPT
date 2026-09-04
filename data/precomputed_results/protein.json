@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "artifact_type": "precomputed_classroom_fallback",
+  "domain": "protein",
+  "status": "completed",
+  "profile": "smoke",
+  "recorded_device": "cpu",
+  "recorded_on": "2026-09-04",
+  "teaching_only": true,
+  "evidence_status": "A portable summary of a completed repository smoke run; it is not evidence that the current student session ran.",
+  "source_data": {
+    "name": "UniProtKB reviewed entries teaching subset",
+    "manifest_entry": "data/manifest.json#domains.protein"
+  },
+  "pretraining": {
+    "name": "next_token_prediction",
+    "metrics": {
+      "iters": 2,
+      "best_val_loss": 3.05104923248291,
+      "history": [
+        {
+          "iter": 0,
+          "train_loss": 3.071249,
+          "val_loss": 3.078519
+        },
+        {
+          "iter": 1,
+          "train_loss": 3.075114,
+          "val_loss": 3.051049
+        },
+        {
+          "iter": 2,
+          "train_loss": 3.087599,
+          "val_loss": 3.069262
+        }
+      ]
+    }
+  },
+  "downstream": {
+    "task_name": "protein composition teaching classification",
+    "task_type": "classification",
+    "label_source": "sequence-derived teaching label",
+    "metric_name": "accuracy",
+    "metric_value": 0.5625,
+    "train_samples": 32,
+    "val_samples": 16,
+    "encoder_frozen": true,
+    "pretrained_parameters_updated": false
+  },
+  "limitations": "See data/README.md for the domain-specific teaching boundary."
+}

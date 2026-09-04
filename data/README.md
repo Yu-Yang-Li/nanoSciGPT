@@ -2,6 +2,8 @@
 
 仓库直接携带十份nanoSciGPT小数据和两份监督学习开场数据，默认运行不访问网络。来源、用途和所需文件见[manifest.json](manifest.json)，使用与引用说明见[第三方告知](../THIRD_PARTY_NOTICES.md)。
 
+十类数据的真实 smoke 运行摘要保存在[预生成课堂结果](precomputed_results/README.md)。现场运行失败时可以用它继续讲结果格式，但必须说明这是备用结果，不能当作当前会话已经运行的证据。
+
 | 目录 | 内置内容 | 课堂用途 | 边界 |
 |---|---|---|---|
 | `text/` | tiny Shakespeare字符流 | 先看一次最小语言预训练 | 只作语言模型热身 |

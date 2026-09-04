@@ -15,7 +15,7 @@ metadata:
 
 > 你有一批 LAMOST 光谱，希望根据每条光谱估计恒星有效温度；一条光谱就是一个样本。
 
-如果这句话还缺一个会改变实验的问题，只问那一个。常见的是“最后要预测什么”或“一行代表什么”。数据路径可读、目标也明确时，就不要继续盘问，直接检查数据并给出第一项操作。
+如果这句话还缺一个会改变实验的问题，只问那一个。常见的是“最后要预测什么”或“一行代表什么”。数据路径可读、目标也明确时，就不要继续盘问，直接检查数据并给出第一项操作。学生已经说出目标但还没有把数据放到仓库时，只问“数据文件放在哪里，或能否给一小段可读样例？”；不要在同一轮再问文件类型、标签来源和字段清单。
 
 每轮回复由三小段自然组成：
 
@@ -43,7 +43,7 @@ python -m nanoscigpt.baseline --case lamost --out_root out/baseline
 
 ## 学生自己的数据
 
-能够读取文件时，先看列名、形状和少量样例，不让学生重复描述机器已经能看到的内容。表格任务确定目标列后，可运行 `python -m nanoscigpt.baseline --csv <CSV绝对路径> --target <目标列> --task <classification或regression> --out_root out/baseline`。不能上传时，仍可把“样本是什么、输入是什么、输出是什么”整理清楚，但停在设计，不生成分数。
+能够读取文件时，先看列名、形状和少量样例，不让学生重复描述机器已经能看到的内容。表格任务确定目标列后，可运行 `python -m nanoscigpt.baseline --csv <CSV绝对路径> --target <目标列> --task <classification或regression> --out_root out/baseline`。不能上传时，沿用已经说出的科学问题，只补最少的样本单位、输入或输出信息；停在设计，不生成分数。
 
 根据数据问题选择第一个容易复查的做法：表格分类/回归先用 RandomForest；时序先用朴素预测或 GRU；图像先用预训练特征或 EfficientNet。需要更细的选择时再读 `references/problem-to-data-routing.md` 和 `references/framework-selection.md`。
 
