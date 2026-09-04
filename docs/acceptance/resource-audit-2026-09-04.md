@@ -36,3 +36,4 @@
 - 三个 Skill 的 `quick_validate.py` 均输出 `Skill is valid!`。
 - 对话索引与十份 JSONL 的最终助手消息逐字一致，见 `tests/test_cli_dialogue_evidence.py`。
 - 复测命令 `python -m pytest -q`：`120 passed in 323.29s`；初次冷克隆的环境超时已在对话验收记录中保留并复测通过。
+- 远端分支干净克隆后，LAMOST 基线和 Protein smoke 均在新目录完成；提交哈希与远端一致，详见 `clean-clone-2026-09-04.md`。
