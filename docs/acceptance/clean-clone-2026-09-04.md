@@ -26,3 +26,5 @@ python -m nanoscigpt.classroom --domain protein --profile smoke --out_root out/c
 ## 最终 master 复测
 
 在文档审查提交 `0af722dc51196b4cb3e90854d926ce9f22d2f136` 的干净克隆中再次执行同样两条命令。`RUN_CWD` 明确为新克隆目录，LAMOST 的 `baseline_summary.json` 和 Protein 的 `run_report.json` 均从该目录生成；结果仍为 LAMOST `RMSE 83.4367` K、R² `0.9981`，Protein 预训练与下游任务 `completed`，设备 `cpu`。
+
+随后在发布头 `b01abeaf7141140f7700849ac8adef008177c913` 的全新克隆中再次执行，`RUN_CWD`、LAMOST 结果文件和 Protein 结果文件均确认位于该克隆；两条路径仍分别得到 `RMSE 83.4367` K / `R² 0.9981` 和 `completed`。这次复测之后只增加验收文档，不改变运行代码。
