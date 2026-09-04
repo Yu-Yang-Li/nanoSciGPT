@@ -114,7 +114,7 @@ A 线讲“模型怎么建”，B 线讲“科研过程怎么闭环”。`autore
 
 三段共用 `ResearchState`（`state.py`）——跨阶段的研究状态是三段成为一个系统的关键。
 
-完整讲义见 [docs/ai-scientist-guide.md](docs/ai-scientist-guide.md)。
+完整讲义见 [docs/instructor/ai-scientist-guide.md](docs/instructor/ai-scientist-guide.md)。
 
 ### 五个教学概念的落点
 
@@ -177,15 +177,15 @@ python -m autoresearch.run --domain text
 | 文档 | 身份 | 用途 |
 |---|---|---|
 | [docs/course-outline.md](docs/course-outline.md) | **课程大纲** | 90 分钟结构、两条时间线、案例与实践分工、作业评分 |
-| [docs/teaching-guide.md](docs/teaching-guide.md) | A 线操作讲稿 | 逐级现场命令、预期输出、停止边界 |
-| [docs/ai-scientist-guide.md](docs/ai-scientist-guide.md) | B 线操作讲稿 | autoresearch 三段式演示指南 |
+| [docs/instructor/teaching-guide.md](docs/instructor/teaching-guide.md) | A 线操作讲稿 | 逐级现场命令、预期输出、停止边界 |
+| [docs/instructor/ai-scientist-guide.md](docs/instructor/ai-scientist-guide.md) | B 线操作讲稿 | autoresearch 三段式演示指南 |
 | [docs/acceptance/skill-release-review-2026-09-04.md](docs/acceptance/skill-release-review-2026-09-04.md) | Skill 上线审查 | 三个学生入口的真实对话、边界和校验结果 |
 | [docs/gpt-like-science-landscape.md](docs/gpt-like-science-landscape.md) | 调研全景 | GPT-like 科学模型项目对比 |
 | [docs/research-notes.md](docs/research-notes.md) | 调研笔记 | 来源与证据记录 |
 
 ## 课堂讲稿
 
-逐级操作讲稿见 [docs/teaching-guide.md](docs/teaching-guide.md)：每级的讲解要点、现场命令、预期输出、停止边界和学生动手点。
+逐级操作讲稿见 [docs/instructor/teaching-guide.md](docs/instructor/teaching-guide.md)：每级的讲解要点、现场命令、预期输出、停止边界和学生动手点。
 
 ## 一键运行全部领域
 

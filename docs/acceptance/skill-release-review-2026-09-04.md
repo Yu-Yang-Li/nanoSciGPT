@@ -26,6 +26,7 @@
 - [Codex CLI 对话记录](dialogue-tests-2026-09-04.md)
 - [边界测试](boundary-tests-2026-09-04.md)
 - [全量测试记录](pytest-non-course-2026-09-04.txt)
+- 讲师资料统一入口：[docs/instructor/](../instructor/README.md)
 
 ## 剩余条件
 

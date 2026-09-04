@@ -100,7 +100,7 @@
 | [course-outline.md](course-outline.md) | 本文件：课程大纲 |
 | [course-outline-25p.md](course-outline-25p.md) | **25页逐页大纲**：每页四段式（旧瓶颈→技术跃迁→论文锚点→实操增量） |
 | [speaker-script.md](speaker-script.md) | **逐页讲稿**：可直接照讲的口播稿，含舞台指令和关键句 |
-| [teaching-guide.md](teaching-guide.md) | A 线课堂操作讲稿 |
-| [ai-scientist-guide.md](ai-scientist-guide.md) | B 线课堂操作讲稿 |
+| [instructor/teaching-guide.md](instructor/teaching-guide.md) | A 线课堂操作讲稿 |
+| [instructor/ai-scientist-guide.md](instructor/ai-scientist-guide.md) | B 线课堂操作讲稿 |
 | [gpt-like-science-landscape.md](gpt-like-science-landscape.md) | GPT-like 科学模型调研全景 |
 | [research-notes.md](research-notes.md) | 调研笔记与来源 |
