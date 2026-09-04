@@ -1,8 +1,8 @@
 # 干净克隆复现验收
 
 日期：2026-09-04  
-来源：`origin/codex/classroom-hardening-20260904`  
-克隆提交：`c9a88e4373ae69f696915f733a8a585ee2b80585`
+来源：`origin/master`  
+克隆提交：`88bd1e3005cf9e61698d4b20e16baadb220bb163`
 
 ## 操作
 
