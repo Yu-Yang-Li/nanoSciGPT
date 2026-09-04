@@ -37,3 +37,18 @@ python -m nanoscigpt.classroom --domain protein --profile smoke --out_root out/c
 `test_rmse=83.43673513294728` K、`test_r2=0.99809165883606`；Protein smoke
 输出 `status=completed`、`downstream_task=completed`、`device=cpu`，预训练、采样和
 下游教学分类结果均生成。该提交只包含讲师资料归档和验收文档更新，未改变运行代码。
+
+同一克隆随后按学生顺序重跑完整路径，输出目录为
+`out/final-journey-current-2`：
+
+```text
+LAMOST_RMSE=83.4367351329469; LAMOST_R2=0.99809165883606
+PROTEIN_STATUS=completed; DOWNSTREAM=completed; DEVICE=cpu
+AUTORESEARCH_DELTA=0.0224; NEXT=stop_branch
+V2_RETAINED=baseline; MERGE=False
+EVIDENCE_PACK=True
+```
+
+文本和 Protein 的课堂预训练、采样与下游任务均完成；v1 生成并评阅一条路线，v2
+执行剩余路线后按同一评价器作出取舍。AutoResearch 未达到 `0.05` 改进门槛，因而
+停止该分支并在证据包中保留负结果，没有把它改写成优化成功。
