@@ -27,6 +27,7 @@
 - [边界测试](boundary-tests-2026-09-04.md)
 - [全量测试记录](pytest-non-course-2026-09-04.txt)
 - 讲师资料统一入口：[docs/instructor/](../instructor/README.md)
+- 课后提交模板：[evidence-pack-template.md](../evidence-pack-template.md)
 
 ## 剩余条件
 
