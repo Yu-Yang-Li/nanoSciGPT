@@ -112,6 +112,27 @@ def test_v2_run_next_requires_explicit_approval(completed_v1, tmp_path):
     assert state["nodes"]["route-2"]["attempts"] == 0
 
 
+def test_v2_run_next_resumes_the_same_route_after_an_interrupted_attempt(
+    completed_v1, tmp_path
+):
+    out_root = tmp_path / "v2"
+    assert _run("init", "--from-v1", completed_v1, "--out-root", out_root).returncode == 0
+    state_path = out_root / "text" / "tree_state.json"
+    state = json.loads(state_path.read_text(encoding="utf-8"))
+    state["nodes"]["route-2"]["status"] = "running"
+    state["nodes"]["route-2"]["attempts"] = 1
+    state_path.write_text(json.dumps(state), encoding="utf-8")
+
+    resumed = _run("run-next", "--state", state_path, "--approve")
+
+    assert resumed.returncode == 0, resumed.stdout + resumed.stderr
+    recovered = json.loads(state_path.read_text(encoding="utf-8"))
+    assert recovered["nodes"]["route-2"]["status"] == "completed"
+    assert recovered["nodes"]["route-2"]["attempts"] == 2
+    assert recovered["nodes"]["route-2"]["resumed_after_interruption"] is True
+    assert recovered["frontier"] == []
+
+
 def test_v2_decision_can_retain_the_completed_v1_route(completed_v1, tmp_path):
     out_root = tmp_path / "v2"
     assert _run("init", "--from-v1", completed_v1, "--out-root", out_root).returncode == 0

@@ -89,3 +89,31 @@ def test_baseline_cli_accepts_a_student_csv_without_calling_it_course_data(tmp_p
     assert status["data_mode"] == "user_csv"
     assert summary["data_mode"] == "user_csv"
     assert summary["data_source_name"] is None
+
+
+def test_baseline_cli_does_not_train_a_student_csv_without_a_target(tmp_path):
+    csv_path = tmp_path / "unlabeled.csv"
+    with csv_path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.writer(handle)
+        writer.writerow(["feature_a", "feature_b"])
+        writer.writerow([1, 2])
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "nanoscigpt.baseline",
+            "--csv",
+            str(csv_path),
+            "--out_root",
+            str(tmp_path / "out"),
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+    )
+
+    assert completed.returncode == 2
+    assert "--csv requires --target" in completed.stderr
+    assert not (tmp_path / "out").exists()

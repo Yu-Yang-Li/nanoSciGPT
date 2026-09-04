@@ -4,8 +4,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_nanogpt_pretraining_skill_is_packaged_as_its_own_lesson():
-    skill_path = ROOT / "skills" / "nanogpt-pretraining" / "SKILL.md"
+def test_nanogpt_pretraining_lesson_is_retained_inside_scientific_language():
+    skill_path = ROOT / "skills" / "nanoscigpt-scientific-language" / "references" / "nanogpt-pretraining.md"
 
     assert skill_path.is_file()
     skill = skill_path.read_text(encoding="utf-8")
@@ -15,23 +15,20 @@ def test_nanogpt_pretraining_skill_is_packaged_as_its_own_lesson():
     assert "downstream_result.json" in skill
 
 
-def test_nanogpt_and_nanoscigpt_skills_have_distinct_triggers():
-    nanogpt = (ROOT / "skills" / "nanogpt-pretraining" / "SKILL.md").read_text(
+def test_nanogpt_warmup_is_part_of_the_scientific_language_entrypoint():
+    nanogpt = (ROOT / "skills" / "nanoscigpt-scientific-language" / "references" / "nanogpt-pretraining.md").read_text(
         encoding="utf-8"
     )
     nanoscigpt = (
         ROOT / "skills" / "nanoscigpt-scientific-language" / "SKILL.md"
     ).read_text(encoding="utf-8")
 
-    nanogpt_description = nanogpt.split("---", 2)[1]
-    nanoscigpt_description = nanoscigpt.split("---", 2)[1]
-    assert "text" in nanogpt_description.lower()
-    assert "text" not in nanoscigpt_description.lower()
-    assert "fine-tuning" not in nanoscigpt_description.lower()
+    assert "--domain text" in nanogpt
+    assert "--domain text" in nanoscigpt
 
 
-def test_autoresearch_model_iteration_is_packaged_as_its_own_lesson():
-    skill_path = ROOT / "skills" / "autoresearch-model-iteration" / "SKILL.md"
+def test_autoresearch_model_iteration_is_retained_inside_ai_scientist():
+    skill_path = ROOT / "skills" / "ai-scientist-research-loop" / "references" / "autoresearch-model-iteration.md"
 
     assert skill_path.is_file()
     skill = skill_path.read_text(encoding="utf-8")
@@ -42,8 +39,8 @@ def test_autoresearch_model_iteration_is_packaged_as_its_own_lesson():
     assert "comparison.json" in skill
 
 
-def test_ai_scientist_v1_is_packaged_as_its_own_lesson():
-    skill_path = ROOT / "skills" / "ai-scientist-v1-workflow" / "SKILL.md"
+def test_ai_scientist_v1_is_retained_inside_ai_scientist():
+    skill_path = ROOT / "skills" / "ai-scientist-research-loop" / "references" / "ai-scientist-v1-workflow.md"
 
     assert skill_path.is_file()
     skill = skill_path.read_text(encoding="utf-8")
@@ -53,8 +50,8 @@ def test_ai_scientist_v1_is_packaged_as_its_own_lesson():
     assert "evidence_map.json" in skill
 
 
-def test_ai_scientist_v2_is_packaged_as_its_own_lesson():
-    skill_path = ROOT / "skills" / "ai-scientist-v2-tree-search" / "SKILL.md"
+def test_ai_scientist_v2_is_retained_inside_ai_scientist():
+    skill_path = ROOT / "skills" / "ai-scientist-research-loop" / "references" / "ai-scientist-v2-tree-search.md"
 
     assert skill_path.is_file()
     skill = skill_path.read_text(encoding="utf-8")
