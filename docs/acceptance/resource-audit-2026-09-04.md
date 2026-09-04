@@ -36,6 +36,6 @@
 
 - 三个 Skill 的 `quick_validate.py` 均输出 `Skill is valid!`。
 - 对话索引与十份 JSONL 的最终助手消息逐字一致，见 `tests/test_cli_dialogue_evidence.py`。
-- 复测命令 `python -m pytest -q`：`121 passed in 326.71s`；初次冷克隆的环境超时已在对话验收记录中保留并复测通过。
+- 复测命令 `python -m pytest -q`：`122 passed in 396.76s`；初次冷克隆的环境超时已在对话验收记录中保留并复测通过。
 - 远端分支干净克隆后，LAMOST 基线和 Protein smoke 均在新目录完成；提交哈希与远端一致，详见 `clean-clone-2026-09-04.md`。
 - 发布头 `ef389c2` 的干净克隆按完整学生顺序重跑了 LAMOST、文本、Protein、AutoResearch、v1、v2 和证据包；结果为 `AUTORESEARCH_DELTA=0.0224`、`NEXT=stop_branch`、`V2_RETAINED=baseline`，详见同一复现记录。其后远端仅增加验收/资料文档提交，运行代码未变。

@@ -102,5 +102,6 @@
 | [speaker-script.md](speaker-script.md) | **逐页讲稿**：可直接照讲的口播稿，含舞台指令和关键句 |
 | [instructor/teaching-guide.md](instructor/teaching-guide.md) | A 线课堂操作讲稿 |
 | [instructor/ai-scientist-guide.md](instructor/ai-scientist-guide.md) | B 线课堂操作讲稿 |
+| [evidence-pack-template.md](evidence-pack-template.md) | 课后最小闭环证据包模板 |
 | [gpt-like-science-landscape.md](gpt-like-science-landscape.md) | GPT-like 科学模型调研全景 |
 | [research-notes.md](research-notes.md) | 调研笔记与来源 |

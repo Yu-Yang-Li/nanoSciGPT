@@ -179,6 +179,7 @@ python -m autoresearch.run --domain text
 | [docs/course-outline.md](docs/course-outline.md) | **课程大纲** | 90 分钟结构、两条时间线、案例与实践分工、作业评分 |
 | [docs/instructor/teaching-guide.md](docs/instructor/teaching-guide.md) | A 线操作讲稿 | 逐级现场命令、预期输出、停止边界 |
 | [docs/instructor/ai-scientist-guide.md](docs/instructor/ai-scientist-guide.md) | B 线操作讲稿 | autoresearch 三段式演示指南 |
+| [docs/evidence-pack-template.md](docs/evidence-pack-template.md) | 课后证据包模板 | 学生提交输入、运行、评价、失败和下一步 |
 | [docs/acceptance/skill-release-review-2026-09-04.md](docs/acceptance/skill-release-review-2026-09-04.md) | Skill 上线审查 | 三个学生入口的真实对话、边界和校验结果 |
 | [docs/gpt-like-science-landscape.md](docs/gpt-like-science-landscape.md) | 调研全景 | GPT-like 科学模型项目对比 |
 | [docs/research-notes.md](docs/research-notes.md) | 调研笔记 | 来源与证据记录 |
