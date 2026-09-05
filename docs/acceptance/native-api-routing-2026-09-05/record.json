@@ -1,0 +1,27 @@
+{
+  "source_sha256": "787e34c07f6866cd2a79ee293c8b3a9c4f88174c718f89f9e91f91d2e4f7eaab",
+  "probes": [
+    {
+      "model": "scnet/GLM-5.3",
+      "kind": "adapted_upstream_route_not_research",
+      "timeout_seconds": 30,
+      "retry_decorator_bypassed_for_probe_only": true,
+      "batch_answers": [
+        "OK",
+        "OK"
+      ],
+      "status": "passed",
+      "answer": "OK",
+      "elapsed_seconds": 7.89
+    },
+    {
+      "model": "gpt-6-astra",
+      "kind": "adapted_upstream_route_not_research",
+      "timeout_seconds": 30,
+      "retry_decorator_bypassed_for_probe_only": true,
+      "status": "passed",
+      "answer": "OK",
+      "elapsed_seconds": 4.625
+    }
+  ]
+}

@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import math
 import sys
 from pathlib import Path
 from typing import Any
@@ -33,7 +35,7 @@ METRIC_LABELS = {
     "best_val_loss": "验证损失",
     "pretrain_val_loss": "验证损失",
 }
-STATUS_LABELS = {"completed": "已完成", "ready": "已准备"}
+STATUS_LABELS = {"completed": "已完成", "ready": "已准备", "failed": "失败", "skipped_no_labels": "无标签，未做监督任务"}
 NEXT_ACTION_LABELS = {"stop": "停止", "conclude": "结束本轮"}
 
 
@@ -46,7 +48,22 @@ def _label(value: Any, labels: dict[str, str]) -> str:
 
 
 def _read_json(path: Path) -> dict[str, Any]:
-    return json.loads(path.read_text(encoding="utf-8"))
+    value = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(value, dict):
+        raise ValueError(f"记录必须是JSON对象：{path}")
+    return value
+
+
+def _finite_number(value: Any) -> bool:
+    return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)
+
+
+def _attachment_summary(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return f"- `{path.resolve()}`｜{path.stat().st_size}字节｜SHA256 `{digest.hexdigest()}`"
 
 
 def _optional_json(path: Path | None, label: str) -> dict[str, Any] | None:
@@ -63,16 +80,24 @@ def _render(
     state: dict[str, Any] | None,
     downstream: dict[str, Any] | None,
     source_paths: list[Path],
+    attachments: list[str] | None = None,
 ) -> str:
     preflight = run_report.get("preflight", {})
     domain = run_report.get("domain", "未记录")
-    source_name = preflight.get("source_name", "未记录")
+    source_name = (downstream or {}).get("source") or preflight.get("source_name") or "未记录"
     task_name = (downstream or {}).get("task_name", preflight.get("task_name", "未记录"))
     representation = preflight.get("representation", "未记录")
-    evidence_identity = "已评测" if comparison is not None or downstream is not None else "已运行"
+    ran = run_report.get("status") == "completed"
+    task_evaluated = bool(downstream and downstream.get("status") == "completed"
+                          and downstream.get("metric_name") and _finite_number(downstream.get("metric_value")))
+    task_compared = task_evaluated and _finite_number(downstream.get("metric_before_finetune"))
+    comparison_evaluated = bool(comparison and comparison.get("primary_metric")
+                                and _finite_number(comparison.get("baseline_value"))
+                                and _finite_number(comparison.get("observed_delta")))
+    evidence_identity = ("已评测" if task_evaluated or comparison_evaluated else "已运行") if ran else "未完成"
     source_label = (
         "教学数据"
-        if run_report.get("profile") == "classroom" or "teaching" in str(source_name).lower()
+        if "teaching" in str(source_name).lower()
         else "数据来源"
     )
 
@@ -85,28 +110,41 @@ def _render(
         f"- 表示方式：{_label(representation, REPRESENTATION_LABELS)}",
         f"- 具体任务：{task_name}",
         f"- 运行状态：{_label(run_report.get('status'), STATUS_LABELS)}",
-        f"- 具体任务状态：{_label(run_report.get('downstream_task'), STATUS_LABELS)}",
+        f"- 具体任务状态：{_label((downstream or {}).get('status', run_report.get('downstream_task')), STATUS_LABELS)}",
     ]
-    if downstream is not None:
+    if task_evaluated:
         lines.append(
             f"- 具体任务评价：{_label(downstream.get('metric_name'), METRIC_LABELS)} = "
             f"{downstream.get('metric_value', '未记录')}"
         )
+        before = downstream.get("metric_before_finetune")
+        if _finite_number(before):
+            after = downstream["metric_value"]
+            delta = after - before
+            lines.append(f"- 本轮微调记录：{before:g} → {after:g}（后减前：{delta:+.6g}）")
+            if downstream["metric_name"] == "mae" and delta > 0:
+                lines.append("- 本轮误差增大，未作为成功改进；记录原样保留。")
+            elif downstream["metric_name"] == "accuracy" and delta < 0:
+                lines.append("- 本轮准确率下降，未作为成功改进；记录原样保留。")
     lines.extend(["", "## 评价与下一步", ""])
 
-    if comparison is None:
+    if not comparison_evaluated or not ran:
         lines.extend(
             [
-                "- 比较状态：尚无比较记录",
-                f"- 下一步决定：{_label((state or {}).get('next_action'), NEXT_ACTION_LABELS) if state else '先完成同口径比较'}",
+                ("- 比较状态：已有本轮微调前后评价，未提供独立版本比较记录" if task_compared and ran else
+                 "- 比较状态：尚无比较记录" if comparison is None else
+                 "- 比较状态：记录不足或本次运行未完成，未认定比较已完成"),
+                f"- 下一步决定：{_label((state or {}).get('next_action'), NEXT_ACTION_LABELS)}",
                 "",
                 "## 当前能够声称",
                 "",
-                "- 训练流程和具体任务接口已经运行，并留下了运行报告。",
+                ("- 训练流程已经运行；具体任务是否完成及其评价，以上述记录为准。" if ran else
+                 "- 本次流程未完成；只能说明已有运行记录，不能据此声称训练完成。"),
                 "",
                 "## 当前不能声称",
                 "",
-                "- 尚不能声称模型已经改善，因为没有提供同口径比较结果。",
+                ("- 本轮微调前后数值不能代替独立对照，不能据此外推收益。" if task_compared else
+                 "- 尚不能声称模型已经改善，因为没有提供同口径比较结果。"),
                 "- 运行完成不等于结果已经经过外部验证。",
             ]
         )
@@ -140,7 +178,11 @@ def _render(
         lines.append("- 教学数据上的结果不能直接外推到真实研究对象。")
 
     lines.extend(["", "## 来源文件", ""])
-    lines.extend(f"- `{path}`" for path in source_paths)
+    lines.extend(f"- `{path.resolve()}`" for path in source_paths)
+    if attachments:
+        lines.extend(["", "## 原始附件", "", "只列出原文件及其摘要，不据附件数量判断研究是否完成。", ""])
+        lines.extend(attachments)
+        lines.extend(["", "原版Agent是否实际运行、实验是否改变下一步、稿件是否生成，需逐项核对原始日志；附件不自动获得新的证据等级。"])
     lines.append("")
     return "\n".join(lines)
 
@@ -150,8 +192,14 @@ def main() -> int:
     parser.add_argument("--run-report", type=Path, required=True)
     parser.add_argument("--comparison", type=Path)
     parser.add_argument("--state", type=Path)
+    parser.add_argument("--downstream-result", type=Path, help="最新任务结果；不提供时沿用运行报告里的路径")
+    parser.add_argument("--attachment", type=Path, action="append", default=[], help="保留原格式的日志、指标、代码差异或稿件；可重复提供")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
+
+    if args.output.exists():
+        print(f"输出已存在，请换新路径以保留旧记录：{args.output}", file=sys.stderr)
+        return 2
 
     if not args.run_report.is_file():
         print(f"找不到运行报告：{args.run_report}", file=sys.stderr)
@@ -161,29 +209,37 @@ def main() -> int:
         run_report = _read_json(args.run_report)
         comparison = _optional_json(args.comparison, "比较结果")
         state = _optional_json(args.state, "研究状态")
-    except (FileNotFoundError, json.JSONDecodeError) as error:
+        attachments = [_attachment_summary(path) for path in args.attachment]
+    except (OSError, ValueError) as error:
         print(error, file=sys.stderr)
         return 2
 
     downstream = None
     downstream_path = None
     reported_downstream = run_report.get("artifacts", {}).get("downstream")
-    if reported_downstream:
-        downstream_path = Path(reported_downstream)
-        if not downstream_path.is_absolute():
-            downstream_path = args.run_report.parent / downstream_path
-        if downstream_path.is_file():
-            downstream = _read_json(downstream_path)
+    try:
+        if args.downstream_result:
+            downstream_path = args.downstream_result
+            downstream = _optional_json(downstream_path, "具体任务结果")
+        elif reported_downstream:
+            downstream_path = Path(reported_downstream)
+            if not downstream_path.is_absolute():
+                downstream_path = args.run_report.parent / downstream_path
+            if downstream_path.is_file():
+                downstream = _read_json(downstream_path)
+        if downstream and downstream.get("domain") not in (None, run_report.get("domain")):
+            raise ValueError("具体任务结果与运行报告的领域不一致")
+    except (OSError, ValueError) as error:
+        print(error, file=sys.stderr)
+        return 2
 
     source_paths = [args.run_report]
     source_paths.extend(path for path in (args.comparison, args.state) if path is not None)
     if downstream_path is not None and downstream is not None:
         source_paths.append(downstream_path)
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(
-        _render(run_report, comparison, state, downstream, source_paths),
-        encoding="utf-8",
-    )
+    with args.output.open("x", encoding="utf-8") as handle:
+        handle.write(_render(run_report, comparison, state, downstream, source_paths, attachments))
     print(args.output)
     return 0
 

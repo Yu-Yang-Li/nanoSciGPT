@@ -1,0 +1,24 @@
+{
+  "mode": "v1-text",
+  "model_requested": "gpt-6-astra",
+  "evidence_type": "upstream_function_api_probe_not_research",
+  "endpoint": "http://127.0.0.1:10100/v1",
+  "max_tokens": 256,
+  "source_commit": "1de1dbc1f4ee2c5f61e9c94348d55eb51d7fa2eb",
+  "status": "passed",
+  "source_sha256": "8c0593243a768360103a30a41c4583df75cbe384f188f91354b46d55f100ec20",
+  "prompt": "Reply with exactly OK.",
+  "answer": "OK",
+  "history": [
+    {
+      "role": "user",
+      "content": "Reply with exactly OK."
+    },
+    {
+      "role": "assistant",
+      "content": "OK"
+    }
+  ],
+  "matched_expected": true,
+  "elapsed_seconds": 23.718
+}

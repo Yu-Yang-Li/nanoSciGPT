@@ -1,0 +1,24 @@
+tokens per iteration will be: 512
+found vocab_size = 4 (inside ../../data\course_dna_20260905\meta.pkl)
+Loading the course checkpoint; optimizer is restarted
+number of parameters: 0.10M
+num decayed parameter tensors: 10, with 102,656 parameters
+num non-decayed parameter tensors: 18, with 1,792 parameters
+using fused AdamW: False
+step 0: train loss 1.3186, val loss 1.3302
+iter 0: loss 1.3476, time 42.86ms
+iter 10: loss 1.3464, time 8.67ms
+step 15: train loss 1.3451, val loss 1.3487
+iter 20: loss 1.3225, time 8.01ms
+step 30: train loss 1.3306, val loss 1.3434
+iter 30: loss 1.3623, time 25.00ms
+training done
+Best validation loss: 1.3302356004714966
+Total train time: 0.01 mins
+Loading meta from ../../data\course_dna_20260905\meta.pkl...
+Sample 1:
+ATGGGGTTGGACTTATA
+Inference time: 0.01 seconds
+Tokens per second: 1686.11
+---------------
+Average tokens per second: 1686.11

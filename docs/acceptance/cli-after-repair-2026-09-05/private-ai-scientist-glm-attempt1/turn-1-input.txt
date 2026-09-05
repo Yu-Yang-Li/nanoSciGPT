@@ -1,0 +1,1 @@
+请按当前仓库 skills/ai-scientist-research-loop/SKILL.md 带我做研究。我想用 AI Scientist 改进蛋白质性质回归模型，但数据和代码都不能上传，现在只方便告诉你上一次的 MAE 是 0.7。你觉得先怎么办？

@@ -1,0 +1,8 @@
+>>> C:\Users\16571\AppData\Local\Programs\Python\Python312\python.exe -m nanoscigpt.tasks.structured_demo --domain image --data_root C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\data --out_dir C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\training-complete-20260905\training\image --pretrain_steps 20 --task_steps 20
+domain=image representation=image_patches
+pretraining: 1.2775 -> 0.7004
+fixed validation loss: 0.7441
+downstream task: completed
+task: astronomical source-count teaching regression
+result saved: C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\training-complete-20260905\training\image\downstream\downstream_result.json
+classroom run completed: image -> C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\training-complete-20260905\training\image\run_report.json

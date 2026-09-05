@@ -1,0 +1,1 @@
+请使用本仓库 skills/nanoscigpt-scientific-language/SKILL.md 带我做课程实验。我选蛋白质，想先用你们提供的数据。实验请写入 out/cli-native-check，不修改课程源文件。

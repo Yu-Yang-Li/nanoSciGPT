@@ -1,0 +1,26 @@
+tokens per iteration will be: 512
+found vocab_size = 65 (inside ../../data\shakespeare_char\meta.pkl)
+Initializing a new model from scratch
+number of parameters: 0.10M
+num decayed parameter tensors: 10, with 106,560 parameters
+num non-decayed parameter tensors: 5, with 320 parameters
+using fused AdamW: False
+step 0: train loss 4.1796, val loss 4.1794
+iter 0: loss 4.1912, time 57.95ms
+iter 10: loss 3.7692, time 15.92ms
+step 15: train loss 3.5647, val loss 3.6051
+iter 20: loss 3.4617, time 21.70ms
+step 30: train loss 3.4023, val loss 3.4794
+iter 30: loss 3.4057, time 59.15ms
+training done
+Best validation loss: 3.4793624877929688
+Total train time: 0.01 mins
+Loading meta from ../../data\shakespeare_char\meta.pkl...
+Sample 1:
+ ooa taYt
+ t&erijyvI
+ft,  t&u.jj 
+Inference time: 0.03 seconds
+Tokens per second: 1173.72
+---------------
+Average tokens per second: 1173.72

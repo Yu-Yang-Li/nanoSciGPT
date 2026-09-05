@@ -1,0 +1,1 @@
+请按当前仓库 skills/research-baseline-builder/SKILL.md 带我做实验。我想用你们的 LAMOST 光谱示例预测恒星温度，你帮我实际跑一下。结果另存到 out/cli-after-repair-baseline，不修改已有文件。

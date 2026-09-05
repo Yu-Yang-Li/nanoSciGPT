@@ -1,0 +1,56 @@
+{
+  "scope": "original_v1_template_baseline_only",
+  "agent_api_run": false,
+  "commit": "1de1dbc1f4ee2c5f61e9c94348d55eb51d7fa2eb",
+  "command": [
+    "C:\\Users\\16571\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "experiment.py",
+    "--out_dir",
+    "run_0"
+  ],
+  "cwd": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\upstream\\v1\\templates\\nanoSciGPT_verify_b4961f0b",
+  "returncode": 0,
+  "elapsed_seconds": 4.453,
+  "experiment_sha256": "d1d176ced7a91c2372cb9061d8787e401ba814384e23399cc7a619c1d1b9f557",
+  "course_bridge": {
+    "status": "prepared_not_run",
+    "upstream_commit": "1de1dbc1f4ee2c5f61e9c94348d55eb51d7fa2eb",
+    "domain": "dna",
+    "template": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\upstream\\v1\\templates\\course_dna_20260905",
+    "data": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\upstream\\v1\\data\\course_dna_20260905",
+    "initial_checkpoint_sha256": "a47aacbb00d15966ffeb9d3083e35b9195f2d81cb97e84b8fa20089f7814d2e3",
+    "optimizer": "fresh optimizer; model weights are continued",
+    "experiment_steps": 30,
+    "native_command": "python launch_scientist.py --experiment course_dna_20260905 --num-ideas 1 --parallel 0 --model <supported-model>"
+  },
+  "result": {
+    "course_dna_20260905": {
+      "means": {
+        "final_train_loss_mean": 1.362257719039917,
+        "best_val_loss_mean": 1.3302356004714966,
+        "total_train_time_mean": 0.34469056129455566,
+        "avg_inference_tokens_per_second_mean": 1686.1099972362504
+      },
+      "stderrs": {
+        "final_train_loss_stderr": 0.0,
+        "best_val_loss_stderr": 0.0,
+        "total_train_time_stderr": 0.0,
+        "avg_inference_tokens_per_second_stderr": 0.0
+      },
+      "final_info_dict": {
+        "final_train_loss": [
+          1.362257719039917
+        ],
+        "best_val_loss": [
+          1.3302356004714966
+        ],
+        "total_train_time": [
+          0.34469056129455566
+        ],
+        "avg_inference_tokens_per_second": [
+          1686.1099972362504
+        ]
+      }
+    }
+  }
+}

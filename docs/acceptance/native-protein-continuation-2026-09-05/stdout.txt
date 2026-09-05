@@ -1,0 +1,26 @@
+tokens per iteration will be: 512
+found vocab_size = 22 (inside ../../data\course_protein_20260905\meta.pkl)
+Loading the course checkpoint; optimizer is restarted
+number of parameters: 0.10M
+num decayed parameter tensors: 10, with 103,808 parameters
+num non-decayed parameter tensors: 18, with 1,792 parameters
+using fused AdamW: False
+step 0: train loss 2.9304, val loss 2.9211
+iter 0: loss 2.9689, time 39.39ms
+iter 10: loss 2.9023, time 10.00ms
+step 15: train loss 2.9142, val loss 2.9111
+saving checkpoint to run_0
+iter 20: loss 2.9645, time 9.50ms
+step 30: train loss 2.9140, val loss 2.9013
+saving checkpoint to run_0
+iter 30: loss 2.9297, time 33.95ms
+training done
+Best validation loss: 2.9012575149536133
+Total train time: 0.01 mins
+Loading meta from ../../data\course_protein_20260905\meta.pkl...
+Sample 1:
+MEGKNGIFAKRRISPCD
+Inference time: 0.01 seconds
+Tokens per second: 1777.77
+---------------
+Average tokens per second: 1777.77

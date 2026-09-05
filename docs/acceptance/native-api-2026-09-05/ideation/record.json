@@ -1,0 +1,22 @@
+{
+  "evidence_type": "original_v1_ideation_only_not_full_research",
+  "model": "gpt-6-astra",
+  "max_num_generations": 1,
+  "num_reflections": 2,
+  "source_files_sha256": {
+    "experiment.py": "0e4207320dfdbe833aaafe628f18103486be823bd15c3e059010c5e7eceeb704",
+    "native_gpt.py": "6c9540c3fb9dfdd5ccb87e3d80ca677f907939e613994bf01da15e0b94dc2983",
+    "plot.py": "ad7e28354ac6baf26b2f26bdb17b6f1b1bbb9ff7c29a896d61b57da444398d82",
+    "prompt.json": "c68197a67cab3b976c15451f319e36320e81eabd4400d7b46533c37ac666fd87",
+    "seed_ideas.json": "ea7a218abf61088d73456160c5c44386dc0a9fbb0851ddc163f31d7ddfef8de0",
+    "task_setup.json": "1b1736cb7dfb7241146c98336375557286a1d630c6ca5f81aa9e16d677fe7c39"
+  },
+  "data_identity": "handwritten teaching protein CSV, not experimental activity measurements",
+  "status": "passed",
+  "experiments_run": false,
+  "novelty_search_run": false,
+  "seed_ideas": 2,
+  "new_ideas": 1,
+  "api_requests": 2,
+  "elapsed_seconds": 94.25
+}

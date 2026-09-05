@@ -1,8 +1,10 @@
 # nanoSciGPT 课堂操作讲稿
 
+> **历史状态**：本文保留 2026-08 的四域训练和本地规则驱动演示供回查，不是当前课程复现入口。当前带练从三个学生 Skill 开始；B 线以 [`skills/ai-scientist-research-loop/SKILL.md`](../../skills/ai-scientist-research-loop/SKILL.md) 及其原项目接入说明为准。正文中的 `python -m autoresearch.*` 不是 karpathy 或 SakanaAI 原项目。
+
 面向：AI4S 实训营"科学模型专题实训（二）"A 线（领域基座模型）
 时长：约 25 分钟（对应 PPT P5–P10 的实操部分）
-前置：学生已安装 `pip install -e .` 和 `pip install -e .[esm]`
+历史前置曾提到 ESM，但当前 `pyproject.toml` 未提供 `esm` 可选依赖，因此不再推荐旧安装命令；当前基础安装使用 `pip install -e .`。
 
 ---
 

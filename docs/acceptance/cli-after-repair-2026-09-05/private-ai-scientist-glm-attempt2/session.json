@@ -1,0 +1,11 @@
+{
+  "session_id": "01a07085-d8a5-72a2-88c7-99cea2116b39",
+  "model": "scnet/GLM-5.3",
+  "model_selection": "explicit",
+  "sandbox": "workspace-write",
+  "persistent_memory_enabled": false,
+  "attempted_turns": 1,
+  "completed_turns": 1,
+  "classroom_execution_passed": false,
+  "note": "Dialogue capture only; inspect actual tool executions and outputs separately."
+}

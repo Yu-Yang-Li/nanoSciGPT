@@ -1,0 +1,99 @@
+[
+  {
+    "name": "course-fine",
+    "command": [
+      "C:\\Users\\16571\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "-m",
+      "nanoscigpt.tasks.downstream_demo",
+      "--domain",
+      "smiles",
+      "--ckpt",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training\\smiles\\model\\ckpt.pt",
+      "--data_root",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\data",
+      "--out_dir",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\native-smiles-task-roundtrip\\course-fine",
+      "--epochs",
+      "2",
+      "--max_samples",
+      "32",
+      "--adaptation",
+      "finetune"
+    ],
+    "cwd": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening",
+    "exit_code": 0,
+    "elapsed_seconds": 4.297
+  },
+  {
+    "name": "export",
+    "command": [
+      "C:\\Users\\16571\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "-m",
+      "nanoscigpt.native_v1",
+      "--checkout",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\upstream\\v1",
+      "--ckpt",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\native-smiles-task-roundtrip\\course-fine\\finetuned.pt",
+      "--data_root",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\data",
+      "--name",
+      "course_smiles_task_roundtrip",
+      "--steps",
+      "4"
+    ],
+    "cwd": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening",
+    "exit_code": 0,
+    "elapsed_seconds": 2.75
+  },
+  {
+    "name": "native",
+    "command": [
+      "C:\\Users\\16571\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "scripts/capture_native_v1_baseline.py",
+      "--checkout",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\upstream\\v1",
+      "--template",
+      "course_smiles_task_roundtrip",
+      "--output",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\native-smiles-task-roundtrip\\native"
+    ],
+    "cwd": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening",
+    "exit_code": 0,
+    "elapsed_seconds": 16.422
+  },
+  {
+    "name": "plot",
+    "command": [
+      "C:\\Users\\16571\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "plot.py"
+    ],
+    "cwd": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\upstream\\v1\\templates\\nanoSciGPT_verify_b70027fe",
+    "exit_code": 0,
+    "elapsed_seconds": 0.797
+  },
+  {
+    "name": "course-return",
+    "command": [
+      "C:\\Users\\16571\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "-m",
+      "nanoscigpt.tasks.downstream_demo",
+      "--domain",
+      "smiles",
+      "--ckpt",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\upstream\\v1\\templates\\nanoSciGPT_verify_b70027fe\\run_0\\checkpoint.pt",
+      "--data_root",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\data",
+      "--out_dir",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\native-smiles-task-roundtrip\\course-return",
+      "--epochs",
+      "2",
+      "--max_samples",
+      "32",
+      "--adaptation",
+      "finetune"
+    ],
+    "cwd": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening",
+    "exit_code": 0,
+    "elapsed_seconds": 7.36
+  }
+]

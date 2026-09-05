@@ -1,0 +1,23 @@
+{
+  "scope": "same_provider_direct_route_single_request_not_coder_acceptance",
+  "model": "GLM-5.3",
+  "endpoint": "https://api.scnet.cn/api/llm/v1",
+  "timeout_seconds": 60,
+  "requested_thinking": "omitted",
+  "http_status": 200,
+  "finish_reason": "stop",
+  "content": "2",
+  "reasoning_characters": 252,
+  "usage": {
+    "completion_tokens": 63,
+    "prompt_tokens": 21,
+    "total_tokens": 84,
+    "completion_tokens_details": {
+      "reasoning_tokens": 61
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "seconds": 5.625
+}

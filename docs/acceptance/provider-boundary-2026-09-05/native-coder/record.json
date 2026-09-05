@@ -1,0 +1,34 @@
+{
+  "status": "failed_no_implemented_change",
+  "model": "openai/scnet/GLM-5.3",
+  "data_identity": "handwritten teaching protein labels",
+  "input_sha256": {
+    "experiment.py": "0e4207320dfdbe833aaafe628f18103486be823bd15c3e059010c5e7eceeb704",
+    "plot.py": "ad7e28354ac6baf26b2f26bdb17b6f1b1bbb9ff7c29a896d61b57da444398d82",
+    "native_gpt.py": "6c9540c3fb9dfdd5ccb87e3d80ca677f907939e613994bf01da15e0b94dc2983",
+    "task_data.npz": "4f17d9e908171627f3f766c1399485dccea6cfc0c4dea3089b751164b4861de5",
+    "task_setup.json": "1b1736cb7dfb7241146c98336375557286a1d630c6ca5f81aa9e16d677fe7c39",
+    "initial_model.pt": "8133192b7d3cd00238a77fe52c727a38ddaa7fbbd4c84cc866f040a4caad9efd"
+  },
+  "source_commit": "1de1dbc1f4ee2c5f61e9c94348d55eb51d7fa2eb",
+  "experiments_run": false,
+  "scope": "original coder prompt and Aider diff coder, one turn only",
+  "baseline_run": true,
+  "max_tokens": 20000,
+  "api_timeout_seconds": 240,
+  "requested_thinking": "omitted_provider_does_not_accept_disabled",
+  "outer_transport_retries": 0,
+  "max_edit_reflections": 1,
+  "tokens_sent": 0,
+  "tokens_received": 0,
+  "elapsed_seconds": 203.937,
+  "output_sha256": {
+    "experiment.py": "0e4207320dfdbe833aaafe628f18103486be823bd15c3e059010c5e7eceeb704",
+    "plot.py": "ad7e28354ac6baf26b2f26bdb17b6f1b1bbb9ff7c29a896d61b57da444398d82",
+    "native_gpt.py": "6c9540c3fb9dfdd5ccb87e3d80ca677f907939e613994bf01da15e0b94dc2983",
+    "task_data.npz": "4f17d9e908171627f3f766c1399485dccea6cfc0c4dea3089b751164b4861de5",
+    "task_setup.json": "1b1736cb7dfb7241146c98336375557286a1d630c6ca5f81aa9e16d677fe7c39",
+    "initial_model.pt": "8133192b7d3cd00238a77fe52c727a38ddaa7fbbd4c84cc866f040a4caad9efd"
+  },
+  "fixed_inputs_unchanged": true
+}

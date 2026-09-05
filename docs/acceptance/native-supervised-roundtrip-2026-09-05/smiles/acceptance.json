@@ -1,0 +1,86 @@
+{
+  "evidence_type": "direct_command_runs_not_cli_dialogue",
+  "agent_api_run": false,
+  "source_checkpoint_sha256": "db39004855d6a612ab12559fd90dc2af14413349fc0d9e5c9a09bc5aa3d868bf",
+  "course": {
+    "status": "completed",
+    "domain": "smiles",
+    "task_name": "ESOL aqueous-solubility teaching regression",
+    "task_type": "regression",
+    "label_source": "measured log solubility in bundled Delaney ESOL data",
+    "metric_name": "mae",
+    "metric_value": 1.9677,
+    "metric_before_finetune": 1.6025,
+    "encoder_delta_l2": 0.28640926657559757,
+    "task_checkpoint": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\native-smiles-task-roundtrip\\course-fine\\finetuned.pt",
+    "pretrained_parameters_updated": true,
+    "train_samples": 32,
+    "val_samples": 16,
+    "adaptation": "finetune",
+    "encoder_frozen": false,
+    "teaching_only": true
+  },
+  "native": {
+    "scope": "v1_supervised_teaching_template_baseline_only",
+    "agent_api_run": false,
+    "commit": "1de1dbc1f4ee2c5f61e9c94348d55eb51d7fa2eb",
+    "command": [
+      "C:\\Users\\16571\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "experiment.py",
+      "--out_dir",
+      "run_0"
+    ],
+    "cwd": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\upstream\\v1\\templates\\nanoSciGPT_verify_b70027fe",
+    "returncode": 0,
+    "elapsed_seconds": 15.75,
+    "experiment_sha256": "0e4207320dfdbe833aaafe628f18103486be823bd15c3e059010c5e7eceeb704",
+    "course_bridge": {
+      "status": "prepared_not_run",
+      "upstream_commit": "1de1dbc1f4ee2c5f61e9c94348d55eb51d7fa2eb",
+      "domain": "smiles",
+      "template": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\upstream\\v1\\templates\\course_smiles_task_roundtrip",
+      "data": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\upstream\\v1\\templates\\course_smiles_task_roundtrip\\task_data.npz",
+      "task_type": "regression",
+      "adaptation": "task-specific training template; original GPT class and v1 research workflow",
+      "initial_checkpoint_sha256": "a9c6a3b44d58f57f1b8aa4bafedca78c0de22628177232469f232ae2da857017",
+      "native_gpt_sha256": "6c9540c3fb9dfdd5ccb87e3d80ca677f907939e613994bf01da15e0b94dc2983",
+      "optimizer": "fresh optimizer; encoder and head continued",
+      "experiment_steps": 4,
+      "native_command": "python launch_scientist.py --experiment course_smiles_task_roundtrip --num-ideas 1 --parallel 0 --model <supported-model>"
+    },
+    "result": {
+      "task": {
+        "means": {
+          "initial_val_mae": 1.967671275138855,
+          "val_mae": 1.6712616682052612
+        },
+        "stderrs": {},
+        "task": {
+          "task_name": "ESOL aqueous-solubility teaching regression",
+          "task_type": "regression",
+          "label_source": "measured log solubility in bundled Delaney ESOL data"
+        },
+        "runs": 1
+      }
+    }
+  },
+  "course_return": {
+    "status": "completed",
+    "domain": "smiles",
+    "task_name": "ESOL aqueous-solubility teaching regression",
+    "task_type": "regression",
+    "label_source": "measured log solubility in bundled Delaney ESOL data",
+    "metric_name": "mae",
+    "metric_value": 1.9417,
+    "metric_before_finetune": 1.6713,
+    "encoder_delta_l2": 0.3296502698838349,
+    "task_checkpoint": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\native-smiles-task-roundtrip\\course-return\\finetuned.pt",
+    "pretrained_parameters_updated": true,
+    "train_samples": 32,
+    "val_samples": 16,
+    "adaptation": "finetune",
+    "encoder_frozen": false,
+    "teaching_only": true
+  },
+  "round_trip_predictions_match": true
+}

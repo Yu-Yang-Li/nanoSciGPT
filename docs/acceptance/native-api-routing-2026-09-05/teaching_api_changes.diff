@@ -1,0 +1,102 @@
+--- original/ai_scientist/llm.py
++++ teaching/ai_scientist/llm.py
+@@ -10,7 +10,12 @@
+ 
+ MAX_NUM_TOKENS = 4096
+ 
++COURSE_OPENAI_MODELS = ('scnet/GLM-5.3', 'gpt-6-astra')
++COURSE_REVIEW_MODEL = 'gpt-6-astra'
++
+ AVAILABLE_LLMS = [
++    'scnet/GLM-5.3',
++    'gpt-6-astra',
+     # Anthropic models
+     "claude-3-5-sonnet-20240620",
+     "claude-3-5-sonnet-20241022",
+@@ -95,7 +100,7 @@
+         new_msg_history = [
+             new_msg_history + [{"role": "assistant", "content": c}] for c in content
+         ]
+-    elif model == "llama-3-1-405b-instruct":
++    elif model == "llama-3-1-405b-instruct" and model not in COURSE_OPENAI_MODELS:
+         new_msg_history = msg_history + [{"role": "user", "content": msg}]
+         response = client.chat.completions.create(
+             model="meta-llama/llama-3.1-405b-instruct",
+@@ -152,7 +157,7 @@
+     if msg_history is None:
+         msg_history = []
+ 
+-    if "claude" in model:
++    if "claude" in model and model not in COURSE_OPENAI_MODELS:
+         new_msg_history = msg_history + [
+             {
+                 "role": "user",
+@@ -183,7 +188,7 @@
+                 ],
+             }
+         ]
+-    elif 'gpt' in model:
++    elif model in COURSE_OPENAI_MODELS or 'gpt' in model:
+         new_msg_history = msg_history + [{"role": "user", "content": msg}]
+         response = client.chat.completions.create(
+             model=model,
+@@ -315,6 +320,8 @@
+ 
+ 
+ def create_client(model):
++    if model in COURSE_OPENAI_MODELS:
++        return openai.OpenAI(), model
+     if model.startswith("claude-"):
+         print(f"Using Anthropic API with model {model}.")
+         return anthropic.Anthropic(), model
+--- original/launch_scientist.py
++++ teaching/launch_scientist.py
+@@ -14,7 +14,7 @@
+ from datetime import datetime
+ 
+ from ai_scientist.generate_ideas import generate_ideas, check_idea_novelty
+-from ai_scientist.llm import create_client, AVAILABLE_LLMS
++from ai_scientist.llm import create_client, AVAILABLE_LLMS, COURSE_OPENAI_MODELS, COURSE_REVIEW_MODEL
+ from ai_scientist.perform_experiments import perform_experiments
+ from ai_scientist.perform_review import perform_review, load_paper, perform_improvement
+ from ai_scientist.perform_writeup import perform_writeup, generate_latex
+@@ -198,7 +198,9 @@
+         io = InputOutput(
+             yes=True, chat_history_file=f"{folder_name}/{idea_name}_aider.txt"
+         )
+-        if model == "deepseek-coder-v2-0724":
++        if model in COURSE_OPENAI_MODELS:
++            main_model = Model("openai/" + model, weak_model="openai/" + model)
++        elif model == "deepseek-coder-v2-0724":
+             main_model = Model("deepseek/deepseek-coder")
+         elif model == "deepseek-reasoner":
+             main_model = Model("deepseek/deepseek-reasoner")
+@@ -234,7 +236,9 @@
+         if writeup == "latex":
+             writeup_file = osp.join(folder_name, "latex", "template.tex")
+             fnames = [exp_file, writeup_file, notes]
+-            if model == "deepseek-coder-v2-0724":
++            if model in COURSE_OPENAI_MODELS:
++                main_model = Model("openai/" + model, weak_model="openai/" + model)
++            elif model == "deepseek-coder-v2-0724":
+                 main_model = Model("deepseek/deepseek-coder")
+             elif model == "deepseek-reasoner":
+                 main_model = Model("deepseek/deepseek-reasoner")
+@@ -267,7 +271,7 @@
+                 paper_text = load_paper(f"{folder_name}/{idea['Name']}.pdf")
+                 review = perform_review(
+                     paper_text,
+-                    model="gpt-4o-2024-05-13",
++                    model=COURSE_REVIEW_MODEL,
+                     client=openai.OpenAI(),
+                     num_reflections=5,
+                     num_fs_examples=1,
+@@ -293,7 +297,7 @@
+                 paper_text = load_paper(f"{folder_name}/{idea['Name']}_improved.pdf")
+                 review = perform_review(
+                     paper_text,
+-                    model="gpt-4o-2024-05-13",
++                    model=COURSE_REVIEW_MODEL,
+                     client=openai.OpenAI(),
+                     num_reflections=5,
+                     num_fs_examples=1,

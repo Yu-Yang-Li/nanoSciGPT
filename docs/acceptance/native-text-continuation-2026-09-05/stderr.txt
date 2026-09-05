@@ -1,0 +1,2 @@
+C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\upstream\v1\templates\nanoSciGPT_verify_127c8170\experiment.py:434: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  scaler = torch.cuda.amp.GradScaler(enabled=(dtype == "float16"))

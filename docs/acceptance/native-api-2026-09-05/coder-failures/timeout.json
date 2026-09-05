@@ -1,0 +1,8 @@
+{
+  "status": "terminated_after_timeout_and_unwanted_outer_retry",
+  "process_exit_code": 1,
+  "reason": "Aider retries after a 90-second request timeout despite LiteLLM num_retries=0. Only the owned probe process was stopped.",
+  "agent_experiments_run": false,
+  "baseline_run": true,
+  "record_json_started_is_not_completion": true
+}

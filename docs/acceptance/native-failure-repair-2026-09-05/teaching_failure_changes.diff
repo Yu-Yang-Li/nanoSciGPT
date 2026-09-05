@@ -1,0 +1,76 @@
+--- original/ai_scientist/perform_experiments.py
++++ teaching/ai_scientist/perform_experiments.py
+@@ -26,6 +26,29 @@
+ You can then implement the next thing on your list."""
+ 
+ 
++def preserve_failed_attempt(cwd, run_num, reason, stderr):
++    # Teaching adaptation: keep partial files and exact attempted code before retry.
++    from pathlib import Path
++    import tempfile
++
++    root = Path(cwd).resolve()
++    failed = root / "failed_runs"
++    failed.mkdir(exist_ok=True)
++    attempt = Path(tempfile.mkdtemp(prefix=f"run_{run_num}_", dir=failed))
++    run = root / f"run_{run_num}"
++    if run.exists():
++        if run.is_symlink() or run.resolve().parent != root:
++            raise ValueError("refusing to move results outside the experiment directory")
++        shutil.move(str(run), str(attempt / "artifacts"))
++    shutil.copy(root / f"run_{run_num}.py", attempt / "experiment.py")
++    if isinstance(stderr, bytes):
++        stderr = stderr.decode("utf-8", errors="replace")
++    (attempt / "failure.json").write_text(
++        json.dumps({"run": run_num, "reason": reason, "stderr": stderr or ""}, indent=2),
++        encoding="utf-8",
++    )
++
++
+ # RUN EXPERIMENT
+ def run_experiment(folder_name, run_num, timeout=7200):
+     cwd = osp.abspath(folder_name)
+@@ -51,8 +74,7 @@
+ 
+         if result.returncode != 0:
+             print(f"Run {run_num} failed with return code {result.returncode}")
+-            if osp.exists(osp.join(cwd, f"run_{run_num}")):
+-                shutil.rmtree(osp.join(cwd, f"run_{run_num}"))
++            preserve_failed_attempt(cwd, run_num, "nonzero_exit", result.stderr)
+             print(f"Run failed with the following error {result.stderr}")
+             stderr_output = result.stderr
+             if len(stderr_output) > MAX_STDERR_OUTPUT:
+@@ -76,10 +98,9 @@
+ YOUR PROPOSED CHANGE MUST USE THIS COMMAND FORMAT, DO NOT ADD ADDITIONAL COMMAND LINE ARGS.
+ If you are finished with experiments, respond with 'ALL_COMPLETED'."""
+         return result.returncode, next_prompt
+-    except TimeoutExpired:
++    except TimeoutExpired as error:
+         print(f"Run {run_num} timed out after {timeout} seconds")
+-        if osp.exists(osp.join(cwd, f"run_{run_num}")):
+-            shutil.rmtree(osp.join(cwd, f"run_{run_num}"))
++        preserve_failed_attempt(cwd, run_num, "timeout", error.stderr)
+         next_prompt = f"Run timed out after {timeout} seconds"
+         return 1, next_prompt
+ 
+@@ -140,6 +161,10 @@
+         print("Not all experiments completed.")
+         return False
+ 
++    if run == 1:
++        print("No new experiment completed.")
++        return False
++
+     current_iter = 0
+     next_prompt = """
+ Great job! Please modify `plot.py` to generate the most relevant plots for the final writeup. 
+@@ -156,6 +181,9 @@
+         current_iter += 1
+         if return_code == 0 or current_iter >= MAX_ITERS:
+             break
++    if return_code != 0:
++        print("Plotting did not complete.")
++        return False
+     next_prompt = """
+ Please modify `notes.txt` with a description of what each plot shows along with the filename of the figure. Please do so in-depth.
+ 

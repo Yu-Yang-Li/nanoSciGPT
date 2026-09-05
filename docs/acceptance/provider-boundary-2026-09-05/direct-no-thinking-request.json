@@ -1,0 +1,11 @@
+{
+  "model": "GLM-5.3",
+  "messages": [
+    {
+      "role": "user",
+      "content": "计算1+1，只回答数字。"
+    }
+  ],
+  "max_tokens": 256,
+  "stream": false
+}

@@ -1,0 +1,45 @@
+{
+  "scope": "original_v1_template_baseline_only",
+  "agent_api_run": false,
+  "commit": "1de1dbc1f4ee2c5f61e9c94348d55eb51d7fa2eb",
+  "command": [
+    "C:\\Users\\16571\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "experiment.py",
+    "--out_dir",
+    "run_0"
+  ],
+  "cwd": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\upstream\\v1\\templates\\nanoSciGPT_verify_6610df13",
+  "returncode": 0,
+  "elapsed_seconds": 5.891,
+  "experiment_sha256": "a0c340ece7c929727f8946727776b0fac49d64e024ab31c61eb996fb50685e65",
+  "result": {
+    "shakespeare_char": {
+      "means": {
+        "final_train_loss_mean": 3.405716896057129,
+        "best_val_loss_mean": 3.4793624877929688,
+        "total_train_time_mean": 0.6329257488250732,
+        "avg_inference_tokens_per_second_mean": 1173.7243598712746
+      },
+      "stderrs": {
+        "final_train_loss_stderr": 0.0,
+        "best_val_loss_stderr": 0.0,
+        "total_train_time_stderr": 0.0,
+        "avg_inference_tokens_per_second_stderr": 0.0
+      },
+      "final_info_dict": {
+        "final_train_loss": [
+          3.405716896057129
+        ],
+        "best_val_loss": [
+          3.4793624877929688
+        ],
+        "total_train_time": [
+          0.6329257488250732
+        ],
+        "avg_inference_tokens_per_second": [
+          1173.7243598712746
+        ]
+      }
+    }
+  }
+}

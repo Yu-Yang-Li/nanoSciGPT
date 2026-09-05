@@ -1,0 +1,24 @@
+{
+  "mode": "v2-tool",
+  "model_requested": "scnet/GLM-5.3",
+  "evidence_type": "upstream_function_api_probe_not_research",
+  "endpoint": "http://127.0.0.1:10100/v1",
+  "max_tokens": 256,
+  "source_commit": "96bd51617cfdbb494a9fc283af00fe090edfae48",
+  "status": "passed",
+  "source_sha256": "fccf46efef8008bc50a53c04113a6f654fd11365e949d5ff43d0f133622cea48",
+  "prompt": "Call record_probe with value 7.",
+  "answer": {
+    "value": 7
+  },
+  "api_seconds": 2.1813926696777344,
+  "prompt_tokens": 181,
+  "completion_tokens": 31,
+  "response_info": {
+    "system_fingerprint": null,
+    "model": "GLM-5.3",
+    "created": 1788587233
+  },
+  "matched_expected": true,
+  "elapsed_seconds": 5.078
+}

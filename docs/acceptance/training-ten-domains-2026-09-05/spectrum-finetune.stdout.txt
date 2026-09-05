@@ -1,0 +1,19 @@
+{
+  "status": "completed",
+  "domain": "spectrum",
+  "task_name": "blackbody temperature teaching regression",
+  "task_type": "regression",
+  "label_source": "recorded parameter from deterministic teaching generator",
+  "metric_name": "mae",
+  "metric_value": 1141.029296875,
+  "metric_before_finetune": 1384.556396484375,
+  "target_unit": "kelvin",
+  "train_samples": 32,
+  "val_samples": 16,
+  "encoder_frozen": false,
+  "pretrained_parameters_updated": true,
+  "encoder_delta_l2": 0.2026830365705678,
+  "adaptation": "finetune",
+  "task_checkpoint": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training\\spectrum\\finetune\\finetuned.pt",
+  "teaching_only": true
+}

@@ -1,0 +1,5 @@
+[
+  "请使用本仓库 skills/nanoscigpt-scientific-language/SKILL.md 带我做课程实验。我选蛋白质，想先用你们提供的数据。实验请写入 out/cli-native-check，不修改课程源文件。",
+  "好，你帮我实际把预训练和微调都跑一遍，模型小一点，CPU单线程即可。微调只用32个训练样本、2个epoch。我想知道两次训练分别做了什么，以及微调前后参数真的变了吗。",
+  "接着用本仓库 skills/ai-scientist-research-loop/SKILL.md 带我研究怎样继续优化。我希望用 autoresearch 或 AI Scientist 原项目，最好接着刚才的蛋白质模型。这次只检查已有条件并说明还差什么，不安装依赖、不下载数据、不调用新的模型API。"
+]

@@ -1,0 +1,11 @@
+{
+  "session_id": "01a07075-426f-70d3-98ce-c1862993185d",
+  "model": null,
+  "model_selection": "cli_default",
+  "sandbox": "workspace-write",
+  "persistent_memory_enabled": false,
+  "attempted_turns": 1,
+  "completed_turns": 1,
+  "classroom_execution_passed": false,
+  "note": "Dialogue capture only; inspect actual tool executions and outputs separately."
+}

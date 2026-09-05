@@ -1,0 +1,1 @@
+用当前仓库 skills/ai-scientist-research-loop/SKILL.md 接着带我研究如何改进刚才的模型。我希望用 autoresearch 或 AI Scientist 原项目，而不是固定规则演示。先检查已经有的模型、任务和环境，告诉我怎样接着做；这次不安装、不下载、不调用额外API。

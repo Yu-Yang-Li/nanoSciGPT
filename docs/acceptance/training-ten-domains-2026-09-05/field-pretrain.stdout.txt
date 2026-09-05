@@ -1,0 +1,8 @@
+>>> C:\Users\16571\AppData\Local\Programs\Python\Python312\python.exe -m nanoscigpt.tasks.structured_demo --domain field --data_root C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\data --out_dir C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\training-complete-20260905\training\field --pretrain_steps 20 --task_steps 20
+domain=field representation=space_time_patches
+pretraining: 1.2003 -> 0.7751
+fixed validation loss: 0.4085
+downstream task: completed
+task: diffusion coefficient teaching regression
+result saved: C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\training-complete-20260905\training\field\downstream\downstream_result.json
+classroom run completed: field -> C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\training-complete-20260905\training\field\run_report.json

@@ -1,0 +1,20 @@
+{
+  "status": "completed",
+  "domain": "protein",
+  "task_name": "student protein regression: activity",
+  "task_type": "regression",
+  "label_source": "student CSV column: activity",
+  "source_sha256": "d16a189a4d69103edc8865bee066eb6ba01a576590911deb9ff4bb56795cbd58",
+  "source": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\docs\\acceptance\\student-protein-2026-09-05\\input.csv",
+  "metric_name": "mae",
+  "metric_value": 3.7293,
+  "metric_before_finetune": 3.7052,
+  "encoder_delta_l2": 0.01793510852982258,
+  "task_checkpoint": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\student-check\\labeled-finetune\\finetuned.pt",
+  "pretrained_parameters_updated": true,
+  "train_samples": 6,
+  "val_samples": 2,
+  "adaptation": "finetune",
+  "encoder_frozen": false,
+  "teaching_only": true
+}

@@ -285,7 +285,7 @@ def run_domain(domain, profile, data_root, out_root, cwd=None, overwrite=False):
     ]
     run_command(downstream_command, cwd)
     commands.append(downstream_command)
-    downstream_task = "completed"
+    downstream_task = json.loads((downstream_dir / "downstream_result.json").read_text(encoding="utf-8"))["status"]
 
     report = {
         "status": "completed",

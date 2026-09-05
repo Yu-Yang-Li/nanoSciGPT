@@ -1,0 +1,14 @@
+>>> C:\Users\16571\AppData\Local\Programs\Python\Python312\python.exe -m nanoscigpt.core.trainer --domain smiles --data_root C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\data --out_dir C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\training-complete-20260905\training\smiles\model --device cpu --max_iters 30 --eval_interval 15 --eval_iters 5 --batch_size 8 --block_size 64 --n_layer 2 --n_head 2 --n_embd 64
+domain=smiles mode=independent vocab=33 params=0.10M
+iter 0: train 3.4129 val 3.3939 (0.0s)
+iter 15: train 2.4526 val 2.4999 (0.2s)
+iter 30: train 2.2188 val 2.1531 (0.3s)
+done: best val loss 2.1531 -> C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\training-complete-20260905\training\smiles\model\ckpt.pt
+>>> C:\Users\16571\AppData\Local\Programs\Python\Python312\python.exe -m nanoscigpt.core.sampler --domain smiles --data_root C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\data --out_dir C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\training-complete-20260905\training\smiles\model --device cpu --num_samples 1 --max_new_tokens 20
+--- sample 1 ---
+C()CCrCO)OCC(Ccc
+>>> C:\Users\16571\AppData\Local\Programs\Python\Python312\python.exe -m nanoscigpt.tasks.downstream_demo --domain smiles --ckpt C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\training-complete-20260905\training\smiles\model\ckpt.pt --data_root C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\data --out_dir C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\training-complete-20260905\training\smiles\downstream --epochs 20 --max_samples 128
+downstream task: completed
+task: ESOL aqueous-solubility teaching regression
+result saved: C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\training-complete-20260905\training\smiles\downstream\downstream_result.json
+classroom run completed: smiles -> C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\training-complete-20260905\training\smiles\run_report.json

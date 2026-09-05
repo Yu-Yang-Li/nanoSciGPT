@@ -1,0 +1,10 @@
+{
+  "scope": "same_provider_direct_route_single_request_not_coder_acceptance",
+  "model": "GLM-5.3",
+  "endpoint": "https://api.scnet.cn/api/llm/v1",
+  "timeout_seconds": 60,
+  "requested_thinking": "disabled",
+  "http_status": 401,
+  "error_type": "HTTPError",
+  "seconds": 0.218
+}

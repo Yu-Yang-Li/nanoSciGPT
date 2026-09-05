@@ -1,0 +1,6 @@
+{
+  "status": "skipped_no_labels",
+  "domain": "protein",
+  "source": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\docs\\acceptance\\student-protein-2026-09-05\\input.csv",
+  "reason": "pretraining ran; no student target column was supplied, so no supervised score is produced"
+}

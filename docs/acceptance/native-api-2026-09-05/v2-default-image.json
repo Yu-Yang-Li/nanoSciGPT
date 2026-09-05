@@ -1,0 +1,24 @@
+{
+  "mode": "v2-image",
+  "model_requested": "gpt-6-astra",
+  "evidence_type": "upstream_function_api_probe_not_research",
+  "endpoint": "http://127.0.0.1:10100/v1",
+  "max_tokens": 256,
+  "source_commit": "96bd51617cfdbb494a9fc283af00fe090edfae48",
+  "status": "passed",
+  "source_sha256": "fccf46efef8008bc50a53c04113a6f654fd11365e949d5ff43d0f133622cea48",
+  "prompt": "Read the chart. Return only the x-axis training step at which the blue curve reaches its maximum.",
+  "image": "docs\\acceptance\\native-supervised-roundtrip-2026-09-05\\protein\\task_training.png",
+  "image_sha256": "63ef7ec9bb765e1ed45f124f8dfd27cc736451f17884f172a376d8ce0ed5b961",
+  "answer": "3",
+  "api_seconds": 4.547006607055664,
+  "prompt_tokens": 866,
+  "completion_tokens": 5,
+  "response_info": {
+    "system_fingerprint": null,
+    "model": "gpt-6-astra",
+    "created": 1788587386
+  },
+  "matched_expected": true,
+  "elapsed_seconds": 7.156
+}

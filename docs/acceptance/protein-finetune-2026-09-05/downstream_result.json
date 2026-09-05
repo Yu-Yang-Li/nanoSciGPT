@@ -1,0 +1,18 @@
+{
+  "status": "completed",
+  "domain": "protein",
+  "task_name": "protein composition teaching classification",
+  "task_type": "classification",
+  "label_source": "sequence-derived teaching label",
+  "metric_name": "accuracy",
+  "metric_value": 0.4375,
+  "metric_before_finetune": 0.5625,
+  "encoder_delta_l2": 0.34334209907918967,
+  "task_checkpoint": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\finetune-acceptance\\protein\\finetune\\finetuned.pt",
+  "pretrained_parameters_updated": true,
+  "train_samples": 32,
+  "val_samples": 16,
+  "adaptation": "finetune",
+  "encoder_frozen": false,
+  "teaching_only": true
+}

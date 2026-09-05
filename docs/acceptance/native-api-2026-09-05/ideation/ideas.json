@@ -1,0 +1,26 @@
+[
+    {
+        "Name": "adaptive_block_size",
+        "Title": "Adaptive Block Size: Dynamic Context Window Adjustment for Efficient Training",
+        "Experiment": "Modify the model to dynamically adjust its block size during training, starting with a smaller block size and gradually increasing it. This could potentially lead to faster initial training and better long-range dependency learning.",
+        "Interestingness": 6,
+        "Feasibility": 4,
+        "Novelty": 4
+    },
+    {
+        "Name": "layerwise_learning_rates",
+        "Title": "Layer-wise Learning Rate Adaptation: Optimizing Training Dynamics in Transformer Models",
+        "Experiment": "Implement layer-wise learning rates, where each transformer layer has its own learning rate. Modify the configure_optimizers function to assign different learning rates to different layers, with deeper layers having lower learning rates. Compare the training dynamics, convergence speed, and final performance with the baseline model.",
+        "Interestingness": 4,
+        "Feasibility": 6,
+        "Novelty": 2
+    },
+    {
+        "Name": "similarity_profile_anchoring",
+        "Title": "Similarity-Profile Anchoring for Stable Protein Activity Fine-Tuning",
+        "Experiment": "Implement three conditions in experiment.py: unchanged supervised continuation, similarity-profile anchoring, and direct feature anchoring. Preserve task_data.npz, task_setup.json, initial_model.pt, native_gpt.py, and the supplied validation evaluation. Extract a pooled_features helper that exactly reproduces the original encoder forward and masked-mean pooling; keep predict as the supplied head applied to these features. Cache detached, L2-normalized initial pooled features for training sequences only as a fixed reference bank R. For minibatch indices i, normalize current features Z and compute the relational loss as the mean squared difference between Z @ R.T and R[i] @ R.T, excluding each example's own training index. If fewer than two training examples exist, mark this condition inapplicable. The direct control uses the mean squared difference between Z and R[i]. Both regularized conditions retain the original normalized-target regression MSE and continue updating all supplied encoder and head parameters. Calibrate each auxiliary coefficient using training data only: perform one common baseline update from the initial checkpoint, measure supervised loss S and each auxiliary loss A on that same minibatch after the update, and set its coefficient to 0.1*S/A. Freeze coefficients thereafter; if S or A is nonfinite or at most 1e-8, flag calibration failure rather than using an unstable coefficient. Discard the probe state and restart all measured runs from the original encoder and head with fresh optimizers, seed 1337, and identical precomputed minibatch schedules. Retain the original learning rate, batch size, AdamW settings, gradient clipping, and setup-defined training steps. Save each actual updated checkpoint with retained fixed masks and parent checkpoint hash, plus the original final_info.json and training_losses.json artifacts. Save coefficients, supervised and auxiliary losses, and runtime separately. Compare actual final validation MAE, changes from the initial checkpoint and baseline, and final full-training supervised MSE for every condition. Do not select checkpoints or tune coefficients using validation results. Report null and worse results, calibration failures, and overhead explicitly. Treat the fixed-bank method as similarity-profile preservation rather than rotation-invariant relational distillation. No improvement is established until runs are executed; single-seed small-data validation comparisons remain exploratory and cannot establish significance or generalization.",
+        "Interestingness": 7,
+        "Feasibility": 8,
+        "Novelty": 4
+    }
+]

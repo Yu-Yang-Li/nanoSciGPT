@@ -1,5 +1,7 @@
 # AI Scientist 讲义：三段式教学指南
 
+> **历史状态**：本文保留本仓库规则驱动 `autoresearch/` 的旧操作记录，不是 `karpathy/autoresearch` 或 SakanaAI v1/v2 的复现。当前 B 线入口是 [`skills/ai-scientist-research-loop/SKILL.md`](../../skills/ai-scientist-research-loop/SKILL.md)，环境与原版命令以其原项目接入说明为准。
+
 面向：AI4S 实训营"科学模型专题实训（二）"B 线（AI Scientist 系统）
 时长：约 25 分钟（对应 PPT P11–P16 的实操部分）
 前置：学生已跑通 A 线 nanoSciGPT 四域训练；autoresearch/ 目录可直接运行

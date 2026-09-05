@@ -1,0 +1,92 @@
+{
+  "evidence_type": "direct_command_runs_not_cli_dialogue",
+  "agent_api_run": false,
+  "source_checkpoint_sha256": "89be53961f9134350d856af9a12f6f641f02649de56933415b1eea4c51b2edd7",
+  "course": {
+    "status": "completed",
+    "domain": "protein",
+    "task_name": "student protein regression: activity",
+    "task_type": "regression",
+    "label_source": "student CSV column: activity",
+    "source_sha256": "d16a189a4d69103edc8865bee066eb6ba01a576590911deb9ff4bb56795cbd58",
+    "source": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\docs\\acceptance\\student-protein-2026-09-05\\input.csv",
+    "metric_name": "mae",
+    "metric_value": 3.7486,
+    "metric_before_finetune": 3.7052,
+    "encoder_delta_l2": 0.035150912560274514,
+    "task_checkpoint": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\native-student-task-roundtrip-v2\\course-fine\\finetuned.pt",
+    "pretrained_parameters_updated": true,
+    "train_samples": 6,
+    "val_samples": 2,
+    "adaptation": "finetune",
+    "encoder_frozen": false,
+    "teaching_only": true
+  },
+  "native": {
+    "scope": "v1_supervised_teaching_template_baseline_only",
+    "agent_api_run": false,
+    "commit": "1de1dbc1f4ee2c5f61e9c94348d55eb51d7fa2eb",
+    "command": [
+      "C:\\Users\\16571\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "experiment.py",
+      "--out_dir",
+      "run_0"
+    ],
+    "cwd": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\upstream\\v1\\templates\\nanoSciGPT_verify_7f9fbaf0",
+    "returncode": 0,
+    "elapsed_seconds": 5.407,
+    "experiment_sha256": "0e4207320dfdbe833aaafe628f18103486be823bd15c3e059010c5e7eceeb704",
+    "course_bridge": {
+      "status": "prepared_not_run",
+      "upstream_commit": "1de1dbc1f4ee2c5f61e9c94348d55eb51d7fa2eb",
+      "domain": "protein",
+      "template": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\upstream\\v1\\templates\\student_protein_task_roundtrip_v2",
+      "data": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\upstream\\v1\\templates\\student_protein_task_roundtrip_v2\\task_data.npz",
+      "task_type": "regression",
+      "adaptation": "task-specific training template; original GPT class and v1 research workflow",
+      "initial_checkpoint_sha256": "8133192b7d3cd00238a77fe52c727a38ddaa7fbbd4c84cc866f040a4caad9efd",
+      "native_gpt_sha256": "6c9540c3fb9dfdd5ccb87e3d80ca677f907939e613994bf01da15e0b94dc2983",
+      "optimizer": "fresh optimizer; encoder and head continued",
+      "experiment_steps": 4,
+      "native_command": "python launch_scientist.py --experiment student_protein_task_roundtrip_v2 --num-ideas 1 --parallel 0 --model <supported-model>"
+    },
+    "result": {
+      "task": {
+        "means": {
+          "initial_val_mae": 3.7485532760620117,
+          "val_mae": 3.398047924041748
+        },
+        "stderrs": {},
+        "task": {
+          "task_name": "student protein regression: activity",
+          "task_type": "regression",
+          "label_source": "student CSV column: activity",
+          "source_sha256": "d16a189a4d69103edc8865bee066eb6ba01a576590911deb9ff4bb56795cbd58",
+          "source": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\docs\\acceptance\\student-protein-2026-09-05\\input.csv"
+        },
+        "runs": 1
+      }
+    }
+  },
+  "course_return": {
+    "status": "completed",
+    "domain": "protein",
+    "task_name": "student protein regression: activity",
+    "task_type": "regression",
+    "label_source": "student CSV column: activity",
+    "source_sha256": "d16a189a4d69103edc8865bee066eb6ba01a576590911deb9ff4bb56795cbd58",
+    "source": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\docs\\acceptance\\student-protein-2026-09-05\\input.csv",
+    "metric_name": "mae",
+    "metric_value": 3.6469,
+    "metric_before_finetune": 3.398,
+    "encoder_delta_l2": 0.03483191247095839,
+    "task_checkpoint": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\native-student-task-roundtrip-v2\\course-return\\finetuned.pt",
+    "pretrained_parameters_updated": true,
+    "train_samples": 6,
+    "val_samples": 2,
+    "adaptation": "finetune",
+    "encoder_frozen": false,
+    "teaching_only": true
+  },
+  "round_trip_predictions_match": true
+}

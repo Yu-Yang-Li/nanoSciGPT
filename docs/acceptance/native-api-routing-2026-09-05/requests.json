@@ -1,0 +1,74 @@
+[
+  {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Check the model route only."
+      },
+      {
+        "role": "user",
+        "content": "Reply with exactly OK."
+      }
+    ],
+    "model": "scnet/GLM-5.3",
+    "max_tokens": 256,
+    "n": 1,
+    "seed": 0,
+    "stop": null,
+    "temperature": 0.1
+  },
+  {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Check the model route only."
+      },
+      {
+        "role": "user",
+        "content": "Reply with exactly OK."
+      }
+    ],
+    "model": "scnet/GLM-5.3",
+    "max_tokens": 256,
+    "n": 1,
+    "seed": 0,
+    "stop": null,
+    "temperature": 0.1
+  },
+  {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Check the model route only."
+      },
+      {
+        "role": "user",
+        "content": "Reply with exactly OK."
+      }
+    ],
+    "model": "scnet/GLM-5.3",
+    "max_tokens": 256,
+    "n": 1,
+    "seed": 0,
+    "stop": null,
+    "temperature": 0.1
+  },
+  {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Check the model route only."
+      },
+      {
+        "role": "user",
+        "content": "Reply with exactly OK."
+      }
+    ],
+    "model": "gpt-6-astra",
+    "max_tokens": 256,
+    "n": 1,
+    "seed": 0,
+    "stop": null,
+    "temperature": 0.1
+  }
+]

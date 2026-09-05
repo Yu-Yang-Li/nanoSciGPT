@@ -1,0 +1,16 @@
+number of parameters: 0.10M
+{
+  "task": {
+    "means": {
+      "initial_val_mae": 1.967671275138855,
+      "val_mae": 1.6712616682052612
+    },
+    "stderrs": {},
+    "task": {
+      "task_name": "ESOL aqueous-solubility teaching regression",
+      "task_type": "regression",
+      "label_source": "measured log solubility in bundled Delaney ESOL data"
+    },
+    "runs": 1
+  }
+}

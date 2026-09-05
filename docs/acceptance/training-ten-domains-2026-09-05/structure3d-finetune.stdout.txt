@@ -1,0 +1,19 @@
+{
+  "status": "completed",
+  "domain": "structure3d",
+  "task_name": "helix pitch teaching regression",
+  "task_type": "regression",
+  "label_source": "recorded parameter from deterministic teaching generator",
+  "metric_name": "mae",
+  "metric_value": 0.2916633188724518,
+  "metric_before_finetune": 0.3590536415576935,
+  "target_unit": "coordinate units per turn",
+  "train_samples": 32,
+  "val_samples": 16,
+  "encoder_frozen": false,
+  "pretrained_parameters_updated": true,
+  "encoder_delta_l2": 0.18362913581730878,
+  "adaptation": "finetune",
+  "task_checkpoint": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training\\structure3d\\finetune\\finetuned.pt",
+  "teaching_only": true
+}

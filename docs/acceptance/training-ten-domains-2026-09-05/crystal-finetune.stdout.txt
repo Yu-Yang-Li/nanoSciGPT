@@ -1,0 +1,19 @@
+{
+  "status": "completed",
+  "domain": "crystal",
+  "task_name": "unit-cell mass density proxy regression",
+  "task_type": "regression",
+  "label_source": "recorded parameter from deterministic teaching generator",
+  "metric_name": "mae",
+  "metric_value": 0.6835695505142212,
+  "metric_before_finetune": 0.7432401180267334,
+  "target_unit": "atomic-mass proxy per cubic angstrom",
+  "train_samples": 32,
+  "val_samples": 16,
+  "encoder_frozen": false,
+  "pretrained_parameters_updated": true,
+  "encoder_delta_l2": 0.10851328702939686,
+  "adaptation": "finetune",
+  "task_checkpoint": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training\\crystal\\finetune\\finetuned.pt",
+  "teaching_only": true
+}

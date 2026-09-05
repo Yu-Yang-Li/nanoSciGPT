@@ -1,0 +1,412 @@
+[
+  {
+    "name": "baseline",
+    "command": [
+      "C:\\Users\\16571\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "-m",
+      "nanoscigpt.baseline",
+      "--case",
+      "lamost",
+      "--out_root",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\baseline"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 18.219
+  },
+  {
+    "name": "text-pretrain",
+    "command": [
+      "C:\\Users\\16571\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "-m",
+      "nanoscigpt.classroom",
+      "--domain",
+      "text",
+      "--profile",
+      "classroom",
+      "--out_root",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 11.5
+  },
+  {
+    "name": "text-finetune",
+    "command": [
+      "C:\\Users\\16571\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "-m",
+      "nanoscigpt.tasks.downstream_demo",
+      "--domain",
+      "text",
+      "--ckpt",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training\\text\\model\\ckpt.pt",
+      "--adaptation",
+      "finetune",
+      "--epochs",
+      "2",
+      "--max_samples",
+      "32",
+      "--out_dir",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training\\text\\finetune"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 4.719
+  },
+  {
+    "name": "protein-pretrain",
+    "command": [
+      "C:\\Users\\16571\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "-m",
+      "nanoscigpt.classroom",
+      "--domain",
+      "protein",
+      "--profile",
+      "classroom",
+      "--out_root",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 10.312
+  },
+  {
+    "name": "protein-finetune",
+    "command": [
+      "C:\\Users\\16571\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "-m",
+      "nanoscigpt.tasks.downstream_demo",
+      "--domain",
+      "protein",
+      "--ckpt",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training\\protein\\model\\ckpt.pt",
+      "--adaptation",
+      "finetune",
+      "--epochs",
+      "2",
+      "--max_samples",
+      "32",
+      "--out_dir",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training\\protein\\finetune"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 4.219
+  },
+  {
+    "name": "dna-pretrain",
+    "command": [
+      "C:\\Users\\16571\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "-m",
+      "nanoscigpt.classroom",
+      "--domain",
+      "dna",
+      "--profile",
+      "classroom",
+      "--out_root",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 11.343
+  },
+  {
+    "name": "dna-finetune",
+    "command": [
+      "C:\\Users\\16571\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "-m",
+      "nanoscigpt.tasks.downstream_demo",
+      "--domain",
+      "dna",
+      "--ckpt",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training\\dna\\model\\ckpt.pt",
+      "--adaptation",
+      "finetune",
+      "--epochs",
+      "2",
+      "--max_samples",
+      "32",
+      "--out_dir",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training\\dna\\finetune"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 4.532
+  },
+  {
+    "name": "smiles-pretrain",
+    "command": [
+      "C:\\Users\\16571\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "-m",
+      "nanoscigpt.classroom",
+      "--domain",
+      "smiles",
+      "--profile",
+      "classroom",
+      "--out_root",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 10.75
+  },
+  {
+    "name": "smiles-finetune",
+    "command": [
+      "C:\\Users\\16571\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "-m",
+      "nanoscigpt.tasks.downstream_demo",
+      "--domain",
+      "smiles",
+      "--ckpt",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training\\smiles\\model\\ckpt.pt",
+      "--adaptation",
+      "finetune",
+      "--epochs",
+      "2",
+      "--max_samples",
+      "32",
+      "--out_dir",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training\\smiles\\finetune"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 3.796
+  },
+  {
+    "name": "weather-pretrain",
+    "command": [
+      "C:\\Users\\16571\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "-m",
+      "nanoscigpt.classroom",
+      "--domain",
+      "weather",
+      "--profile",
+      "classroom",
+      "--out_root",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 7.813
+  },
+  {
+    "name": "weather-finetune",
+    "command": [
+      "C:\\Users\\16571\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "-m",
+      "nanoscigpt.tasks.downstream_demo",
+      "--domain",
+      "weather",
+      "--ckpt",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training\\weather\\model\\ckpt.pt",
+      "--adaptation",
+      "finetune",
+      "--epochs",
+      "2",
+      "--max_samples",
+      "32",
+      "--out_dir",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training\\weather\\finetune"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 5.0
+  },
+  {
+    "name": "crystal-pretrain",
+    "command": [
+      "C:\\Users\\16571\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "-m",
+      "nanoscigpt.classroom",
+      "--domain",
+      "crystal",
+      "--profile",
+      "classroom",
+      "--out_root",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 7.14
+  },
+  {
+    "name": "crystal-finetune",
+    "command": [
+      "C:\\Users\\16571\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "-m",
+      "nanoscigpt.tasks.downstream_demo",
+      "--domain",
+      "crystal",
+      "--ckpt",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training\\crystal\\model\\ckpt.pt",
+      "--adaptation",
+      "finetune",
+      "--epochs",
+      "2",
+      "--max_samples",
+      "32",
+      "--out_dir",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training\\crystal\\finetune"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 4.594
+  },
+  {
+    "name": "structure3d-pretrain",
+    "command": [
+      "C:\\Users\\16571\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "-m",
+      "nanoscigpt.classroom",
+      "--domain",
+      "structure3d",
+      "--profile",
+      "classroom",
+      "--out_root",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 7.063
+  },
+  {
+    "name": "structure3d-finetune",
+    "command": [
+      "C:\\Users\\16571\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "-m",
+      "nanoscigpt.tasks.downstream_demo",
+      "--domain",
+      "structure3d",
+      "--ckpt",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training\\structure3d\\model\\ckpt.pt",
+      "--adaptation",
+      "finetune",
+      "--epochs",
+      "2",
+      "--max_samples",
+      "32",
+      "--out_dir",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training\\structure3d\\finetune"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 4.234
+  },
+  {
+    "name": "image-pretrain",
+    "command": [
+      "C:\\Users\\16571\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "-m",
+      "nanoscigpt.classroom",
+      "--domain",
+      "image",
+      "--profile",
+      "classroom",
+      "--out_root",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 7.734
+  },
+  {
+    "name": "image-finetune",
+    "command": [
+      "C:\\Users\\16571\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "-m",
+      "nanoscigpt.tasks.downstream_demo",
+      "--domain",
+      "image",
+      "--ckpt",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training\\image\\model\\ckpt.pt",
+      "--adaptation",
+      "finetune",
+      "--epochs",
+      "2",
+      "--max_samples",
+      "32",
+      "--out_dir",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training\\image\\finetune"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 5.281
+  },
+  {
+    "name": "spectrum-pretrain",
+    "command": [
+      "C:\\Users\\16571\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "-m",
+      "nanoscigpt.classroom",
+      "--domain",
+      "spectrum",
+      "--profile",
+      "classroom",
+      "--out_root",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 8.641
+  },
+  {
+    "name": "spectrum-finetune",
+    "command": [
+      "C:\\Users\\16571\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "-m",
+      "nanoscigpt.tasks.downstream_demo",
+      "--domain",
+      "spectrum",
+      "--ckpt",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training\\spectrum\\model\\ckpt.pt",
+      "--adaptation",
+      "finetune",
+      "--epochs",
+      "2",
+      "--max_samples",
+      "32",
+      "--out_dir",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training\\spectrum\\finetune"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 4.89
+  },
+  {
+    "name": "field-pretrain",
+    "command": [
+      "C:\\Users\\16571\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "-m",
+      "nanoscigpt.classroom",
+      "--domain",
+      "field",
+      "--profile",
+      "classroom",
+      "--out_root",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 7.219
+  },
+  {
+    "name": "field-finetune",
+    "command": [
+      "C:\\Users\\16571\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "-m",
+      "nanoscigpt.tasks.downstream_demo",
+      "--domain",
+      "field",
+      "--ckpt",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training\\field\\model\\ckpt.pt",
+      "--adaptation",
+      "finetune",
+      "--epochs",
+      "2",
+      "--max_samples",
+      "32",
+      "--out_dir",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training\\field\\finetune"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 4.734
+  },
+  {
+    "name": "text-sft",
+    "command": [
+      "C:\\Users\\16571\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "-m",
+      "nanoscigpt.tasks.text_sft",
+      "--ckpt",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training\\text\\model\\ckpt.pt",
+      "--out_dir",
+      "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\text-sft",
+      "--steps",
+      "20"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 5.031
+  }
+]

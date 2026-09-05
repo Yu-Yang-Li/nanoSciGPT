@@ -1,0 +1,15 @@
+>>> C:\Users\16571\AppData\Local\Programs\Python\Python312\python.exe -m nanoscigpt.core.trainer --domain text --data_root C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\data --out_dir C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\training-complete-20260905\training\text\model --device cpu --max_iters 30 --eval_interval 15 --eval_iters 5 --batch_size 8 --block_size 64 --n_layer 2 --n_head 2 --n_embd 64
+domain=text mode=stream vocab=65 params=0.10M
+iter 0: train 4.2041 val 4.2010 (0.0s)
+iter 15: train 3.4302 val 3.3880 (0.2s)
+iter 30: train 3.0596 val 3.0929 (0.4s)
+done: best val loss 3.0929 -> C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\training-complete-20260905\training\text\model\ckpt.pt
+>>> C:\Users\16571\AppData\Local\Programs\Python\Python312\python.exe -m nanoscigpt.core.sampler --domain text --data_root C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\data --out_dir C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\training-complete-20260905\training\text\model --device cpu --num_samples 1 --max_new_tokens 20
+--- sample 1 ---
+
+Nu mes Lr yetyZtynhe
+>>> C:\Users\16571\AppData\Local\Programs\Python\Python312\python.exe -m nanoscigpt.tasks.downstream_demo --domain text --ckpt C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\training-complete-20260905\training\text\model\ckpt.pt --data_root C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\data --out_dir C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\training-complete-20260905\training\text\downstream --epochs 20 --max_samples 128
+downstream task: completed
+task: text punctuation-density teaching classification
+result saved: C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\training-complete-20260905\training\text\downstream\downstream_result.json
+classroom run completed: text -> C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\training-complete-20260905\training\text\run_report.json

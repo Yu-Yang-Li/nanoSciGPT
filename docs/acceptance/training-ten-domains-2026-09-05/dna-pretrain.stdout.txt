@@ -1,0 +1,14 @@
+>>> C:\Users\16571\AppData\Local\Programs\Python\Python312\python.exe -m nanoscigpt.core.trainer --domain dna --data_root C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\data --out_dir C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\training-complete-20260905\training\dna\model --device cpu --max_iters 30 --eval_interval 15 --eval_iters 5 --batch_size 8 --block_size 64 --n_layer 2 --n_head 2 --n_embd 64
+domain=dna mode=stream vocab=4 params=0.10M
+iter 0: train 1.3993 val 1.3942 (0.0s)
+iter 15: train 1.3603 val 1.3698 (0.2s)
+iter 30: train 1.3227 val 1.3555 (0.3s)
+done: best val loss 1.3555 -> C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\training-complete-20260905\training\dna\model\ckpt.pt
+>>> C:\Users\16571\AppData\Local\Programs\Python\Python312\python.exe -m nanoscigpt.core.sampler --domain dna --data_root C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\data --out_dir C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\training-complete-20260905\training\dna\model --device cpu --num_samples 1 --max_new_tokens 20
+--- sample 1 ---
+AATGTTTTTGGCTTACAAAAC
+>>> C:\Users\16571\AppData\Local\Programs\Python\Python312\python.exe -m nanoscigpt.tasks.downstream_demo --domain dna --ckpt C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\training-complete-20260905\training\dna\model\ckpt.pt --data_root C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\data --out_dir C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\training-complete-20260905\training\dna\downstream --epochs 20 --max_samples 128
+downstream task: completed
+task: DNA GC-content teaching classification
+result saved: C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\training-complete-20260905\training\dna\downstream\downstream_result.json
+classroom run completed: dna -> C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\training-complete-20260905\training\dna\run_report.json

@@ -1,0 +1,7 @@
+{
+  "status": "configured_not_run",
+  "commit": "1de1dbc1f4ee2c5f61e9c94348d55eb51d7fa2eb",
+  "output_sha256": "e960d60e2fd94eb9f65d465b05275b91102a0027a7f8473af7a10fdef98a0554",
+  "changes": "teaching_failure_changes.diff",
+  "scope": "Preserve failed run artifacts/code/stderr; reject incomplete experiments or plotting. No API or whole-session budget changes."
+}

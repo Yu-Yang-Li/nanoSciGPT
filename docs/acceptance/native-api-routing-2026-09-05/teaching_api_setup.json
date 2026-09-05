@@ -1,0 +1,12 @@
+{
+  "status": "configured_not_run",
+  "commit": "1de1dbc1f4ee2c5f61e9c94348d55eb51d7fa2eb",
+  "model": "scnet/GLM-5.3",
+  "review_model": "gpt-6-astra",
+  "endpoint_configuration": "Set OPENAI_BASE_URL and OPENAI_API_BASE to the same verified endpoint in the launch process; OPENAI_API_KEY is not saved here.",
+  "output_sha256": {
+    "ai_scientist/llm.py": "787e34c07f6866cd2a79ee293c8b3a9c4f88174c718f89f9e91f91d2e4f7eaab",
+    "launch_scientist.py": "a128bd4cf879514578396ef60becc4476ffb95adc1ce25199489a3da325ae350"
+  },
+  "changes": "teaching_api_changes.diff"
+}

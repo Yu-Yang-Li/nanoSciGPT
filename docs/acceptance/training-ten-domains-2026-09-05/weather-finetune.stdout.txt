@@ -1,0 +1,19 @@
+{
+  "status": "completed",
+  "domain": "weather",
+  "task_name": "advection speed teaching regression",
+  "task_type": "regression",
+  "label_source": "recorded parameter from deterministic teaching generator",
+  "metric_name": "mae",
+  "metric_value": 0.02881574258208275,
+  "metric_before_finetune": 0.029691051691770554,
+  "target_unit": "grid units per frame",
+  "train_samples": 32,
+  "val_samples": 16,
+  "encoder_frozen": false,
+  "pretrained_parameters_updated": true,
+  "encoder_delta_l2": 0.09806121317738735,
+  "adaptation": "finetune",
+  "task_checkpoint": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training\\weather\\finetune\\finetuned.pt",
+  "teaching_only": true
+}

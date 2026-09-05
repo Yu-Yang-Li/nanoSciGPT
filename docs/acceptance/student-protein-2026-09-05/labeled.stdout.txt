@@ -1,0 +1,14 @@
+>>> C:\Users\16571\AppData\Local\Programs\Python\Python312\python.exe -m nanoscigpt.core.trainer --domain protein --data_root C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\student-check\labeled --out_dir C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\student-check\labeled-run\protein\model --device cpu --max_iters 2 --eval_interval 1 --eval_iters 1 --batch_size 2 --block_size 32 --n_layer 1 --n_head 1 --n_embd 16
+domain=protein mode=independent vocab=22 params=0.00M
+iter 0: train 2.9097 val 2.9216 (0.0s)
+iter 1: train 2.8214 val 2.9249 (0.0s)
+iter 2: train 2.8784 val 2.9015 (0.0s)
+done: best val loss 2.9015 -> C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\student-check\labeled-run\protein\model\ckpt.pt
+>>> C:\Users\16571\AppData\Local\Programs\Python\Python312\python.exe -m nanoscigpt.core.sampler --domain protein --data_root C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\student-check\labeled --out_dir C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\student-check\labeled-run\protein\model --device cpu --num_samples 1 --max_new_tokens 4
+--- sample 1 ---
+MRATD
+>>> C:\Users\16571\AppData\Local\Programs\Python\Python312\python.exe -m nanoscigpt.tasks.downstream_demo --domain protein --ckpt C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\student-check\labeled-run\protein\model\ckpt.pt --data_root C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\student-check\labeled --out_dir C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\student-check\labeled-run\protein\downstream --epochs 2 --max_samples 32
+downstream task: completed
+task: student protein regression: activity
+result saved: C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\student-check\labeled-run\protein\downstream\downstream_result.json
+classroom run completed: protein -> C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\student-check\labeled-run\protein\run_report.json

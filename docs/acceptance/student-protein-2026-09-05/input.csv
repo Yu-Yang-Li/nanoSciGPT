@@ -1,0 +1,9 @@
+sequence,split,activity
+MAAAAAAAA,train,10
+MCCCCCCCC,train,11
+MDDDDDDDD,train,12
+MEEEEEEEE,train,13
+MFFFFFFFF,train,14
+MGGGGGGGG,train,15
+MHHHHHHHH,val,16
+MIIIIIIII,val,17

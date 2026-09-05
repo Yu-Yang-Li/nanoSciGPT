@@ -1,0 +1,11 @@
+{
+  "scope": "same_provider_direct_route_single_request_not_coder_acceptance",
+  "model": "GLM-5.3",
+  "endpoint": "https://api.scnet.cn/api/llm/v1",
+  "timeout_seconds": 60,
+  "requested_thinking": "disabled",
+  "http_status": 400,
+  "error_type": "HTTPError",
+  "detail": "{\"error\":{\"message\":\"Format Error\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"400\"},\"request_id\":\"1f591ef749ef8c30-20260905161149395\"}",
+  "seconds": 0.844
+}

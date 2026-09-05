@@ -1,0 +1,39 @@
+[09:50 | 任务接收]
+课题：LAMOST光谱有效温度回归；运行模式：初始化+基线。
+
+[09:50 | 任务路由]
+课题：LAMOST光谱有效温度回归；模板：rf；依据：用户通过 --template 显式指定模板。
+
+[模板] 复制 baseline_randomforest.py -> C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\training-complete-20260905\baseline\LAMOST光谱有效温度回归\scripts\baseline_randomforest.py
+[09:50 | 工作区]
+已创建 C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\training-complete-20260905\baseline\LAMOST光谱有效温度回归；生成 7 个 SOP/Schema 文件；模板脚本：baseline_randomforest.py。
+
+C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\training-complete-20260905\baseline\LAMOST光谱有效温度回归
+[09:50 | 基线运行]
+脚本：scripts/baseline_randomforest.py；数据身份：bundled_course；工作区：C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\training-complete-20260905\baseline\LAMOST光谱有效温度回归
+
+[数据模式] bundled_course：当前使用仓库内置课程数据，来源和使用边界见 data/manifest.json。
+[数据] train=(1600, 128), test=(400, 128)
+[CV] 5-fold r2: 0.9477 ± 0.0946
+[Test] RMSE=83.4367, R2=0.9981
+[Top 特征重要性]
+flux_bin_016    0.098767
+flux_bin_014    0.035403
+flux_bin_040    0.030786
+flux_bin_063    0.030454
+flux_bin_121    0.029531
+flux_bin_019    0.028798
+flux_bin_039    0.027731
+flux_bin_035    0.026893
+flux_bin_036    0.020273
+flux_bin_125    0.018067
+flux_bin_041    0.017587
+flux_bin_018    0.017464
+flux_bin_025    0.017350
+flux_bin_000    0.015633
+flux_bin_015    0.015623
+[保存] 模型已保存到 rf_model.joblib
+[记录] metrics=metrics.json summary=baseline_summary.json log=train_log.txt
+[09:51 | 流程完成]
+状态：baseline_completed；结果文件：C:\Users\16571\Documents\Codex\2026-09-04\nanoscigpt-classroom-hardening\out\training-complete-20260905\baseline\LAMOST光谱有效温度回归\baseline_summary.json。
+

@@ -1,0 +1,131 @@
+[
+  {
+    "http_status": 200,
+    "body": {
+      "id": "03144352b0d1a51f-20260905143935756",
+      "created": 1788590377,
+      "model": "GLM-5.3",
+      "object": "chat.completion",
+      "choices": [
+        {
+          "finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "content": "OK",
+            "role": "assistant",
+            "reasoning_content": "User wants me to reply with exactly \"OK\"."
+          },
+          "provider_specific_fields": {}
+        }
+      ],
+      "usage": {
+        "completion_tokens": 12,
+        "prompt_tokens": 24,
+        "total_tokens": 36,
+        "completion_tokens_details": {
+          "reasoning_tokens": 10
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "request_id": "2db06b6e-fbd0-961c-8b66-67633ffce83f"
+    }
+  },
+  {
+    "http_status": 200,
+    "body": {
+      "id": "e695f57d7af93611-20260905143937521",
+      "created": 1788590378,
+      "model": "GLM-5.3",
+      "object": "chat.completion",
+      "choices": [
+        {
+          "finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "content": "OK",
+            "role": "assistant",
+            "reasoning_content": "The user asks me to reply with exactly \"OK\"."
+          },
+          "provider_specific_fields": {}
+        }
+      ],
+      "usage": {
+        "completion_tokens": 13,
+        "prompt_tokens": 24,
+        "total_tokens": 37,
+        "completion_tokens_details": {
+          "reasoning_tokens": 11
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "request_id": "3f5dd270-d229-9bef-bf6a-d8bd78a02d4c"
+    }
+  },
+  {
+    "http_status": 200,
+    "body": {
+      "id": "bfd48919636a4938-20260905143939451",
+      "created": 1788590380,
+      "model": "GLM-5.3",
+      "object": "chat.completion",
+      "choices": [
+        {
+          "finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "content": "OK",
+            "role": "assistant"
+          },
+          "provider_specific_fields": {}
+        }
+      ],
+      "usage": {
+        "completion_tokens": 2,
+        "prompt_tokens": 24,
+        "total_tokens": 26,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "request_id": "5319c202-c1d0-93f5-a2cd-8c3c02b99f1a"
+    }
+  },
+  {
+    "http_status": 200,
+    "body": {
+      "id": "chatcmpl-b581104bec90440f9b331df4",
+      "object": "chat.completion",
+      "created": 1788590374,
+      "model": "gpt-6-astra",
+      "choices": [
+        {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "OK"
+          },
+          "finish_reason": "stop",
+          "logprobs": null
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 21,
+        "completion_tokens": 5,
+        "total_tokens": 26,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      }
+    }
+  }
+]

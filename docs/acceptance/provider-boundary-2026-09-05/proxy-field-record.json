@@ -1,0 +1,25 @@
+{
+  "scope": "installed_builder_only_no_network_no_config_changes",
+  "source": "C:/Users/16571/AppData/Roaming/npm/node_modules/@bitkyc08/opencodex/src/adapters/openai-chat.ts",
+  "source_sha256": "5178079b420d9015efdd83015dcfe73a60d1a89c2856a14bad33a5969f6fad6e",
+  "incoming_fields": [
+    "model",
+    "messages",
+    "max_tokens",
+    "thinking",
+    "reasoning_effort"
+  ],
+  "outgoing_fields": [
+    "model",
+    "messages",
+    "stream",
+    "max_tokens",
+    "reasoning_effort"
+  ],
+  "incoming_thinking": {
+    "type": "disabled"
+  },
+  "outgoing_thinking_present": false,
+  "outgoing_reasoning_effort": "low",
+  "outgoing_max_tokens": 6000
+}

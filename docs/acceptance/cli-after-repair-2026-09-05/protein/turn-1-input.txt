@@ -1,0 +1,1 @@
+请按当前仓库 skills/nanoscigpt-scientific-language/SKILL.md 带我做实验。我选蛋白质，使用你们的示例。请实际把预训练和微调都跑一遍，CPU单线程、小模型，微调32个样本、2个epoch。结果另存到 out/cli-after-repair-protein，不改已有文件。

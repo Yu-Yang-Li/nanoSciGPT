@@ -11,6 +11,7 @@ out/
 *.npy
 *.pt
 .pytest_cache/
+.venv/
 *.egg-info/
 
 # keep per-domain research state (B-line artifact)

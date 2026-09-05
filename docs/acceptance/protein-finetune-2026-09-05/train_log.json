@@ -1,0 +1,23 @@
+{
+  "domain": "protein",
+  "pretraining": "next_token_prediction",
+  "iters": 30,
+  "best_val_loss": 2.9162580490112306,
+  "history": [
+    {
+      "iter": 0,
+      "train_loss": 3.105218,
+      "val_loss": 3.09506
+    },
+    {
+      "iter": 15,
+      "train_loss": 2.950579,
+      "val_loss": 2.91951
+    },
+    {
+      "iter": 30,
+      "train_loss": 2.924861,
+      "val_loss": 2.916258
+    }
+  ]
+}

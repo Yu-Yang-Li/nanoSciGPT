@@ -1,0 +1,18 @@
+[
+  "C:\\Users\\16571\\AppData\\Local\\OpenAI\\Codex\\bin\\2d468d2a6f48dd72\\codex.EXE",
+  "exec",
+  "-C",
+  "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening",
+  "--sandbox",
+  "workspace-write",
+  "-c",
+  "sandbox_mode=\"workspace-write\"",
+  "-c",
+  "approval_policy=\"never\"",
+  "-c",
+  "features.memories=false",
+  "--json",
+  "-o",
+  "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\cli-cold-default-baseline-dialogue\\turn-1-reply.md",
+  "请按当前仓库 skills/research-baseline-builder/SKILL.md 带我做实验。我想用自己的表格预测材料强度，但数据不能上传。每行是一种材料配方，目标列是强度，输入包括组分比例和制备温度。我现在该怎么开始？不要运行课程样例来代替我的数据。"
+]

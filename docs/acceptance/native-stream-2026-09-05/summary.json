@@ -1,0 +1,27 @@
+{
+  "model": "openai/scnet/GLM-5.3",
+  "client_requests": 1,
+  "stream": true,
+  "requested_extra_params": {
+    "max_tokens": 20000,
+    "timeout": 240,
+    "num_retries": 0
+  },
+  "same_prompt_after_normalizing_work_directory": true,
+  "first_chunk_seconds": 6.609,
+  "last_chunk_seconds": 219.719,
+  "chunks_received": 4335,
+  "content_characters": 2,
+  "finish_reasons": [
+    "length"
+  ],
+  "usage_received": [],
+  "usage_interpretation": "No usage received; requested max_tokens is not measured token usage or cost.",
+  "proxy_header_timeout_ms": 200000,
+  "proxy_config_connectTimeoutMs": null,
+  "proxy_source_sha256": {
+    "chat-native.ts": "d728fb68741a5eeefb2e9e616bd24cab31bda982f5da46412618392d53c050e7",
+    "responses/fetch-helpers.ts": "ecc406b90eb4c0b736d56f87f3ed744c97137382ab644773cc4aa6ce1cfbdaab"
+  },
+  "scope": "One streamed original v1 Aider request; no automatic execution of generated code; not full research acceptance."
+}

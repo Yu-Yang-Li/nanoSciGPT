@@ -1,0 +1,10 @@
+{
+  "session_id": "01a0706a-a4d8-76d3-8231-e02ff727f663",
+  "model": null,
+  "model_selection": "cli_default",
+  "sandbox": "workspace-write",
+  "attempted_turns": 2,
+  "completed_turns": 2,
+  "classroom_execution_passed": false,
+  "note": "Dialogue capture only; inspect actual tool executions and outputs separately."
+}

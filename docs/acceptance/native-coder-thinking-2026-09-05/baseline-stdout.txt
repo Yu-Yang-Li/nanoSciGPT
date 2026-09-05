@@ -1,0 +1,18 @@
+number of parameters: 0.00M
+{
+  "task": {
+    "means": {
+      "initial_val_mae": 3.7485532760620117,
+      "val_mae": 3.398047924041748
+    },
+    "stderrs": {},
+    "task": {
+      "task_name": "student protein regression: activity",
+      "task_type": "regression",
+      "label_source": "student CSV column: activity",
+      "source_sha256": "d16a189a4d69103edc8865bee066eb6ba01a576590911deb9ff4bb56795cbd58",
+      "source": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\docs\\acceptance\\student-protein-2026-09-05\\input.csv"
+    },
+    "runs": 1
+  }
+}

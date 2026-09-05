@@ -1,0 +1,305 @@
+{
+  "evidence_type": "direct_command_runs_not_cli_dialogue",
+  "domains": {
+    "text": {
+      "status": "completed",
+      "domain": "text",
+      "task_name": "text punctuation-density teaching classification",
+      "task_type": "classification",
+      "label_source": "text-derived teaching label",
+      "metric_name": "accuracy",
+      "metric_value": 1.0,
+      "metric_before_finetune": 1.0,
+      "encoder_delta_l2": 0.31864430878457356,
+      "task_checkpoint": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training\\text\\finetune\\finetuned.pt",
+      "pretrained_parameters_updated": true,
+      "train_samples": 32,
+      "val_samples": 16,
+      "adaptation": "finetune",
+      "encoder_frozen": false,
+      "teaching_only": true,
+      "original_checkpoint_unchanged": true
+    },
+    "protein": {
+      "status": "completed",
+      "domain": "protein",
+      "task_name": "protein composition teaching classification",
+      "task_type": "classification",
+      "label_source": "sequence-derived teaching label",
+      "metric_name": "accuracy",
+      "metric_value": 0.4375,
+      "metric_before_finetune": 0.5625,
+      "encoder_delta_l2": 0.34334209907918967,
+      "task_checkpoint": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training\\protein\\finetune\\finetuned.pt",
+      "pretrained_parameters_updated": true,
+      "train_samples": 32,
+      "val_samples": 16,
+      "adaptation": "finetune",
+      "encoder_frozen": false,
+      "teaching_only": true,
+      "original_checkpoint_unchanged": true
+    },
+    "dna": {
+      "status": "completed",
+      "domain": "dna",
+      "task_name": "DNA GC-content teaching classification",
+      "task_type": "classification",
+      "label_source": "sequence-derived teaching label",
+      "metric_name": "accuracy",
+      "metric_value": 0.875,
+      "metric_before_finetune": 0.625,
+      "encoder_delta_l2": 0.42646683011690856,
+      "task_checkpoint": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training\\dna\\finetune\\finetuned.pt",
+      "pretrained_parameters_updated": true,
+      "train_samples": 32,
+      "val_samples": 16,
+      "adaptation": "finetune",
+      "encoder_frozen": false,
+      "teaching_only": true,
+      "original_checkpoint_unchanged": true
+    },
+    "smiles": {
+      "status": "completed",
+      "domain": "smiles",
+      "task_name": "ESOL aqueous-solubility teaching regression",
+      "task_type": "regression",
+      "label_source": "measured log solubility in bundled Delaney ESOL data",
+      "metric_name": "mae",
+      "metric_value": 1.9677,
+      "metric_before_finetune": 1.6025,
+      "encoder_delta_l2": 0.28640926657559757,
+      "task_checkpoint": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training\\smiles\\finetune\\finetuned.pt",
+      "pretrained_parameters_updated": true,
+      "train_samples": 32,
+      "val_samples": 16,
+      "adaptation": "finetune",
+      "encoder_frozen": false,
+      "teaching_only": true,
+      "original_checkpoint_unchanged": true
+    },
+    "weather": {
+      "status": "completed",
+      "domain": "weather",
+      "task_name": "advection speed teaching regression",
+      "task_type": "regression",
+      "label_source": "recorded parameter from deterministic teaching generator",
+      "metric_name": "mae",
+      "metric_value": 0.02881574258208275,
+      "metric_before_finetune": 0.029691051691770554,
+      "target_unit": "grid units per frame",
+      "train_samples": 32,
+      "val_samples": 16,
+      "encoder_frozen": false,
+      "pretrained_parameters_updated": true,
+      "encoder_delta_l2": 0.09806121317738735,
+      "adaptation": "finetune",
+      "task_checkpoint": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training\\weather\\finetune\\finetuned.pt",
+      "teaching_only": true,
+      "original_checkpoint_unchanged": true
+    },
+    "crystal": {
+      "status": "completed",
+      "domain": "crystal",
+      "task_name": "unit-cell mass density proxy regression",
+      "task_type": "regression",
+      "label_source": "recorded parameter from deterministic teaching generator",
+      "metric_name": "mae",
+      "metric_value": 0.6835695505142212,
+      "metric_before_finetune": 0.7432401180267334,
+      "target_unit": "atomic-mass proxy per cubic angstrom",
+      "train_samples": 32,
+      "val_samples": 16,
+      "encoder_frozen": false,
+      "pretrained_parameters_updated": true,
+      "encoder_delta_l2": 0.10851328702939686,
+      "adaptation": "finetune",
+      "task_checkpoint": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training\\crystal\\finetune\\finetuned.pt",
+      "teaching_only": true,
+      "original_checkpoint_unchanged": true
+    },
+    "structure3d": {
+      "status": "completed",
+      "domain": "structure3d",
+      "task_name": "helix pitch teaching regression",
+      "task_type": "regression",
+      "label_source": "recorded parameter from deterministic teaching generator",
+      "metric_name": "mae",
+      "metric_value": 0.2916633188724518,
+      "metric_before_finetune": 0.3590536415576935,
+      "target_unit": "coordinate units per turn",
+      "train_samples": 32,
+      "val_samples": 16,
+      "encoder_frozen": false,
+      "pretrained_parameters_updated": true,
+      "encoder_delta_l2": 0.18362913581730878,
+      "adaptation": "finetune",
+      "task_checkpoint": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training\\structure3d\\finetune\\finetuned.pt",
+      "teaching_only": true,
+      "original_checkpoint_unchanged": true
+    },
+    "image": {
+      "status": "completed",
+      "domain": "image",
+      "task_name": "astronomical source-count teaching regression",
+      "task_type": "regression",
+      "label_source": "recorded parameter from deterministic teaching generator",
+      "metric_name": "mae",
+      "metric_value": 1.1832373142242432,
+      "metric_before_finetune": 1.3582769632339478,
+      "target_unit": "sources",
+      "train_samples": 32,
+      "val_samples": 16,
+      "encoder_frozen": false,
+      "pretrained_parameters_updated": true,
+      "encoder_delta_l2": 0.16904354331449728,
+      "adaptation": "finetune",
+      "task_checkpoint": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training\\image\\finetune\\finetuned.pt",
+      "teaching_only": true,
+      "original_checkpoint_unchanged": true
+    },
+    "spectrum": {
+      "status": "completed",
+      "domain": "spectrum",
+      "task_name": "blackbody temperature teaching regression",
+      "task_type": "regression",
+      "label_source": "recorded parameter from deterministic teaching generator",
+      "metric_name": "mae",
+      "metric_value": 1141.029296875,
+      "metric_before_finetune": 1384.556396484375,
+      "target_unit": "kelvin",
+      "train_samples": 32,
+      "val_samples": 16,
+      "encoder_frozen": false,
+      "pretrained_parameters_updated": true,
+      "encoder_delta_l2": 0.2026830365705678,
+      "adaptation": "finetune",
+      "task_checkpoint": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training\\spectrum\\finetune\\finetuned.pt",
+      "teaching_only": true,
+      "original_checkpoint_unchanged": true
+    },
+    "field": {
+      "status": "completed",
+      "domain": "field",
+      "task_name": "diffusion coefficient teaching regression",
+      "task_type": "regression",
+      "label_source": "recorded parameter from deterministic teaching generator",
+      "metric_name": "mae",
+      "metric_value": 0.03843149542808533,
+      "metric_before_finetune": 0.04025820642709732,
+      "target_unit": "inverse time units",
+      "train_samples": 32,
+      "val_samples": 16,
+      "encoder_frozen": false,
+      "pretrained_parameters_updated": true,
+      "encoder_delta_l2": 0.12337170356343075,
+      "adaptation": "finetune",
+      "task_checkpoint": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\training\\field\\finetune\\finetuned.pt",
+      "teaching_only": true,
+      "original_checkpoint_unchanged": true
+    }
+  },
+  "text_sft": {
+    "status": "completed",
+    "domain": "text",
+    "loss_scope": "answer_tokens_only",
+    "steps": 20,
+    "answer_val_loss_before": 3.1289319038391112,
+    "answer_val_loss_after": 2.7633603954315187,
+    "training_losses": [
+      3.1295711994171143,
+      3.0150644779205322,
+      3.0187973976135254,
+      3.0935280323028564,
+      3.025718927383423,
+      2.9531311988830566,
+      2.9538466930389404,
+      2.844595432281494,
+      2.8245275020599365,
+      2.792626142501831,
+      2.725623607635498,
+      2.6940758228302,
+      2.6841161251068115,
+      2.6689767837524414,
+      2.624072551727295,
+      2.5826399326324463,
+      2.5250840187072754,
+      2.575709819793701,
+      2.447038173675537,
+      2.3893353939056396
+    ],
+    "encoder_delta_l2": 2.0325174526438428,
+    "pretrained_parameters_updated": true,
+    "samples": [
+      {
+        "question": "Describe DNA.",
+        "reference": "A sequence of bases.",
+        "before": "\n",
+        "after": "\n"
+      },
+      {
+        "question": "Describe a protein.",
+        "reference": "A chain of amino acids.",
+        "before": "\n",
+        "after": "\n"
+      },
+      {
+        "question": "Describe a spectrum.",
+        "reference": "Light measured by wavelength.",
+        "before": "\n",
+        "after": "\n"
+      }
+    ],
+    "train_pairs": [
+      [
+        "What is DNA?",
+        "A sequence of bases."
+      ],
+      [
+        "What is a protein?",
+        "A chain of amino acids."
+      ],
+      [
+        "What is a spectrum?",
+        "Light measured by wavelength."
+      ],
+      [
+        "What does a telescope collect?",
+        "Light."
+      ],
+      [
+        "What is a label?",
+        "A target for a sample."
+      ],
+      [
+        "What is training?",
+        "Learning from data."
+      ],
+      [
+        "What is validation?",
+        "Checking on held out data."
+      ],
+      [
+        "What is a model?",
+        "A rule learned from data."
+      ]
+    ],
+    "validation_pairs": [
+      [
+        "Describe DNA.",
+        "A sequence of bases."
+      ],
+      [
+        "Describe a protein.",
+        "A chain of amino acids."
+      ],
+      [
+        "Describe a spectrum.",
+        "Light measured by wavelength."
+      ]
+    ],
+    "teaching_only": true,
+    "data_source": "handwritten teaching Q&A; validation rephrases the same concepts, not new scientific knowledge",
+    "checkpoint": "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\training-complete-20260905\\text-sft\\sft.pt",
+    "claim_boundary": "demonstrates answer-only training; does not establish general question-answering ability"
+  }
+}

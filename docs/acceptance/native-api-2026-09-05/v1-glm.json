@@ -1,0 +1,13 @@
+{
+  "mode": "v1-text",
+  "model_requested": "scnet/GLM-5.3",
+  "evidence_type": "upstream_function_api_probe_not_research",
+  "endpoint": "http://127.0.0.1:10100/v1",
+  "max_tokens": 256,
+  "source_commit": "1de1dbc1f4ee2c5f61e9c94348d55eb51d7fa2eb",
+  "status": "failed",
+  "source_sha256": "8c0593243a768360103a30a41c4583df75cbe384f188f91354b46d55f100ec20",
+  "error_type": "ValueError",
+  "error": "Model scnet/GLM-5.3 not supported.",
+  "elapsed_seconds": 9.593
+}
