@@ -1,0 +1,134 @@
+{
+  "commit": "7f3a9efb681e59a295925c2723c7c9489f97001b",
+  "dependency_install_scope": "isolated venv reusing system site packages; not a fresh network dependency install",
+  "agent_dialogue": false,
+  "steps": [
+    {
+      "name": "venv",
+      "command": [
+        "C:\\Users\\16571\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "-m",
+        "venv",
+        "--system-site-packages",
+        "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\publish-20260905\\clean-clone\\.venv"
+      ],
+      "exit_code": 0,
+      "seconds": 7.093
+    },
+    {
+      "name": "install",
+      "command": [
+        "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\publish-20260905\\clean-clone\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pip",
+        "install",
+        "--no-deps",
+        "--no-build-isolation",
+        "-e",
+        "."
+      ],
+      "exit_code": 0,
+      "seconds": 10.797
+    },
+    {
+      "name": "data-list",
+      "command": [
+        "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\publish-20260905\\clean-clone\\.venv\\Scripts\\python.exe",
+        "-m",
+        "nanoscigpt.classroom",
+        "--list"
+      ],
+      "exit_code": 0,
+      "seconds": 2.688
+    },
+    {
+      "name": "baseline",
+      "command": [
+        "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\publish-20260905\\clean-clone\\.venv\\Scripts\\python.exe",
+        "-m",
+        "nanoscigpt.baseline",
+        "--case",
+        "lamost",
+        "--out_root",
+        "out/baseline"
+      ],
+      "exit_code": 0,
+      "seconds": 17.406
+    },
+    {
+      "name": "text",
+      "command": [
+        "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\publish-20260905\\clean-clone\\.venv\\Scripts\\python.exe",
+        "-m",
+        "nanoscigpt.classroom",
+        "--domain",
+        "text",
+        "--profile",
+        "classroom",
+        "--out_root",
+        "out/classroom"
+      ],
+      "exit_code": 0,
+      "seconds": 11.469
+    },
+    {
+      "name": "text-sft",
+      "command": [
+        "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\publish-20260905\\clean-clone\\.venv\\Scripts\\python.exe",
+        "-m",
+        "nanoscigpt.tasks.text_sft",
+        "--ckpt",
+        "out/classroom/text/model/ckpt.pt",
+        "--steps",
+        "200",
+        "--out_dir",
+        "out/classroom/text/sft"
+      ],
+      "exit_code": 0,
+      "seconds": 7.125
+    },
+    {
+      "name": "protein",
+      "command": [
+        "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\publish-20260905\\clean-clone\\.venv\\Scripts\\python.exe",
+        "-m",
+        "nanoscigpt.classroom",
+        "--domain",
+        "protein",
+        "--profile",
+        "classroom",
+        "--out_root",
+        "out/classroom"
+      ],
+      "exit_code": 0,
+      "seconds": 11.156
+    },
+    {
+      "name": "protein-finetune",
+      "command": [
+        "C:\\Users\\16571\\Documents\\Codex\\2026-09-04\\nanoscigpt-classroom-hardening\\out\\publish-20260905\\clean-clone\\.venv\\Scripts\\python.exe",
+        "-m",
+        "nanoscigpt.tasks.downstream_demo",
+        "--domain",
+        "protein",
+        "--ckpt",
+        "out/classroom/protein/model/ckpt.pt",
+        "--adaptation",
+        "finetune",
+        "--epochs",
+        "2",
+        "--max_samples",
+        "32",
+        "--out_dir",
+        "out/classroom/protein/finetune"
+      ],
+      "exit_code": 0,
+      "seconds": 4.781
+    }
+  ],
+  "expected_files_present": true,
+  "baseline_metrics": [
+    "out\\baseline\\LAMOST\u5149\u8c31\u6709\u6548\u6e29\u5ea6\u56de\u5f52\\metrics.json"
+  ],
+  "git_status": ""
+}
