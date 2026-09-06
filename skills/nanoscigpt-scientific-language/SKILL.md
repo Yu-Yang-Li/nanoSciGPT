@@ -1,6 +1,6 @@
 ---
 name: nanoscigpt-scientific-language
-description: Use when a student wants to turn protein, DNA, molecule, weather, crystal, 3D structure, image, spectrum, or physical-field data into a small runnable scientific pretraining lesson in the nanoSciGPT repository.
+description: Use when a nanoSciGPT student asks about text pretraining and fine-tuning, scientific data representation, continuous light-curve patches, or comparing pretrained and directly trained scientific models.
 metadata:
   short-description: 从语言模型走到科学数据预训练
 ---
@@ -9,13 +9,45 @@ metadata:
 
 这门实训不要求学生先会写 Transformer。可以先用文本热身，也可以直接选一种科学数据；先跑通一个很小的预训练模型，再把模型接到一个具体任务上。
 
+当前课堂提问见[光变课堂对话](../../docs/classroom-lightcurve-prompts.md)。先用文本理解两段训练，再接着学生选定的科学数据；教师示例是 StarLightCurves 光变。旧蛋白质组成标签和文本标点分类的局限见[旧案例诊断](../../docs/acceptance/demo-task-audit-20260906.md)，不把构造标签当成学生的真实任务。
+
+像一起看实验那样接话：学生问数字怎么输入，就拿一条实际曲线说明；说“训练试试”，再运行；问“不预训练会怎样”，就读本轮同设置的对照。普通追问先用几句连贯的话回答，不把数据清洗、所有架构和全部训练命令一次讲完。已有数据、路径和任务直接沿用，确实缺少信息时再补问。
+
+文件名、检查步骤和限制是助教需要掌握的背景，不是每个回答都要展示的章节。可以先说“这次直接分类也跑过了，我把两组结果放在一起给你看”，再给当前问题所需的比较。学生想看训练细节时，再展开过程和命令。
+
 ## 从学生已经选择的对象开始
 
 学生已经说“蛋白质”“天气网格”或给出数据路径时，直接沿用，不重新让他选。还没有对象时，只问：
 
 > 你想先试哪一种数据？可以说蛋白质、DNA、分子、天气、晶体、三维结构、图像、光谱或连续物理场。
 
-蛋白质适合教师贯穿讲解，但不是默认答案。学生还只想理解文本语言模型时，先运行`text`示例；已经选好科学对象时，直接进入相应示例。
+学生还只想理解文本语言模型时，使用 `text`；前文选好科学对象以后就沿用。自己的光变数据若有不规则时间、多波段或缺测，需要先读实际字段；课堂的定长曲线接口不自动适合所有巡天数据。
+
+“我的数据”通常就是前文正在使用的数据，只有学生给出新文件或明确换数据时才切换。检查文件先限于当前项目和学生提供的路径；历史文档或相邻目录里存在另一份光变，并不表示学生选了它。确实指代不清时，问“还是刚才那份光变吗？”，不要自行认领另一份数据。
+
+## 选光变时：把连续数值分成片段
+
+读取[光变课堂说明](../../docs/starlight-classroom.md)的“再让 GPT 学曲线”部分。StarLightCurves 不在旧的 `--domain` 列表中，使用单独的 `nanoscigpt.starlight` 入口。它和其他科学对象共用 nanoGPT 的因果 Transformer 模块，但读入的是连续片段，不是文本词表。
+
+例如学生问“这些数字怎么让模型读进去”，可以接：
+
+> 刚才一条光变有 1024 个亮度数值。这里每 32 个相邻数值放成一小段，一条曲线就有 32 段；模型依次读这些片段，根据前面的片段预测下一段。顺序还在，数值也还在，不用先把它们写成文字。做分类时，再用这些片段的表示判断属于哪一类。
+
+这里只解释正在使用的表示方法。默认参数由文档里的实跑命令给出；学生修改过参数时，以本次配置为准。片段化借鉴时间序列模型的思路，不称为 TimesFM 完整复现。
+
+课程包已经经过上游处理，本入口保留原数值，不另做逐条归一化、周期搜索或相位折叠。讲解这些步骤时以代码实际发生的操作为准。自己的数据若要归一化，先判断绝对亮度、振幅是否也是任务所需信息，不能默认只保留形状。“我的光变”若仍指前文选定的课程数据，就继续用它；真的换成新文件时再读字段，只补问眼前还缺的关键信息。
+
+需要展开结构时，对照实际代码讲：每段通过一个小型残差感知机变成表示，再加入位置信息；因果注意力允许读取当前及此前的片段，用来预测下一段。随机森林也能使用每个采样位置的数值，不能说它完全忽略顺序；两者区别在于怎样组织这些输入和共享计算。
+
+学生要求预训练再分类时，按文档运行小实验，解释 `metrics.json` 中的预训练误差和分类结果。该入口会一起生成直接分类及匹配总更新次数的对照；后续追问先读取这些结果。比较收益使用 `scratch` 与 `finetuned` 等完整训练分支，不把刚初始化的分类头当成充分训练的基线。参数更新不等于泛化有效，预训练也不保证每次涨分。
+
+展示片段预测时读 `patch_examples.npz`：它用真实前文预测下一段，不是从第一段自由生成整条曲线。分类用 `predictions.npz`；模型文件保存为 `config/state/step`，不是旧领域接口的 checkpoint 格式。`nanoscigpt.starlight` 再次运行会重新训练，各组对照从相同初始化开始；没有恢复代码时，不把重跑说成从上次权重续训。
+
+这份数据原本都有标签。预训练使用训练曲线但忽略类别；分类使用训练曲线和标签。验证和测试曲线不参与参数更新。少标签实验需要另定并固定标签数量，当前完整训练标签下的成绩不能改称少标签效果。
+
+先说实际观察，再区分原因。例如“这一轮预训练后宏 F1 更高，但准确率低于加长训练的对照”，已经足以回答结果问题。误差低于简单预测，只说明在当前评价下预测更准；不能据此确定内部学到了什么。两个分支分数相同不代表逐条预测相同，分数后来不同也不是权重正确加载的证据；权重衔接看代码与检查点，泛化判断看另外的样本和重复实验。
+
+## 选其他科学对象或文本时
 
 ## 把“科学语言”说具体
 
@@ -33,13 +65,9 @@ python -m nanoscigpt.classroom --list
 python -m nanoscigpt.classroom --domain protein --profile classroom --out_root out/classroom
 ```
 
-文本热身使用同一入口：
+文本预训练和问答微调使用[文本热身说明](references/nanogpt-pretraining.md)中的两段训练。该入口直接产生文本模型和问答结果，不需要绕到旧标点分类。
 
-```powershell
-python -m nanoscigpt.classroom --domain text --profile classroom --out_root out/classroom
-```
-
-把 `protein` 换成学生选择的领域；如果先做文本热身，就使用`--domain text`。使用能成功导入仓库依赖的 Python，默认`python`不可用时再运行`scripts/find_course_python.ps1 -RequiredModules numpy,torch`。
+其他领域把 `protein` 换成学生选择的领域。使用能成功导入仓库依赖的 Python，默认`python`不可用时再运行`scripts/find_course_python.ps1 -RequiredModules numpy,torch`。
 
 ## 怎样读运行结果
 
@@ -58,13 +86,7 @@ python -m nanoscigpt.tasks.downstream_demo --domain protein --ckpt out/classroom
 
 学生接着说“再训练一下”时，用刚产生的`task_checkpoint`继续，沿用数据和抽样数量，另存到新目录。已经微调过的任务会恢复模型和任务头，继续前的评价应与上一轮结束时一致。不要重新拿预训练文件从头接一个任务头，却说是在延续上一轮。旧的六类结构化预训练文件没有保存任务标签的标准化参数，第一次任务微调仍建立新任务头；结果中的`head_initialization`会说明这一点，后续微调才接续保存完整的任务状态。
 
-讲文本从接龙转向问答时，使用下面的回答微调，而不是把标点分类说成问答：
-
-```powershell
-python -m nanoscigpt.tasks.text_sft --ckpt out/classroom/text/model/ckpt.pt --steps 200 --out_dir out/classroom/text/sft
-```
-
-这个示范用单线程CPU接着原文本模型学习八组短问答，只对回答部分计算误差。`sft_result.json`分别保存原题（`training_samples`）和换个问法（`samples`）的实际回答，以及验证损失和参数变化。先展示原题，再换个问法：记住八道题不等于会回答其他问题。验证题只改写了相同概念的问法；小模型可能仍然不会正确回答，不能把参考答案展示成模型输出，也不能把这个示范说成通用聊天模型。
+讲文本从接龙转向问答时，按[文本热身说明](references/nanogpt-pretraining.md)读取本轮 `sft_result.json`。其中 `training_samples` 是训练问法，`samples` 是未参加本轮参数更新的问法。参考答案与模型实际生成分开；这是已知概念的短问答练习，不是通用聊天模型。
 
 验证损失下降只代表这个小模型按预定目标学到了东西，不等于发现了科学机制。天气、晶体、三维结构、图像、光谱和物理场是仓库生成的教学夹具；蛋白质、DNA、SMILES与文本来自列明来源的课程子集。介绍数据时读取 `data/manifest.json`，用“课程样例”“生成夹具”或“真实来源子集”说清身份。
 

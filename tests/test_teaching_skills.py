@@ -10,9 +10,15 @@ def test_nanogpt_pretraining_lesson_is_retained_inside_scientific_language():
     assert skill_path.is_file()
     skill = skill_path.read_text(encoding="utf-8")
     assert "name: nanogpt-pretraining" in skill
-    assert "python -m nanoscigpt.classroom --domain text" in skill
-    assert "run_report.json" in skill
-    assert "downstream_result.json" in skill
+    assert "python -m nanoscigpt.core.trainer --domain text" in skill
+    assert "python -m nanoscigpt.tasks.text_sft" in skill
+    assert "--pairs data/course/text_qa_phrasings.json" in skill
+    assert "model/train_log.json" in skill
+    assert "sft/sft_result.json" in skill
+    sft_command = next(line for line in skill.splitlines()
+                       if line.startswith("python -m nanoscigpt.tasks.text_sft"))
+    assert "--seed" not in sft_command  # This CLI does not expose that argument.
+    assert "nanoscigpt.core.sampler --help" in skill
 
 
 def test_nanogpt_warmup_is_part_of_the_scientific_language_entrypoint():
@@ -24,7 +30,7 @@ def test_nanogpt_warmup_is_part_of_the_scientific_language_entrypoint():
     ).read_text(encoding="utf-8")
 
     assert "--domain text" in nanogpt
-    assert "--domain text" in nanoscigpt
+    assert "references/nanogpt-pretraining.md" in nanoscigpt
 
 
 def test_autoresearch_model_iteration_is_retained_inside_ai_scientist():

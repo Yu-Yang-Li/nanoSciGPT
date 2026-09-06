@@ -37,7 +37,7 @@ def encode_pair(question, answer, tokenizer, block_size):
     return x, y
 
 
-def run(ckpt_path, data_root, out_dir, steps=200, seed=1337):
+def run(ckpt_path, data_root, out_dir, steps=200, seed=1337, pairs_path=None):
     if steps < 1:
         raise ValueError("steps must be positive")
     torch.set_num_threads(1)
@@ -50,8 +50,16 @@ def run(ckpt_path, data_root, out_dir, steps=200, seed=1337):
     tokenizer = CharTokenizer.load(Path(data_root) / "text/tokenizer.json")
     if config.vocab_size != len(tokenizer.stoi):
         raise ValueError("checkpoint and text tokenizer vocabularies differ")
-    train = [encode_pair(q, a, tokenizer, config.block_size) for q, a in TRAIN_PAIRS]
-    val = [encode_pair(q, a, tokenizer, config.block_size) for q, a in VAL_PAIRS]
+    pairs = json.loads(Path(pairs_path).read_text(encoding="utf-8")) if pairs_path else {
+        "train": TRAIN_PAIRS, "validation": VAL_PAIRS}
+    train_pairs, val_pairs = pairs["train"], pairs["validation"]
+    if not train_pairs or not val_pairs:
+        raise ValueError("training and validation pairs must both be nonempty")
+    train_questions = {q.strip() for q, _ in train_pairs}
+    if train_questions.intersection(q.strip() for q, _ in val_pairs):
+        raise ValueError("training and validation questions overlap")
+    train = [encode_pair(q, a, tokenizer, config.block_size) for q, a in train_pairs]
+    val = [encode_pair(q, a, tokenizer, config.block_size) for q, a in val_pairs]
     original = {name: value.detach().clone() for name, value in model.named_parameters()}
 
     def evaluate():
@@ -74,8 +82,8 @@ def run(ckpt_path, data_root, out_dir, steps=200, seed=1337):
         return tokenizer.decode(ids[0, len(prefix):].tolist())
 
     before = evaluate()
-    samples = [{"question": q, "reference": a, "before": sample(q)} for q, a in VAL_PAIRS]
-    training_samples = [{"question": q, "reference": a, "before": sample(q)} for q, a in TRAIN_PAIRS]
+    samples = [{"question": q, "reference": a, "before": sample(q)} for q, a in val_pairs]
+    training_samples = [{"question": q, "reference": a, "before": sample(q)} for q, a in train_pairs]
     torch.manual_seed(seed)
     optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3)
     training_losses = []
@@ -98,8 +106,8 @@ def run(ckpt_path, data_root, out_dir, steps=200, seed=1337):
               "answer_val_loss_before": before, "answer_val_loss_after": after, "training_losses": training_losses,
               "encoder_delta_l2": delta, "pretrained_parameters_updated": delta > 0, "samples": samples,
               "training_samples": training_samples,
-              "train_pairs": TRAIN_PAIRS, "validation_pairs": VAL_PAIRS, "teaching_only": True,
-              "data_source": "handwritten teaching Q&A; validation rephrases the same concepts, not new scientific knowledge",
+              "train_pairs": train_pairs, "validation_pairs": val_pairs, "teaching_only": True,
+              "data_source": str(Path(pairs_path).resolve()) if pairs_path else "handwritten teaching Q&A; validation rephrases the same concepts, not new scientific knowledge",
               "checkpoint": str((out_dir / "sft.pt").resolve()),
               "claim_boundary": "demonstrates answer-only training; does not establish general question-answering ability"}
     (out_dir / "sft_result.json").write_text(json.dumps(result, indent=2), encoding="utf-8")
@@ -113,5 +121,6 @@ if __name__ == "__main__":
     parser.add_argument("--data_root", default="data")
     parser.add_argument("--out_dir", default="out/classroom/text/sft")
     parser.add_argument("--steps", type=int, default=200)
+    parser.add_argument("--pairs", help="JSON with train and validation question-answer pairs")
     args = parser.parse_args()
-    run(args.ckpt, args.data_root, args.out_dir, args.steps)
+    run(args.ckpt, args.data_root, args.out_dir, args.steps, pairs_path=args.pairs)

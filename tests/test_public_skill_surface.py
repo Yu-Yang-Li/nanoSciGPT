@@ -21,7 +21,7 @@ def test_students_see_exactly_three_skill_entrypoints() -> None:
 
 def test_scientific_language_entrypoint_contains_text_warmup_and_all_domains() -> None:
     skill = _read("skills/nanoscigpt-scientific-language/SKILL.md")
-    assert "python -m nanoscigpt.classroom --domain text" in skill
+    assert "references/nanogpt-pretraining.md" in skill
     for domain in (
         "protein",
         "dna",
@@ -34,7 +34,7 @@ def test_scientific_language_entrypoint_contains_text_warmup_and_all_domains() -
         "field",
     ):
         assert domain in skill
-    assert "nanogpt-pretraining" not in skill
+    assert "name: nanoscigpt-scientific-language" in skill
 
 
 def test_scientific_language_entrypoint_marks_precomputed_results_as_fallback() -> None:

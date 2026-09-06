@@ -7,7 +7,7 @@ metadata:
 
 # nanoGPT 预训练
 
-用仓库里的小文本模型，让学生亲眼看到两段不同的训练：先从无标签文本中练习预测下一个字符，再固定这份预训练表示，训练一个简单任务头。课堂中的第二段叫“任务头训练”，不是微调；微调还会继续更新预训练模型参数，本样例暂不执行。这里借用 nanoGPT 的最小训练思路，不宣称复现 GPT-2 的规模或成绩。
+用 tiny Shakespeare 文本训练约十万参数的小模型，再用人工整理的短问答继续训练。前者练习预测下一个字符，后者只对回答部分计算误差。这里借用 nanoGPT 的最小训练思路，不宣称复现 GPT-2 的规模或成绩。
 
 ## 从学生当前的问题开始
 
@@ -16,20 +16,32 @@ metadata:
 需要运行时，从同时包含 `pyproject.toml`、`nanoscigpt/` 和 `data/` 的仓库根目录开始。默认 `python` 不可用时，运行 `scripts/find_course_python.ps1 -RequiredModules numpy,torch`，再把返回的解释器放到下面命令最前面。
 
 ```powershell
-python -m nanoscigpt.classroom --domain text --profile classroom --out_root out/classroom
+$env:OMP_NUM_THREADS = '2'
+$env:MKL_NUM_THREADS = '2'
+python -m nanoscigpt.core.trainer --domain text --out_dir out/text-lesson-01/model --device cpu --max_iters 1000 --eval_interval 15 --eval_iters 5 --batch_size 8 --block_size 64 --n_layer 2 --n_head 2 --n_embd 64 --seed 1337
 ```
 
-第一次只想确认环境时，把 `classroom` 换成 `smoke`。仓库使用 `data/text/` 中的 tiny Shakespeare 课程文本，训练代码位于 `nanoscigpt/core/`；这一步默认离线运行。
+仓库使用 `data/text/` 中的 tiny Shakespeare 课程文本，训练代码位于 `nanoscigpt/core/`；这一步默认离线运行。重新实验使用新的输出目录，保留原文件。已有本轮结果时沿用，不重复训练。
+
+接着学习多种问法：
+
+```powershell
+python -m nanoscigpt.tasks.text_sft --ckpt out/text-lesson-01/model/ckpt.pt --pairs data/course/text_qa_phrasings.json --steps 800 --out_dir out/text-lesson-01/sft
+```
+
+数据包含32条训练问答和8条验证问答。同一概念在训练中有多种问法，验证保留其他组合。它们是人工教学短句，不是自然问答 benchmark。验证问题不参与本轮梯度更新，但验证集已参与课程方案的开发，不能称为独立盲测。旧8题默认仍保留，课堂使用上面的 `--pairs` 文件。
 
 ## 和学生一起读结果
 
-先打开 `out/classroom/text/run_report.json`，沿着其中的路径查看：
+读取本次输出：
 
 - `model/train_log.json`：这次预训练的迭代数和最佳验证损失摘要；
-- `model/ckpt.pt`：这次训练留下的模型参数；
-- `downstream/downstream_result.json`：固定预训练表示后，简单任务头得到的结果。
+- `model/ckpt.pt`：验证损失最低时的模型参数，不一定是最后一步；
+- `sft/sft_result.json`：微调前后实际回答、参考答案、验证损失和参数变化。
 
-文本下游任务按标点密度构造标签，只用于展示“同一份表示怎样接到一个有标签任务”，不是自然语言理解 benchmark。验证损失下降说明训练过程跑通；任务头有输出说明表示已被接入一个具体任务。这两件事都不能单独证明模型理解了语言机制。
+学生问“训练前后有什么不同”，看相同问题的前后回答；问“换个问法呢”，看 `samples` 的验证问法。`training_samples` 与 `samples` 分别计数，展示实际正确和错误例子。参考答案与生成文本分开。还想看文本接龙时，查看 `python -m nanoscigpt.core.sampler --help` 并对本轮预训练权重采样。
+
+这些验证问法针对熟悉概念，不是新知识测试。短句正确不意味着长文本写作或陌生知识问答也已学会。错误可以直接指出；几个回答不足以确定错误来自哪个内部机制。旧标点分类不属于本次问答实践，也不拿它的准确率证明语言能力。
 
 学生问预训练和微调的区别时，按这三个名称回答：预训练从原始文本学习常见关系；任务头训练冻结原模型，只学习怎样从已有表示得到标签；微调则让预训练模型参数也随具体任务继续改变。
 
@@ -39,4 +51,4 @@ python -m nanoscigpt.classroom --domain text --profile classroom --out_root out/
 
 例如学生说“我先跑文本版”，可以这样接：
 
-> 我们先让小模型读字符并预测下一个字符。运行上面的 `smoke` 命令，把最后几行和 `run_report.json` 的路径发回来；我再和你分开看预训练结果与任务头结果。
+> 我们先让小模型读文本，练习预测下一个字符，再用短问答接着训练。我先检查数据和环境，跑完一起看它实际说了什么。

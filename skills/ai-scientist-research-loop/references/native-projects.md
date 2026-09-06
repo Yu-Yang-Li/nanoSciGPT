@@ -1,5 +1,7 @@
 # 原项目接入说明
 
+本页的 API 与主调度命令只用于学生明确选择的“原版独立运行”。课堂默认用[Qoder 自带模型主持研究](qoder-research.md)，无需另外购买模型 API。源码准备、模板导出和单独实验可以继续复用；不要因为读到本页的独立程序依赖，就停止当前 Qoder 的研究工作。
+
 ## 源码与教学设置
 
 在nanoSciGPT仓库根目录运行`python -m nanoscigpt.upstream prepare <project>`。它获取固定版本源码到`out/upstream/<project>/`，保存`teaching_setup.json`和`teaching_changes.diff`，不安装依赖、不调用模型API、不训练。已有实验不重置；要另做一次准备，换`--root`。
@@ -10,9 +12,9 @@
 | v1 | https://github.com/SakanaAI/AI-Scientist | 1de1dbc1f4ee2c5f61e9c94348d55eb51d7fa2eb | 复制原版nanoGPT模板；两层64维、batch 8、64上下文、30轮设定、一个随机种子、单文本数据；保留想法、代码实验和写作流程 |
 | v2 | https://github.com/SakanaAI/AI-Scientist-v2 | 96bd51617cfdbb494a9fc283af00fe090edfae48 | 单worker、单种子、每阶段最多3次、单次执行180秒；保留原版四阶段和研究树 |
 
-这些是待研究的低负载起点，不保证任何学生电脑都适用，也不与原论文预算等价。单次执行时间不是整个研究的时间/API费用上限；v1多次改码、v2四阶段、文献检索、写作与评阅还会产生额外调用。开始完整研究前，和学生约定整场时间、API费用及停止方式。
+这些是待研究的低负载起点，不保证任何学生电脑都适用，也不与原论文预算等价。单次执行时间不是整个研究的预算。Qoder 带练约定计算时间、会员用量与停止方式；选择独立 API 运行时另行约定 API 费用，不能默认学生同意两套计费。
 
-## 环境
+## 原版独立运行的环境
 
 准备实际运行时，先运行`python -m nanoscigpt.upstream doctor`。读所选上游README，在独立虚拟环境中安装它的依赖；不要直接覆盖nanoSciGPT教学环境。仅讨论学生的研究方案，不需要检查教师这台电脑。原项目完整流程主要面向Linux，Windows优先使用WSL或准备好的Linux机器；v1的小模板基线已单独验证可以在Windows CPU运行。
 
@@ -20,7 +22,7 @@
 - v1实验模板训练需torch/numpy，绘图还需matplotlib。只测模板时，在教学环境安装`python -m pip install -e ".[native-v1-template]"`即可补上绘图依赖；这不等于安装了完整研究环境。完整研究还需Aider、检索API、模型API及LaTeX工具。选`--model`并不自动改变全部审稿调用；固定版本的部分评阅仍使用`gpt-4o-2024-05-13`。
 - v2的编程、运行反馈、视觉反馈、总结和写作分工有不同模型设置。检查`bfts_config.yaml`和源码中的实际路由；文本模型不一定支持图像反馈。GLM-5.3不能未经实测直接填进去宣称全面兼容。
 
-只核对密钥是否存在和服务是否可用，不在对话、日志或Git中保存密钥。CLI登录不能替代原项目要求的API配置。实验在本地执行，仍可能把代码、日志、数据片段和稿件发给模型服务；私有材料先核对允许发送的范围，不以“本地运行”替代这项确认。
+选择独立 API 路线后，只核对所选密钥是否存在和服务是否可用，不在对话、日志或Git中保存密钥。CLI登录不能替代原项目内部的API配置；这不影响 Qoder 直接主持教学研究。实验在本地执行，仍可能把代码、日志、数据片段和稿件发给模型服务；私有材料先核对允许发送的范围，不以“本地运行”替代这项确认。
 
 接入参数以实际服务的文档和返回为准，不从模型名字推断兼容性。例如，当前SCNet接口未为GLM列出关闭思考支持，实测额外传入`thinking`报400；经本机代理时这个字段还可能被丢弃。短回答成功不代表Aider长改码可用。遇到`finish_reason=length`、空正文或网关超时，先保存记录并说明未完成，不以继续提高额度作为默认处理。文档与实际对照见[接口核查](../../../docs/acceptance/provider-boundary-2026-09-05/README.md)。
 
@@ -78,7 +80,7 @@ python launch_scientist.py --experiment course_protein --num-ideas 1 --parallel 
 
 先执行`python experiment.py --out_dir run_0`及`python plot.py`。`run_0/final_info.json`里的初始指标应与微调报告一致；`run_0/checkpoint.pt`可回到课程微调入口继续训练。继续时沿用原报告的抽样上限，避免无意改变验证样本。旧文件缺少领域、任务或数据来源信息时，回到原预训练模型另做一次微调，不猜测这些信息。
 
-这项教学适配只保留原版GPT类和研究流程，不把自编的监督训练循环称为原版训练循环。没有执行`launch_scientist.py`就不算完成了Agent研究。
+这项教学适配复用原版GPT类；自编的监督训练循环不称为原版训练循环。没有执行`launch_scientist.py`就不能声称原版独立调度已运行；若由 Qoder 实际提出想法、改码、执行和分析，应如实记录为 Qoder 主持的教学研究，而非否认这也是 Agent 研究。
 
 核对生成的新想法及检索记录、实际运行过的实验、代码改动、图表与稿件。若API或论文编译失败，报告已完成的环节，保留报错，不用本仓库的离线`draft.md`冒充原版生成稿件。
 

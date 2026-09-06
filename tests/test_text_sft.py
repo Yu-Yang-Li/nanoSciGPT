@@ -1,6 +1,8 @@
 import hashlib
+import json
 from pathlib import Path
 
+import pytest
 import torch
 
 from nanoscigpt.core.gpt import GPT, GPTConfig
@@ -49,3 +51,30 @@ def test_text_sft_uses_pretrained_weights_and_preserves_source(tmp_path):
     assert result["training_samples"][0]["question"] == text_sft.TRAIN_PAIRS[0][0]
     assert result["training_samples"][0]["after"] is not None
     assert hashlib.sha256(checkpoint.read_bytes()).hexdigest() == digest
+
+
+def test_custom_sft_pairs_are_used_in_training_and_generated_comparisons(tmp_path):
+    config = GPTConfig(65, block_size=64, n_layer=1, n_head=1, n_embd=16)
+    model = GPT(config)
+    checkpoint = tmp_path / "input.pt"
+    torch.save({"model": model.state_dict(), "model_args": vars(config), "domain": "text"}, checkpoint)
+    pairs = tmp_path / "pairs.json"
+    pairs.write_text(json.dumps({"train": [["What is light?", "A signal."]],
+                                 "validation": [["Describe light.", "A signal."]]}))
+    result = text_sft.run(checkpoint, ROOT / "data", tmp_path / "custom", steps=1, pairs_path=pairs)
+    assert [x["question"] for x in result["training_samples"]] == ["What is light?"]
+    assert [x["question"] for x in result["samples"]] == ["Describe light."]
+    assert result["training_samples"][0]["after"] is not None
+
+
+def test_custom_sft_rejects_question_overlap_before_writing_results(tmp_path):
+    config = GPTConfig(65, block_size=64, n_layer=1, n_head=1, n_embd=16)
+    model = GPT(config)
+    checkpoint = tmp_path / "input.pt"
+    torch.save({"model": model.state_dict(), "model_args": vars(config), "domain": "text"}, checkpoint)
+    pairs = tmp_path / "pairs.json"
+    pairs.write_text(json.dumps({"train": [["What is light?", "A signal."]],
+                                 "validation": [["  What is light?  ", "A signal."]]}))
+    with pytest.raises(ValueError, match="overlap"):
+        text_sft.run(checkpoint, ROOT / "data", tmp_path / "bad", steps=1, pairs_path=pairs)
+    assert not (tmp_path / "bad").exists()

@@ -1,0 +1,842 @@
+{
+  "context": "Fresh GitHub-based checkout; same existing CPU dependencies. Code runs, not new Qoder dialogue.",
+  "source_sha256": {
+    "out/starlight/lstm-01/metrics.json": "733e14afc0959cf2ae3bcdbef22943a6fe26a1282a38adb970cb8fe67128ee7d",
+    "out/starlight/gpt-01/metrics.json": "3f02cfb805d7c1019bf0a40186a06318b4e03ee49e5bfcd077d8fae04b2e3824",
+    "out/text-lesson-01/model/train_log.json": "1ee61d8cc68ec09561e21d9087a52f5fe8ed85ed4109afc36a663f461e20af48",
+    "out/text-lesson-01/sft/sft_result.json": "1251c1cba55413b016109c9799b17d1f56b6dbc421c9581e1654443a9f54a531"
+  },
+  "prediction_comparisons": [
+    {
+      "run": "lstm-01",
+      "array": "y_true",
+      "shape": [
+        8236
+      ],
+      "identical_to_recorded_run": true
+    },
+    {
+      "run": "lstm-01",
+      "array": "lstm",
+      "shape": [
+        8236,
+        3
+      ],
+      "identical_to_recorded_run": true
+    },
+    {
+      "run": "gpt-01",
+      "array": "y_true",
+      "shape": [
+        8236
+      ],
+      "identical_to_recorded_run": true
+    },
+    {
+      "run": "gpt-01",
+      "array": "scratch",
+      "shape": [
+        8236,
+        3
+      ],
+      "identical_to_recorded_run": true
+    },
+    {
+      "run": "gpt-01",
+      "array": "scratch_long",
+      "shape": [
+        8236,
+        3
+      ],
+      "identical_to_recorded_run": true
+    },
+    {
+      "run": "gpt-01",
+      "array": "finetuned",
+      "shape": [
+        8236,
+        3
+      ],
+      "identical_to_recorded_run": true
+    }
+  ],
+  "lstm": {
+    "config": {
+      "data": "out/starlight/data/data-and-splits.npz",
+      "output": "out/starlight/lstm-01",
+      "seed": 45,
+      "steps": 800,
+      "eval_every": 50,
+      "batch_size": 32,
+      "patch_size": 32,
+      "width": 64,
+      "layers": 2,
+      "threads": 2,
+      "learning_rate": 0.001
+    },
+    "fit_samples": 800,
+    "validation_samples": 200,
+    "test_samples": 8236,
+    "parameters": 62723,
+    "selected_step": 800,
+    "validation": {
+      "accuracy": 0.88,
+      "macro_f1": 0.8548548548548549,
+      "balanced_accuracy": 0.8893719806763286,
+      "per_class": {
+        "1": {
+          "precision": 0.5681818181818182,
+          "recall": 0.8333333333333334,
+          "f1-score": 0.6756756756756757,
+          "support": 30.0
+        },
+        "2": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 55.0
+        },
+        "3": {
+          "precision": 0.9504950495049505,
+          "recall": 0.8347826086956521,
+          "f1-score": 0.8888888888888888,
+          "support": 115.0
+        },
+        "accuracy": 0.88,
+        "macro avg": {
+          "precision": 0.8395589558955896,
+          "recall": 0.8893719806763286,
+          "f1-score": 0.8548548548548549,
+          "support": 200.0
+        },
+        "weighted avg": {
+          "precision": 0.9067619261926193,
+          "recall": 0.88,
+          "f1-score": 0.8874624624624624,
+          "support": 200.0
+        }
+      },
+      "confusion_matrix": [
+        [
+          25,
+          0,
+          5
+        ],
+        [
+          0,
+          55,
+          0
+        ],
+        [
+          19,
+          0,
+          96
+        ]
+      ]
+    },
+    "metrics": {
+      "accuracy": 0.8771248178727538,
+      "macro_f1": 0.8520607400131497,
+      "balanced_accuracy": 0.8987090046614187,
+      "per_class": {
+        "1": {
+          "precision": 0.5447368421052632,
+          "recall": 0.8793542905692439,
+          "f1-score": 0.6727331816704583,
+          "support": 1177.0
+        },
+        "2": {
+          "precision": 0.9974025974025974,
+          "recall": 0.9995661605206074,
+          "f1-score": 0.9984832069339111,
+          "support": 2305.0
+        },
+        "3": {
+          "precision": 0.9649776453055141,
+          "recall": 0.8172065628944047,
+          "f1-score": 0.8849658314350797,
+          "support": 4754.0
+        },
+        "accuracy": 0.8771248178727538,
+        "macro avg": {
+          "precision": 0.8357056949377916,
+          "recall": 0.8987090046614187,
+          "f1-score": 0.8520607400131497,
+          "support": 8236.0
+        },
+        "weighted avg": {
+          "precision": 0.9139961116990404,
+          "recall": 0.8771248178727538,
+          "f1-score": 0.886405817077606,
+          "support": 8236.0
+        }
+      },
+      "confusion_matrix": [
+        [
+          1035,
+          2,
+          140
+        ],
+        [
+          0,
+          2304,
+          1
+        ],
+        [
+          865,
+          4,
+          3885
+        ]
+      ]
+    },
+    "elapsed_seconds": 10.847,
+    "data_sha256": "036f467bc0424b062ada6c92a52de084b169819e20fc60e12c717e9629e6bc43",
+    "code_sha256": "0a615a03d89663b1384ed3c9a3336db4da558519cb8fb66386fbbe4dff05ca33",
+    "boundary": "Supervised patch-LSTM; no pretraining. Same split and 32-point patches as classroom GPT. Validation selects checkpoint. Architecture and optimization differ, so this is not an isolated pretraining ablation."
+  },
+  "gpt": {
+    "config": {
+      "data": "out/starlight/data/data-and-splits.npz",
+      "output": "out/starlight/gpt-01",
+      "seed": 45,
+      "pretrain_steps": 300,
+      "finetune_steps": 800,
+      "eval_every": 50,
+      "batch_size": 32,
+      "patch_size": 32,
+      "width": 64,
+      "layers": 2,
+      "threads": 2,
+      "head_mode": "flat",
+      "cosine": true,
+      "validation_only": false
+    },
+    "parameters": 248163,
+    "selected_steps": {
+      "pretrained": 300,
+      "scratch": 750,
+      "scratch_long": 550,
+      "finetuned": 500
+    },
+    "metrics": {
+      "scratch": {
+        "accuracy": 0.9101505585235551,
+        "macro_f1": 0.8849439725171764,
+        "balanced_accuracy": 0.917919256346167,
+        "per_class": {
+          "1": {
+            "precision": 0.6351931330472103,
+            "recall": 0.8802039082412915,
+            "f1-score": 0.7378917378917379,
+            "support": 1177.0
+          },
+          "2": {
+            "precision": 0.9974014724989173,
+            "recall": 0.9991323210412147,
+            "f1-score": 0.9982661465106198,
+            "support": 2305.0
+          },
+          "3": {
+            "precision": 0.9676443202979516,
+            "recall": 0.8744215397559949,
+            "f1-score": 0.9186740331491713,
+            "support": 4754.0
+          },
+          "accuracy": 0.9101505585235551,
+          "macro avg": {
+            "precision": 0.866746308614693,
+            "recall": 0.917919256346167,
+            "f1-score": 0.8849439725171764,
+            "support": 8236.0
+          },
+          "weighted avg": {
+            "precision": 0.9284620945122672,
+            "recall": 0.9101505585235551,
+            "f1-score": 0.9151139384163083,
+            "support": 8236.0
+          }
+        },
+        "confusion_matrix": [
+          [
+            1036,
+            2,
+            139
+          ],
+          [
+            2,
+            2303,
+            0
+          ],
+          [
+            593,
+            4,
+            4157
+          ]
+        ]
+      },
+      "scratch_long": {
+        "accuracy": 0.9250849927149102,
+        "macro_f1": 0.8927471579789586,
+        "balanced_accuracy": 0.8964979535680925,
+        "per_class": {
+          "1": {
+            "precision": 0.7294213528932355,
+            "recall": 0.7604078164825828,
+            "f1-score": 0.7445923460898503,
+            "support": 1177.0
+          },
+          "2": {
+            "precision": 0.9978336221837089,
+            "recall": 0.9991323210412147,
+            "f1-score": 0.9984825493171472,
+            "support": 2305.0
+          },
+          "3": {
+            "precision": 0.9404382046373112,
+            "recall": 0.9299537231804796,
+            "f1-score": 0.9351665785298784,
+            "support": 4754.0
+          },
+          "accuracy": 0.9250849927149102,
+          "macro avg": {
+            "precision": 0.8892310599047519,
+            "recall": 0.8964979535680925,
+            "f1-score": 0.8927471579789586,
+            "support": 8236.0
+          },
+          "weighted avg": {
+            "precision": 0.9263451501134732,
+            "recall": 0.9250849927149102,
+            "f1-score": 0.925651940487472,
+            "support": 8236.0
+          }
+        },
+        "confusion_matrix": [
+          [
+            895,
+            2,
+            280
+          ],
+          [
+            2,
+            2303,
+            0
+          ],
+          [
+            330,
+            3,
+            4421
+          ]
+        ]
+      },
+      "finetuned": {
+        "accuracy": 0.9218067022826615,
+        "macro_f1": 0.8969686476866293,
+        "balanced_accuracy": 0.9228712173482463,
+        "per_class": {
+          "1": {
+            "precision": 0.6758711374095989,
+            "recall": 0.8734069668649108,
+            "f1-score": 0.7620459599703484,
+            "support": 1177.0
+          },
+          "2": {
+            "precision": 0.9986984815618222,
+            "recall": 0.9986984815618222,
+            "f1-score": 0.9986984815618222,
+            "support": 2305.0
+          },
+          "3": {
+            "precision": 0.9664399092970521,
+            "recall": 0.8965082036180059,
+            "f1-score": 0.9301615015277171,
+            "support": 4754.0
+          },
+          "accuracy": 0.9218067022826615,
+          "macro avg": {
+            "precision": 0.8803365094228245,
+            "recall": 0.9228712173482463,
+            "f1-score": 0.8969686476866293,
+            "support": 8236.0
+          },
+          "weighted avg": {
+            "precision": 0.9339431347170088,
+            "recall": 0.9218067022826615,
+            "f1-score": 0.9253176145152826,
+            "support": 8236.0
+          }
+        },
+        "confusion_matrix": [
+          [
+            1028,
+            2,
+            147
+          ],
+          [
+            2,
+            2302,
+            1
+          ],
+          [
+            491,
+            1,
+            4262
+          ]
+        ]
+      }
+    },
+    "validation": {
+      "scratch": {
+        "accuracy": 0.89,
+        "macro_f1": 0.8692408591572388,
+        "balanced_accuracy": 0.9115942028985508,
+        "per_class": {
+          "1": {
+            "precision": 0.5869565217391305,
+            "recall": 0.9,
+            "f1-score": 0.7105263157894737,
+            "support": 30.0
+          },
+          "2": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1-score": 1.0,
+            "support": 55.0
+          },
+          "3": {
+            "precision": 0.9696969696969697,
+            "recall": 0.8347826086956521,
+            "f1-score": 0.897196261682243,
+            "support": 115.0
+          },
+          "accuracy": 0.89,
+          "macro avg": {
+            "precision": 0.8522178304787,
+            "recall": 0.9115942028985508,
+            "f1-score": 0.8692408591572388,
+            "support": 200.0
+          },
+          "weighted avg": {
+            "precision": 0.9206192358366272,
+            "recall": 0.89,
+            "f1-score": 0.8974667978357107,
+            "support": 200.0
+          }
+        },
+        "confusion_matrix": [
+          [
+            27,
+            0,
+            3
+          ],
+          [
+            0,
+            55,
+            0
+          ],
+          [
+            19,
+            0,
+            96
+          ]
+        ]
+      },
+      "scratch_long": {
+        "accuracy": 0.915,
+        "macro_f1": 0.8876353276353276,
+        "balanced_accuracy": 0.9014492753623188,
+        "per_class": {
+          "1": {
+            "precision": 0.6857142857142857,
+            "recall": 0.8,
+            "f1-score": 0.7384615384615385,
+            "support": 30.0
+          },
+          "2": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1-score": 1.0,
+            "support": 55.0
+          },
+          "3": {
+            "precision": 0.9454545454545454,
+            "recall": 0.9043478260869565,
+            "f1-score": 0.9244444444444444,
+            "support": 115.0
+          },
+          "accuracy": 0.915,
+          "macro avg": {
+            "precision": 0.8770562770562771,
+            "recall": 0.9014492753623188,
+            "f1-score": 0.8876353276353276,
+            "support": 200.0
+          },
+          "weighted avg": {
+            "precision": 0.9214935064935065,
+            "recall": 0.915,
+            "f1-score": 0.9173247863247863,
+            "support": 200.0
+          }
+        },
+        "confusion_matrix": [
+          [
+            24,
+            0,
+            6
+          ],
+          [
+            0,
+            55,
+            0
+          ],
+          [
+            11,
+            0,
+            104
+          ]
+        ]
+      },
+      "finetuned": {
+        "accuracy": 0.925,
+        "macro_f1": 0.9067464145604219,
+        "balanced_accuracy": 0.9400966183574879,
+        "per_class": {
+          "1": {
+            "precision": 0.6829268292682927,
+            "recall": 0.9333333333333333,
+            "f1-score": 0.7887323943661971,
+            "support": 30.0
+          },
+          "2": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1-score": 1.0,
+            "support": 55.0
+          },
+          "3": {
+            "precision": 0.9807692307692307,
+            "recall": 0.8869565217391304,
+            "f1-score": 0.9315068493150684,
+            "support": 115.0
+          },
+          "accuracy": 0.925,
+          "macro avg": {
+            "precision": 0.8878986866791746,
+            "recall": 0.9400966183574879,
+            "f1-score": 0.9067464145604219,
+            "support": 200.0
+          },
+          "weighted avg": {
+            "precision": 0.9413813320825516,
+            "recall": 0.925,
+            "f1-score": 0.928926297511094,
+            "support": 200.0
+          }
+        },
+        "confusion_matrix": [
+          [
+            28,
+            0,
+            2
+          ],
+          [
+            0,
+            55,
+            0
+          ],
+          [
+            13,
+            0,
+            102
+          ]
+        ]
+      }
+    },
+    "pretraining": {
+      "initial_validation_mse": 1.32169187484249,
+      "best_validation_mse": 0.014730858956613848,
+      "naive_validation_mse": {
+        "zero": 1.0158377885818481,
+        "last_value": 0.07978957891464233,
+        "repeat_patch": 0.21619871258735657
+      }
+    },
+    "budget": {
+      "pretraining": 300,
+      "scratch": 800,
+      "finetuned": 800,
+      "scratch_long": 1100
+    },
+    "elapsed_seconds": 91.298,
+    "versions": {
+      "python": "3.12.10",
+      "torch": "2.12.0+cpu",
+      "numpy": "2.4.2"
+    },
+    "data_sha256": "036f467bc0424b062ada6c92a52de084b169819e20fc60e12c717e9629e6bc43",
+    "code_sha256": {
+      "starlight.py": "c082c7466a2984551831c82e7d68c805de1846728d79de8a4bae25dd22a32372",
+      "lightcurve_model.py": "929e6ccae3dbdb05fa0d290f8e9f9e66eada755b00492b347a53beb23321f0c1",
+      "gpt.py": "09fd2634aad8c22663fe52b0de2b86300c2915d1d2710847c749e1c2911b5bec"
+    },
+    "boundary": "Preprocessed UCR benchmark; not raw survey classification or TimesFM reproduction. Pretraining uses only 800 fit curves, without labels. Validation selects checkpoints. Patch predictions use observed prefixes, not free-running forecasts. No guarantee of physical-time alignment. Long scratch matches update count, not measured FLOPs."
+  },
+  "text": {
+    "initial_validation_loss": 4.201022,
+    "best_validation_loss": 2.245285654067993,
+    "scoring": "Exact first generated line, stripping surrounding whitespace; raw generation retained below.",
+    "train_correct": 32,
+    "train_total": 32,
+    "validation_correct": 7,
+    "validation_total": 8,
+    "training_samples": [
+      {
+        "question": "What is DNA?",
+        "reference": "A sequence of bases.",
+        "before": "\n",
+        "after": "A sequence of bases.\n"
+      },
+      {
+        "question": "Define DNA.",
+        "reference": "A sequence of bases.",
+        "before": "\n",
+        "after": "A sequence of bases.\n"
+      },
+      {
+        "question": "Explain DNA.",
+        "reference": "A sequence of bases.",
+        "before": "\n",
+        "after": "A sequence of bases.\n"
+      },
+      {
+        "question": "Tell me about DNA.",
+        "reference": "A sequence of bases.",
+        "before": "\n",
+        "after": "A sequence of bases.\n"
+      },
+      {
+        "question": "What is a protein?",
+        "reference": "A chain of amino acids.",
+        "before": "\n",
+        "after": "A chain of amino acids.\n"
+      },
+      {
+        "question": "Define a protein.",
+        "reference": "A chain of amino acids.",
+        "before": "\n",
+        "after": "A chain of amino acids.\n"
+      },
+      {
+        "question": "Explain a protein.",
+        "reference": "A chain of amino acids.",
+        "before": "\n",
+        "after": "A chain of amino acids.\n"
+      },
+      {
+        "question": "Tell me about a protein.",
+        "reference": "A chain of amino acids.",
+        "before": "\n",
+        "after": "A chain of amino acids.\n"
+      },
+      {
+        "question": "What is a spectrum?",
+        "reference": "Light measured by wavelength.",
+        "before": "\n",
+        "after": "Light measured by wavelength.\n"
+      },
+      {
+        "question": "Define a spectrum.",
+        "reference": "Light measured by wavelength.",
+        "before": "\n",
+        "after": "Light measured by wavelength.\n"
+      },
+      {
+        "question": "Explain a spectrum.",
+        "reference": "Light measured by wavelength.",
+        "before": "\n",
+        "after": "Light measured by wavelength.\n"
+      },
+      {
+        "question": "Tell me about a spectrum.",
+        "reference": "Light measured by wavelength.",
+        "before": "\n",
+        "after": "Light measured by wavelength.\n"
+      },
+      {
+        "question": "What is a label?",
+        "reference": "A target for a sample.",
+        "before": "\n",
+        "after": "A target for a sample.\n"
+      },
+      {
+        "question": "Define a label.",
+        "reference": "A target for a sample.",
+        "before": "\n",
+        "after": "A target for a sample.\n"
+      },
+      {
+        "question": "Describe a label.",
+        "reference": "A target for a sample.",
+        "before": "\n",
+        "after": "A target for a sample.\n"
+      },
+      {
+        "question": "Tell me about a label.",
+        "reference": "A target for a sample.",
+        "before": "\n",
+        "after": "A target for a sample.\n"
+      },
+      {
+        "question": "What is training?",
+        "reference": "Learning from data.",
+        "before": "\n",
+        "after": "Learning from data.\n"
+      },
+      {
+        "question": "Define training.",
+        "reference": "Learning from data.",
+        "before": "\n",
+        "after": "Learning from data.\n"
+      },
+      {
+        "question": "Describe training.",
+        "reference": "Learning from data.",
+        "before": "\n",
+        "after": "Learning from data.\n"
+      },
+      {
+        "question": "Tell me about training.",
+        "reference": "Learning from data.",
+        "before": "\n",
+        "after": "Learning from data.\n"
+      },
+      {
+        "question": "What is validation?",
+        "reference": "Checking on held out data.",
+        "before": "\n",
+        "after": "Checking on held out data.\n"
+      },
+      {
+        "question": "Define validation.",
+        "reference": "Checking on held out data.",
+        "before": "\n",
+        "after": "Checking on held out data.\n"
+      },
+      {
+        "question": "Describe validation.",
+        "reference": "Checking on held out data.",
+        "before": "\n",
+        "after": "Checking on held out data.\n"
+      },
+      {
+        "question": "Tell me about validation.",
+        "reference": "Checking on held out data.",
+        "before": "\n",
+        "after": "Checking on held out data.\n"
+      },
+      {
+        "question": "What is a model?",
+        "reference": "A rule learned from data.",
+        "before": "\n",
+        "after": "A rule learned from data.\n"
+      },
+      {
+        "question": "Define a model.",
+        "reference": "A rule learned from data.",
+        "before": "\n",
+        "after": "A rule learned from data.\n"
+      },
+      {
+        "question": "Describe a model.",
+        "reference": "A rule learned from data.",
+        "before": "\n",
+        "after": "A rule learned from data.\n"
+      },
+      {
+        "question": "Explain a model.",
+        "reference": "A rule learned from data.",
+        "before": "\n",
+        "after": "A rule learned from data.\n"
+      },
+      {
+        "question": "What does a telescope collect?",
+        "reference": "Light.",
+        "before": "\n",
+        "after": "Light.\n"
+      },
+      {
+        "question": "What can a telescope collect?",
+        "reference": "Light.",
+        "before": "\n",
+        "after": "Light.\n"
+      },
+      {
+        "question": "What do telescopes collect?",
+        "reference": "Light.",
+        "before": "\n",
+        "after": "Light.\n"
+      },
+      {
+        "question": "Name what a telescope collects.",
+        "reference": "Light.",
+        "before": "\n",
+        "after": "Light.\n"
+      }
+    ],
+    "validation_samples": [
+      {
+        "question": "Describe DNA.",
+        "reference": "A sequence of bases.",
+        "before": "\n",
+        "after": "A sequence of bases.\n"
+      },
+      {
+        "question": "Describe a protein.",
+        "reference": "A chain of amino acids.",
+        "before": "\n",
+        "after": "Light measured by wavelength.\n"
+      },
+      {
+        "question": "Describe a spectrum.",
+        "reference": "Light measured by wavelength.",
+        "before": "\n",
+        "after": "Light measured by wavelength.\n"
+      },
+      {
+        "question": "Explain a label.",
+        "reference": "A target for a sample.",
+        "before": "\n",
+        "after": "A target for a sample.\n"
+      },
+      {
+        "question": "Explain training.",
+        "reference": "Learning from data.",
+        "before": "\n",
+        "after": "Learning from data.\n"
+      },
+      {
+        "question": "Explain validation.",
+        "reference": "Checking on held out data.",
+        "before": "\n",
+        "after": "Checking on held out data.\n"
+      },
+      {
+        "question": "Tell me about a model.",
+        "reference": "A rule learned from data.",
+        "before": "\n",
+        "after": "A rule learned from data.\n"
+      },
+      {
+        "question": "What does the telescope collect?",
+        "reference": "Light.",
+        "before": "\n",
+        "after": "Light.\n"
+      }
+    ]
+  },
+  "limits": [
+    "Repeated known benchmark, not an independent new scientific evaluation.",
+    "Fixed Q&A validation was used in course development, not a blind test.",
+    "New phrasing generalization and research dialogue are not validated by these code runs."
+  ]
+}
