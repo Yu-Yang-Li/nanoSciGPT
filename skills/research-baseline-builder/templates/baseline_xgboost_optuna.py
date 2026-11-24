@@ -16,6 +16,7 @@ from pathlib import Path
 import joblib, numpy as np, optuna, pandas as pd, xgboost as xgb
 from sklearn.metrics import accuracy_score, mean_squared_error, r2_score
 from sklearn.model_selection import KFold, StratifiedKFold, cross_val_score, train_test_split
+from sklearn.preprocessing import LabelEncoder
 warnings.filterwarnings("ignore")
 optuna.logging.set_verbosity(optuna.logging.WARNING)
 
@@ -93,11 +94,13 @@ def train_eval(X, y, cfg, data_mode="demo", source=None):
     X_tr, X_te, y_tr, y_te = train_test_split(
         X, y, test_size=cfg["test_size"], random_state=cfg["random_state"],
         stratify=y if is_clf else None)
+    encoder = LabelEncoder().fit(y_tr) if is_clf else None
+    y_fit = encoder.transform(y_tr) if is_clf else y_tr
     emit(f"[数据模式] {data_mode}：{'当前使用示例数据，不代表用户真实数据结果。' if data_mode == 'demo' else '当前使用用户提供的数据文件。'}", log_lines)
     emit(f"[数据] train={X_tr.shape} test={X_te.shape}", log_lines)
     study = optuna.create_study(direction="maximize",
         sampler=optuna.samplers.TPESampler(seed=cfg["random_state"]))
-    study.optimize(make_objective(X_tr, y_tr, cfg), n_trials=cfg["n_trials"], timeout=cfg["timeout"])
+    study.optimize(make_objective(X_tr, y_fit, cfg), n_trials=cfg["n_trials"], timeout=cfg["timeout"])
     emit(f"[Optuna] best_cv={study.best_value:.4f}", log_lines)
     emit(f"[Optuna] best_params={study.best_params}", log_lines)
 
@@ -110,9 +113,10 @@ def train_eval(X, y, cfg, data_mode="demo", source=None):
         model = xgb.XGBClassifier(**bp)
     else:
         model = xgb.XGBRegressor(**bp)
-    model.fit(X_tr, y_tr)
+    model.fit(X_tr, y_fit)
     yp = model.predict(X_te)
     if is_clf:
+        yp = encoder.inverse_transform(yp)
         acc = accuracy_score(y_te, yp)
         emit(f"[Test] accuracy={acc:.4f}", log_lines)
         metrics = {"test_accuracy": float(acc)}
@@ -122,7 +126,10 @@ def train_eval(X, y, cfg, data_mode="demo", source=None):
         emit(f"[Test] RMSE={rmse:.4f} R2={r2:.4f}", log_lines)
         metrics = {"test_rmse": float(rmse), "test_r2": float(r2)}
     cfg["model_save_path"].parent.mkdir(parents=True, exist_ok=True)
-    joblib.dump({"model": model, "best_params": bp}, cfg["model_save_path"])
+    bundle = {"model": model, "best_params": bp}
+    if is_clf:
+        bundle["label_encoder"] = encoder
+    joblib.dump(bundle, cfg["model_save_path"])
     emit(f"[保存] {cfg['model_save_path']}", log_lines)
     summary = {
         "schema": "research_baseline_summary_v1",
