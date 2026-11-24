@@ -154,6 +154,14 @@ py -3.12 -m venv .venv
 
 ## 4. 真实输入、输出与课程资料
 
+修订后的 ATLAS-A 课堂包也提供 DSK 实验入口。将 04 和 06 学生包分别解压后运行：
+
+```bash
+python -m autoresearch.classroom_dsk --lesson path/to/04 --client-dir path/to/06 --output atlas-dsk-run
+```
+
+这一入口使用 06 包的个人接口配置。DSK 读开发记录给出三次提议，本地 CPU 训练和锁定后确认，最后生成短报告和独立上下文的四项评分。输出目录含逐轮理由、请求和响应、锁定记录、逐种子误差以及分阶段用时。已完成的实验可通过 `--writeup-from atlas-dsk-run` 在新输出目录中校核数据后只做写作和评审。
+
 上面的提问是**使用示例**，不是伪造的逐字实测记录。原始输入与实际回复另存：
 
 - [LAMOST 实测对话](docs/acceptance/cli-after-repair-2026-09-05/baseline/dialogue.md)
