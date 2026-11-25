@@ -64,6 +64,25 @@ def test_demo_fixtures_only_include_seed_53():
             assert len(arrays["53_y"]) == 32
 
 
+def test_every_domain_feeds_its_encoder_into_the_same_nanogpt_blocks():
+    import torch
+    from nanoscigpt.core.gpt import Block
+    from nanoscigpt.scientific.scigpt import SciGPT
+    from nanoscigpt.tasks import one_backbone
+
+    block_shapes = set()
+    for domain in one_backbone.DOMAINS:
+        make_encoder, block_size, parts = one_backbone.load(domain, DATA_ROOT)
+        model = SciGPT(make_encoder(), block_size, n_embd=one_backbone.N_EMBD)
+        assert all(type(block) is Block for block in model.blocks)
+        block_shapes.add(tuple(p.shape for p in model.blocks.parameters()))
+        labeled = parts["53"]["inputs"]
+        hidden, _ = model.hidden(labeled)
+        assert model(labeled).shape == (32,)
+        assert torch.isfinite(model.encoder.next_token_loss(hidden, labeled))
+    assert len(block_shapes) == 1
+
+
 @pytest.mark.parametrize("domain", RUNNABLE)
 def test_preflight_accepts_all_bundled_domains(domain):
     from nanoscigpt.classroom import validate_domain_data
