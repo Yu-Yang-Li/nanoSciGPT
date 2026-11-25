@@ -75,8 +75,11 @@ def run(domain, data_root, out_root, overwrite=False):
     measured = config.get("variant") == "measured_sequence"
     if measured:
         module = "measured_sequence"
+    thermo = domain == "rna" and config.get("variant") == "duplex_free_energy"
+    if thermo:
+        module = "rna_duplex"
     fit = import_module(f"{__name__}.{module}").fit
-    classification = domain in ("text", "protein", "rna") and not (word_count or measured)
+    classification = domain in ("text", "protein", "rna") and not (word_count or measured or thermo)
     metric = "balanced_accuracy" if classification else "MAE"
     tests = [splits["group1"], splits["group2"]]
     test_inputs = [{k: v for k, v in test.items() if k != "y"} for test in tests]
@@ -148,5 +151,5 @@ def run(domain, data_root, out_root, overwrite=False):
     )
     for method, (first, second) in zip(METHODS, means):
         print(f"{method:18} {first:.6f}  {second:.6f}")
-    print(f"paired wins: {counts[0]}/5, {counts[1]}/5")
+    print(f"paired wins: {counts[0]}/{len(rows)}, {counts[1]}/{len(rows)}")
     return record

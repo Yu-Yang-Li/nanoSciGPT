@@ -79,3 +79,5 @@ The classroom small-molecule logP fixture is derived from Cirino et al., Sangste
 
 The v7 protein teaching panel is adapted from Bouwmeester et al., DeepLC (2021), CC BY 4.0. See [source, authors and transformations](data/protein/three_rows/SOURCES.md).
 The v7 dna teaching panel is adapted from Ke et al., Array Melt (2025), CC BY 4.0. See [source, authors and transformations](data/dna/three_rows/SOURCES.md).
+
+The v8 RNA demonstration uses experimental short-duplex measurements from Zuber et al. (2022) and Sieg et al. (2023). See the [source tables, licenses, attribution and transformations](data/rna/three_rows/SOURCES.md).

@@ -51,6 +51,19 @@ def test_default_and_original_classroom_profiles():
     assert original["n_embd"] <= 64
 
 
+def test_demo_fixtures_only_include_seed_53():
+    import numpy as np
+    from nanoscigpt.tasks.three_rows import DOMAINS
+
+    for domain in DOMAINS:
+        folder = DATA_ROOT / domain / "three_rows"
+        settings = json.loads((folder / "settings.json").read_text(encoding="utf8"))
+        assert list(settings["seeds"]) == ["53"]
+        with np.load(folder / "fixture.npz", allow_pickle=False) as arrays:
+            assert {key.split("_", 1)[0] for key in arrays} == {"53", "aux", "group1", "group2"}
+            assert len(arrays["53_y"]) == 32
+
+
 @pytest.mark.parametrize("domain", RUNNABLE)
 def test_preflight_accepts_all_bundled_domains(domain):
     from nanoscigpt.classroom import validate_domain_data

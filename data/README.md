@@ -1,6 +1,6 @@
 # 内置课堂数据
 
-默认的 11 份学生实验保存在各方向的 `three_rows/` 下。每份的 `fixture.npz` 存放训练和确认数据，`settings.json` 记录其 SHA-256、五个种子及训练参数。[十一方向数据、模型与参考成绩](../docs/eleven-domain-examples.md)
+默认的 11 份学生实验保存在各方向的 `three_rows/` 下。每份的 `fixture.npz` 存放训练和确认数据，`settings.json` 记录其 SHA-256、演示种子 53 及训练参数。[十一方向数据、模型与参考成绩](../docs/eleven-domain-examples.md)
 
 下表列出十份原始教学对照及两份开场数据。原始任务通过 `--profile classroom` 或 `--profile smoke` 运行。来源、用途和所需文件见[原始任务清单](manifest.json)，使用与引用说明见[第三方告知](../THIRD_PARTY_NOTICES.md)。
 
