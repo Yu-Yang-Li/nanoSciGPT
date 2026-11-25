@@ -14,7 +14,7 @@ import numpy as np
 SEQUENCE_DOMAINS = ("text", "protein", "dna", "smiles")
 STRUCTURED_DOMAINS = ("weather", "crystal", "structure3d", "image", "spectrum", "field")
 RUNNABLE_DOMAINS = SEQUENCE_DOMAINS + STRUCTURED_DOMAINS
-DEFAULT_PROFILE = "classroom"
+DEFAULT_PROFILE = "three-rows"
 CPU_PROFILES = {
     "smoke": {
         "device": "cpu",
@@ -326,36 +326,46 @@ def list_domains(data_root):
 
 
 def main():
+    from .tasks import three_rows
+
     parser = argparse.ArgumentParser(
         description="Run an offline, CPU-first nanoSciGPT classroom example."
     )
-    parser.add_argument("--domain", choices=RUNNABLE_DOMAINS + ("all",))
-    parser.add_argument("--profile", choices=tuple(CPU_PROFILES), default=DEFAULT_PROFILE)
+    parser.add_argument("--domain", choices=(*three_rows.DOMAINS, "all"))
+    parser.add_argument("--profile", choices=(DEFAULT_PROFILE, *CPU_PROFILES), default=DEFAULT_PROFILE,
+                        help="three-rows (default): 11 student tasks; classroom and smoke: 10 original tasks")
     parser.add_argument("--data_root", default="data")
     parser.add_argument("--out_root", default="out/classroom")
     parser.add_argument(
         "--overwrite", action="store_true", help="replace a finished run in the target directory"
     )
-    parser.add_argument("--list", action="store_true", help="show only choices that are ready")
+    parser.add_argument("--list", action="store_true", help="show data availability for the selected profile")
     args = parser.parse_args()
 
+    paired = args.profile == DEFAULT_PROFILE
+    available = three_rows.DOMAINS if paired else RUNNABLE_DOMAINS
     if args.list:
-        list_domains(args.data_root)
+        if paired:
+            for domain in available:
+                folder = Path(args.data_root) / domain / "three_rows"
+                ready = all((folder / name).is_file() for name in ("settings.json", "fixture.npz"))
+                print(f"{domain}: {'ready' if ready else 'missing data'} ({folder})")
+        else:
+            list_domains(args.data_root)
         return
     if not args.domain:
         parser.error(
             "choose a domain reported by --list, choose --domain all, or use --list"
         )
-    domains = RUNNABLE_DOMAINS if args.domain == "all" else (args.domain,)
+    if args.domain != "all" and args.domain not in available:
+        parser.error(f"{args.domain} is unavailable in --profile {args.profile}; use --profile three-rows")
+    domains = available if args.domain == "all" else (args.domain,)
     for domain in domains:
         try:
-            run_domain(
-                domain,
-                args.profile,
-                args.data_root,
-                args.out_root,
-                overwrite=args.overwrite,
-            )
+            if paired:
+                three_rows.run(domain, args.data_root, args.out_root, overwrite=args.overwrite)
+            else:
+                run_domain(domain, args.profile, args.data_root, args.out_root, overwrite=args.overwrite)
         except FileExistsError as error:
             parser.error(str(error))
 

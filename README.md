@@ -4,6 +4,8 @@
 
 从科学问题出发，先做分类或回归，再用小模型学习预训练与微调，最后讨论怎样让研究 Agent 继续实验。可以选课程样例，也可以带自己的数据；不用先会写模型代码。
 
+从仓库根目录运行 `python -m nanoscigpt.classroom --domain protein`，即可用 32 个精确标签预测酵母肽段的色谱保留时间。默认入口与 v7 学生包的三行实验使用同一批数据、模型和训练配置。`--list` 查看全部 11 个方向，`--domain all` 依次训练。每个方向输出 `three_rows.csv` 和逐种子回执。[任务、安装版本和参考成绩](docs/eleven-domain-examples.md)
+
 ## 当前光变课堂（2026-09-07）
 
 先按下方“下载与安装”准备环境，再从[课堂提问](docs/classroom-lightcurve-prompts.md)开始。第一轮在仓库目录对助手说：
@@ -91,7 +93,7 @@ py -3.12 -m venv .venv
 使用仓库 .venv 中的 Python，并解释两次训练分别学什么。
 ```
 
-没有选好方向，直接问“你可以带我做哪些数据？”即可。不必都选蛋白质，也不必运行所有领域。
+默认的 11 个方向在[学生实验表](docs/eleven-domain-examples.md)中列出。下表是保留的十个原始教学对照，运行时显式指定 `--profile classroom`；例如 `python -m nanoscigpt.classroom --profile classroom --domain protein`。快速走通旧流程可用 `--profile smoke`。
 
 | 名称 | 数据形式 | 课程数据身份 |
 |---|---|---|

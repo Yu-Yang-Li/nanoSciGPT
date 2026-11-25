@@ -74,3 +74,8 @@ Exact URLs and bundled files are recorded in `data/manifest.json`.
 The six structured fixtures (`weather`, `crystal`, `structure3d`, `image`,
 `spectrum`, and `field`) are generated locally by nanoSciGPT. They do not
 contain third-party observational or simulation data.
+
+The classroom small-molecule logP fixture is derived from Cirino et al., SangsterLogP dataset v1 (CC BY 4.0). See [source and transformations](data/smiles/three_rows/SOURCES.md).
+
+The v7 protein teaching panel is adapted from Bouwmeester et al., DeepLC (2021), CC BY 4.0. See [source, authors and transformations](data/protein/three_rows/SOURCES.md).
+The v7 dna teaching panel is adapted from Ke et al., Array Melt (2025), CC BY 4.0. See [source, authors and transformations](data/dna/three_rows/SOURCES.md).

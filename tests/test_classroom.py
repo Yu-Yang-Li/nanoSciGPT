@@ -40,14 +40,15 @@ def test_bundled_data_manifest_covers_every_runnable_domain():
             assert (ROOT / relative_path).is_file(), (domain, relative_path)
 
 
-def test_classroom_profiles_default_to_small_cpu_runs():
+def test_default_and_original_classroom_profiles():
     from nanoscigpt.classroom import CPU_PROFILES, DEFAULT_PROFILE
 
-    assert DEFAULT_PROFILE == "classroom"
-    assert CPU_PROFILES[DEFAULT_PROFILE]["device"] == "cpu"
-    assert CPU_PROFILES[DEFAULT_PROFILE]["max_iters"] <= 30
-    assert CPU_PROFILES[DEFAULT_PROFILE]["n_layer"] <= 2
-    assert CPU_PROFILES[DEFAULT_PROFILE]["n_embd"] <= 64
+    assert DEFAULT_PROFILE == "three-rows"
+    original = CPU_PROFILES["classroom"]
+    assert original["device"] == "cpu"
+    assert original["max_iters"] <= 30
+    assert original["n_layer"] <= 2
+    assert original["n_embd"] <= 64
 
 
 @pytest.mark.parametrize("domain", RUNNABLE)
@@ -183,8 +184,22 @@ def test_classroom_list_only_offers_domains_that_pass_preflight():
         timeout=30,
     )
 
-    for domain in RUNNABLE:
+    for domain in (*RUNNABLE, "rna"):
         assert f"{domain}: ready" in completed.stdout
+
+
+@pytest.mark.parametrize("choice", (*RUNNABLE, "rna", "all"))
+def test_default_routes_to_the_student_data(monkeypatch, tmp_path, choice):
+    from nanoscigpt import classroom
+    from nanoscigpt.tasks import three_rows
+
+    called = []
+    monkeypatch.setattr(three_rows, "run", lambda *args, **kw: called.append((args, kw)))
+    monkeypatch.setattr(sys, "argv", ["classroom", "--domain", choice, "--data_root", str(DATA_ROOT),
+                                     "--out_root", str(tmp_path), "--overwrite"])
+    classroom.main()
+    domains = three_rows.DOMAINS if choice == "all" else (choice,)
+    assert called == [((d, str(DATA_ROOT), str(tmp_path)), {"overwrite": True}) for d in domains]
 
 
 def test_text_lesson_keeps_training_history_sample_and_task_head_identity(tmp_path):
