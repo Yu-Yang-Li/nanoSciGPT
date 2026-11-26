@@ -21,29 +21,41 @@ DATA = Path(__file__).resolve().parents[2] / "data" / "eleven"
 
 # readout: "probe" = frozen backbone + ridge regression; "finetune" = all weights, 200 steps.
 # budget: "fixed" = 1,600 pretraining updates at every size; "passes" = size // 2 updates.
+# data, question, label: the plain-language description shown to students and the public.
 FIELDS = {
     "spectrum": dict(name="光谱", kind="patch", width=4, positions=16, task="紫外/可见通量比（log10）", readout="probe", budget="passes",
-                     token="连续 4 个波长采样点的通量"),
+                     token="连续 4 个波长采样点的通量",
+                     data="模拟", question="看可见光部分，推测紫外有多亮", label="模拟设定"),
     "protein": dict(name="蛋白质", kind="symbol", vocab=19, positions=32, task="色谱保留时间（分钟）", readout="probe", budget="fixed",
-                    token="1 个氨基酸"),
+                    token="1 个氨基酸",
+                    data="真实", question="预测蛋白质片段在仪器里多久流出来", label="实验测的"),
     "dna": dict(name="DNA", kind="symbol", vocab=6, positions=64, task="发夹熔解温度（°C）", readout="finetune", budget="fixed",
-                token="1 个碱基"),
+                token="1 个碱基",
+                data="真实", question="预测一小段 DNA 加热到多少度会解开", label="实验测的"),
     "rna": dict(name="RNA", kind="symbol", vocab=6, positions=32, task="三核苷酸熵（bit）", readout="probe", budget="fixed",
-                token="1 个碱基"),
+                token="1 个碱基",
+                data="真实", question="判断一段序列有多少重复", label="直接数出来的"),
     "smiles": dict(name="小分子", kind="symbol", vocab=27, positions=22, task="sp³ 杂化碳比例", readout="probe", budget="fixed",
-                   token="1 个 SMILES 词法单元"),
-    "crystal": dict(name="晶体", kind="crystal", positions=6, task="赝立方晶格常数（Å）", readout="finetune", budget="fixed",
-                    token="晶格矩阵 1 个，之后每个原子 1 个（元素 + 分数坐标）"),
+                   token="1 个 SMILES 词法单元",
+                   data="真实分子", question="预测分子里饱和碳占多少", label="由结构式算出来的"),
+    "crystal": dict(name="晶体", kind="crystal", positions=6, task="形成能（eV/晶胞）", readout="finetune", budget="passes",
+                    token="晶格矩阵 1 个，之后每个原子 1 个（元素 + 分数坐标）",
+                    data="计算", question="预测晶体稳不稳定", label="量子力学计算"),
     "structure3d": dict(name="三维结构", kind="patch", width=16, positions=16, task="首尾距（键长）", readout="probe", budget="fixed",
-                        token="距离矩阵中的 1 个 4×4 块（遮去含首尾距的两块）"),
+                        token="距离矩阵中的 1 个 4×4 块（遮去含首尾距的两块）",
+                        data="模拟", question="根据部分原子间的距离，推测分子链两端相距多远", label="模拟设定"),
     "weather": dict(name="天气场", kind="patch", width=64, positions=16, task="平均云团亮度", readout="probe", budget="fixed",
-                    token="同一 4×4 区域连续四帧"),
+                    token="同一 4×4 区域连续四帧",
+                    data="简化模拟", question="看几帧云团移动的画面，估计云团有多亮", label="模拟设定"),
     "field": dict(name="扩散场", kind="patch", width=16, positions=16, task="扩散系数（log10）", readout="finetune", budget="passes",
-                  token="4 个相邻位置连续四帧"),
+                  token="4 个相邻位置连续四帧",
+                  data="模拟", question="看几帧画面，推测扩散得多快", label="模拟设定"),
     "image": dict(name="天文图像", kind="patch", width=16, positions=16, task="星像半高全宽（像素）", readout="probe", budget="fixed",
-                  token="4×4 像素块"),
+                  token="4×4 像素块",
+                  data="模拟", question="估计星点有多模糊", label="模拟设定"),
     "text": dict(name="文本", kind="symbol", vocab=28, positions=62, task="去空格后的词数", readout="finetune", budget="fixed",
-                 token="1 个字母或空格"),
+                 token="1 个字母或空格",
+                 data="真实", question="去掉空格后，数原来有几个词", label="直接数出来的"),
 }
 SIZES = {"unlabeled": 12800, "pool": 256, "dev": 480, "A": 480, "B": 480}
 
@@ -293,7 +305,8 @@ def main():
     args = parser.parse_args()
     torch.set_num_threads(2)
     spec = FIELDS[args.field]
-    print(f"{spec['name']}：一个 token = {spec['token']}；下游任务：{spec['task']}")
+    print(f"{spec['name']}（{spec['data']}数据）：{spec['question']}。标签：{spec['label']}")
+    print(f"一个 token = {spec['token']}；下游任务：{spec['task']}")
     parts, task = load(args.field)
     show_tokens(args.field, {k: v[0] for k, v in task["A"][0].items()})
     parts, task = normalize(args.field, parts, task, args.seed)
