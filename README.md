@@ -4,7 +4,9 @@
 
 从科学问题出发，先做分类或回归，再用小模型学习预训练与微调，最后讨论怎样让研究 Agent 继续实验。可以选课程样例，也可以带自己的数据；不用先会写模型代码。
 
-**从预训练规模实验开始。** 安装本项目后，运行 `python -m nanoscigpt.tasks.structure_scale`。程序在 CPU 上生成模拟链，遮去含有答案的两个距离块，用同一批 32 个标签预测链的首尾距。默认用种子 53 训练 200、800、3,200 三档，各输出两组新样本上的平均绝对误差。十一方向共享两层 nanoGPT 和一个标量读出，换的是科学输入的编码方式。五种子实验中，8 个方向在两组确认集上都随四档规模逐档改善。[十一方向数据、编码与曲线](docs/pretraining-scale/README.md) · [可运行的 Notebook](docs/pretraining-scale/structure-scale.ipynb)
+**从预训练规模实验开始。** 安装本项目后，运行 `python -m nanoscigpt.tasks.structure_scale`。程序在 CPU 上生成模拟链，遮去含有答案的两个距离块，用同一批 32 个标签预测链的首尾距。默认用种子 53 训练 200、800、3,200 三档，各输出两组新样本上的平均绝对误差。十一方向共享两层 nanoGPT 和一个标量读出，换的是科学输入的编码方式。五种子实验中，9 个方向在两组确认集上都随四档规模逐档改善。[十一方向数据、编码与曲线](docs/pretraining-scale/README.md) · [可运行的 Notebook](docs/pretraining-scale/structure-scale.ipynb)
+
+要单独观察数据量的作用，可运行 `python docs/pretraining-scale/symbol-scaling/run_rna.py`。四档使用真实核糖体 RNA 片段，每档固定 1,600 次更新，比较相同留出片段上的下一 token 交叉熵。[RNA 离线复现与结果](docs/pretraining-scale/symbol-scaling/README.md)
 
 早期三行对照仍可用 `python -m nanoscigpt.classroom --domain protein` 运行，预测酵母肽段色谱保留时间。`--list` 列出所有方向。[三行实验及成绩](docs/eleven-domain-examples.md)
 

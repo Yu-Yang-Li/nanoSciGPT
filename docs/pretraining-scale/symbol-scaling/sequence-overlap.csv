@@ -1,0 +1,5 @@
+﻿domain,group,source_groups,n,exact_either_strand,within_one_substitution_either_strand
+dna,A,2,480,0,1
+dna,B,2,480,0,0
+rna,A,17,480,0,16
+rna,B,19,480,0,17
