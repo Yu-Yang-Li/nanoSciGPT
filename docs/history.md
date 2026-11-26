@@ -2,6 +2,24 @@
 
 这一页收录 2026 年 9 月到 11 月初的课堂入口、验收记录和使用说明，原样保留，供查阅。项目当前的用法和结果见[首页](../README.md)。
 
+## 2026-11-26 复跑记录
+
+在空目录克隆本分支，用 Windows、Python 3.12、CPU 版 torch 2.12.0 把本页的命令逐条重跑，结果如下。
+
+| 命令 | 结果 | 用时 |
+|---|---|---:|
+| `nanoscigpt.classroom --list` | 可以运行 | 4 秒 |
+| `nanoscigpt.classroom --domain protein`（三行对照） | 可以运行 | 9 秒 |
+| `nanoscigpt.baseline --case lamost` | 可以运行 | 21 秒 |
+| `nanoscigpt.classroom --domain text --profile classroom` | 可以运行 | 29 秒 |
+| `nanoscigpt.tasks.text_sft` | 可以运行 | 12 秒 |
+| `nanoscigpt.classroom --domain protein --profile classroom` | 可以运行 | 25 秒 |
+| `nanoscigpt.tasks.downstream_demo ... --adaptation finetune` | 可以运行 | 6 秒 |
+| `nanoscigpt.classroom --profile smoke` | 可以运行 | 22 秒 |
+| `autoresearch.classroom_dsk` | **克隆后不能直接运行**：需要单独发放的 04、06 课堂包，仓库里没有；只有 `--help` 能运行 | — |
+
+光变课堂的命令在 [starlight-classroom.md](starlight-classroom.md)，要先下载约 110 MB 数据，这次没有复跑。
+
 ## 三行对照（随机森林、直接微调、预训练后微调）
 
 三行对照仍可用 `python -m nanoscigpt.classroom --domain protein` 运行，预测酵母肽段色谱保留时间。`--list` 列出所有方向。[三行实验及成绩](eleven-domain-examples.md)
@@ -161,6 +179,8 @@ py -3.12 -m venv .venv
 ```bash
 python -m autoresearch.classroom_dsk --lesson path/to/04 --client-dir path/to/06 --output atlas-dsk-run
 ```
+
+> **2026-11-26 复跑**：这条命令需要单独发放的 04、06 课堂包，仓库里没有，克隆后不能直接运行。
 
 这一入口使用 06 包的个人接口配置。DSK 读开发记录给出三次提议，本地 CPU 训练和锁定后确认，最后生成短报告和独立上下文的四项评分。输出目录含逐轮理由、请求和响应、锁定记录、逐种子误差以及分阶段用时。已完成的实验可通过 `--writeup-from atlas-dsk-run` 在新输出目录中校核数据后只做写作和评审。
 

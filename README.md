@@ -46,7 +46,7 @@
 | 扩散场（默认） | 25 秒 | 0.130 / 0.124 / 0.094 | 0.170 | 是 |
 | 光谱 | 17 秒 | 0.112 / 0.094 / 0.062 | 0.330 | 是 |
 | 蛋白质 | 57 秒 | 13.20 / 13.95 / 8.02 | 10.84 | 否 |
-| DNA | 约 100 秒 | 5.26 / 5.05 / 4.15 | 7.03 | 是 |
+| DNA | 189 秒 | 5.26 / 5.05 / 4.15 | 7.03 | 是 |
 | RNA | 56 秒 | 0.310 / 0.254 / 0.169 | 0.174 | 是 |
 | 小分子 | 46 秒 | 0.200 / 0.147 / 0.092 | 0.236 | 是 |
 | 晶体 | 31 秒 | 0.067 / 0.078 / 0.048 | 0.224 | 否 |
@@ -55,7 +55,7 @@
 | 天文图像 | 38 秒 | 0.708 / 0.567 / 0.431 | 0.625 | 是 |
 | 文本 | 103 秒 | 1.295 / 1.392 / 1.272 | 1.243 | 否 |
 
-单个种子、单组留出、只到 3,200 档时，曲线会有起伏，上图的五种子平均才是结论依据。种子 53 的每个数都和五种子实验里同一种子的记录一致。
+单个种子、单组留出、只到 3,200 档时，曲线会有起伏，上图的五种子平均才是结论依据。在 Windows 上，种子 53 的每个数都和五种子实验里同一种子的记录一致；Linux 上浮点计算顺序不同，预训练损失差 2% 以内，单种子下游误差可能差到 20% 左右。
 
 **命令行。** 需要 Python 3.10 及以上和 Git。
 
@@ -68,12 +68,14 @@ python -m venv .venv
 .venv/bin/python -m nanoscigpt.tasks.eleven --field field
 ```
 
-Windows 把 `.venv/bin/python` 换成 `.venv\Scripts\python.exe`。在本机打开 Notebook 需要先装 Jupyter：`.venv/bin/python -m pip install notebook`，再运行 `.venv/bin/python -m jupyter notebook`。不打开界面、直接整本执行可以用 `.venv/bin/python -m jupyter nbconvert --to notebook --execute notebooks/eleven_fields.ipynb --output-dir out`，执行后的 Notebook 存在 `out/eleven_fields.ipynb`。最后一条命令和 Notebook 做的事一样：先打印 token，再输出每档的预训练损失和下游误差。用 `--sizes 200,800,3200,12800` 可以加到最大档，`--seed` 可以换种子。种子 53 的结果和五种子实验里的同一种子逐项一致。
+Windows 把 `.venv/bin/python` 换成 `.venv\Scripts\python.exe`。在本机打开 Notebook 需要先装 Jupyter：`.venv/bin/python -m pip install notebook`，再运行 `.venv/bin/python -m jupyter notebook`。不打开界面、直接整本执行可以用 `.venv/bin/python -m jupyter nbconvert --to notebook --execute notebooks/eleven_fields.ipynb --output-dir out`，执行后的 Notebook 存在 `out/eleven_fields.ipynb`。最后一条命令和 Notebook 做的事一样：先打印 token，再输出每档的预训练损失和下游误差。用 `--sizes 200,800,3200,12800` 可以加到最大档，`--seed` 可以换种子。Windows 上种子 53 的结果和五种子实验里的同一种子逐项一致。照这一节在空目录首次安装的耗时和两个平台的结果，见 [首次使用检查](docs/first-run-2026-11-26.md)；从 PyTorch 官方源下载 torch 在当时的网络下要 27 到 36 分钟。
 
 ## 更多
 
 - [五种子完整实验与留出结果](docs/pretraining-scale/shared-checkpoints/README.md)，含读出方式、预算的选择规则和没有通过的任务
 - [只看预训练损失的四档总表与离线复现包](docs/pretraining-scale/data-scaling/README.md)
+- [扩散场上的自动研究](docs/autoresearch-field.md)：DSK 每轮提一个改动，和同预算随机搜索比较，各跑 3 次
+- [课堂提问](docs/classroom-prompts.md)
 - [三个教学 Skill](skills/README.md)：配合编程 Agent 做基线、预训练和研究迭代
 - [早期课堂与验收记录](docs/history.md)：2026 年 9 月的光变课堂、三行对照和旧验收
 

@@ -25,7 +25,7 @@ metadata:
 
 ## 按这次想做的研究选择入口
 
-准备实际执行某个原项目时，再读[原项目接入说明](references/native-projects.md)，并用可用的Python运行`python -m nanoscigpt.upstream doctor`。仅讨论方案时，先聊实验本身，不检查本机环境或替学生创建实验文件。源码准备与安装、调用API、训练是不同操作。
+准备实际执行某个原项目时，再读[原项目接入说明](../../../../skills/ai-scientist-research-loop/references/native-projects.md)，并用可用的Python运行`python -m nanoscigpt.upstream doctor`。仅讨论方案时，先聊实验本身，不检查本机环境或替学生创建实验文件。源码准备与安装、调用API、训练是不同操作。
 
 ### 围绕模型继续优化：autoresearch
 
@@ -75,6 +75,6 @@ Codex登录不等于原项目拥有模型API。缺少API时，可以完成源码
 
 只有学生明确想看无API离线演示时才用以下旧实现，并标明它们不是三个原项目的复现：
 
-- [固定预算比较](references/autoresearch-model-iteration.md)：`autoresearch.experiment`。
-- [已有结果整理](references/ai-scientist-v1-workflow.md)：`autoresearch.v1`。
-- [预设分支比较](references/ai-scientist-v2-tree-search.md)：`autoresearch.v2`。
+- [固定预算比较](../../../../skills/ai-scientist-research-loop/references/autoresearch-model-iteration.md)：`autoresearch.experiment`。
+- [已有结果整理](../../../../skills/ai-scientist-research-loop/references/ai-scientist-v1-workflow.md)：`autoresearch.v1`。
+- [预设分支比较](../../../../skills/ai-scientist-research-loop/references/ai-scientist-v2-tree-search.md)：`autoresearch.v2`。

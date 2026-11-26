@@ -17,7 +17,7 @@ CLI实际回复：
 - **真实微调**：32 个训练样本、2 个 epoch；16 个验证样本的准确率 `56.25% → 43.75%`，本轮效果下降。
 - 已验证预训练参数确实更新，原 checkpoint 保持不变。微调前使用新初始化任务头，不能视为训练充分的对照。
 
-查看[实验结果说明](C:/Users/16571/Documents/Codex/2026-09-04/nanoscigpt-classroom-hardening/out/cli-after-repair-protein/实验结果.md)。
+查看实验结果说明（当时教师机器上的文件，未随仓库提供）。
 
 本次仅写入新输出目录。核验发现既有 `docs/upstream-adaptation.md` 在运行期间发生变化，本任务未写入或覆盖该文件。
 
