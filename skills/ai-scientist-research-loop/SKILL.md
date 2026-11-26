@@ -41,18 +41,20 @@ metadata:
 
 ### 十一方向上的自动研究（课堂实例）
 
-学生在十一方向 Notebook 上跑通一个方向后，用 `autoresearch.eleven_search` 接着迭代。它固定主干（2 层、2 头、32 维），只允许改编码器切法、预训练目标与遮盖比例、预训练步数和学习率、读出方式；每轮在开发集上评估 5 个种子，只改不起作用的设置（例如每个 token 含 4 帧时的排列顺序）算作重复、不再评估，确认集只在全部轮次结束后评一次。加 `--version 1` 复现第一版（3 个种子、不合并等价配置）。
+学生在十一方向 Notebook 上跑通一个方向后，用 `autoresearch.common_search`（Notebook 第 7 节）接着迭代，十一个方向都能用。它固定主干（2 层、2 头、32 维），只允许改相邻 token 的合并、预训练目标与遮盖比例、预训练步数和学习率、读出方式和表示的汇总方式；每轮在开发集上评估 3 个种子，只改不起作用的设置算作重复、不再评估，留出组只在全部轮次结束后评一次。
 
 ```powershell
-python -m autoresearch.eleven_search --method model --repeat 1 --out out/autoresearch
-python -m autoresearch.eleven_search --method random --repeat 1 --out out/autoresearch
+python -m autoresearch.common_search --field field --method random
+python -m autoresearch.common_search --field field --method model
 ```
 
-`--method model` 由 DSK 读取此前每一轮的配置和开发集误差，提出下一个配置并写出理由；需要学生在自己的进程环境里设置 `SCNET_API_BASE`、`SCNET_API_KEY`、`SCNET_MODEL`，密钥不写进任何文件。`--method random` 是同样预算的随机搜索，不需要 API。课堂上的三次对比结果见 [自动研究结果](../../docs/autoresearch-field.md)：先读那里的结论再讲，不把单次运行的赢面说成方法的普遍优势。学生使用当前编程助手自带的模型时，也可以由你读取 `journal.json` 里的历史，按同样的规则提出下一个配置，再用脚本的评估函数运行。
+`--method model` 由 DSK 读取此前每一轮的配置和开发集误差，提出下一个配置并写出理由；需要学生在自己的进程环境里设置 `SCNET_API_BASE`、`SCNET_API_KEY`、`SCNET_MODEL`，密钥不写进任何文件。`--method random` 是同样预算的随机搜索，不需要 API。十一个方向的对比结果见 [十一方向的自动研究](../../docs/autoresearch-eleven.md)：先读那里的结论再讲，哪些方向没有跑赢随机搜索要照实说，不把单次运行的赢面说成方法的普遍优势。学生使用当前编程助手自带的模型时，也可以由你读取 `journal.json` 里的历史，按同样的规则提出下一个配置，再用 `common_search.score` 运行。
+
+扩散场上更早的两版实验用的是为扩散场单独写的搜索空间（`autoresearch.eleven_search`，可以改一个 token 含几个位置和几帧），结果见 [扩散场的自动研究](../../docs/autoresearch-field.md)。
 
 ### 调参智能体的经验积累（RSI 实例）
 
-讲“从研究迭代到 RSI”时用 GD-1 轨道拟合：`python -m autoresearch.stream_skill --out out/stream-skill`。DSK 在一次拟合里边看 χ² 边调 7 个轨道参数；每轮拟合两个训练场景后，对照真值改写自己的调参经验，锁定后到 8 个没见过的场景上盲测。先读[结果](../../docs/stream-skill.md)再讲：经验积累比空经验和随机搜索好，和 Nelder–Mead 相当，第 5 轮之后因为只看最新两个场景而回升。可以让学生对比第 5 轮和第 8 轮的经验原文，找出被最新场景带偏的规则。
+讲“从研究迭代到 RSI”时用 GD-1 轨道拟合。Notebook 第 8 节从存档的参数重画四组图，不需要 API：每一轮经验找到的轨道叠在观测点上、一次拟合之内的四次提交、经验里的规则逐轮怎么变、盲测成绩曲线。想从头再跑一遍用 `python -m autoresearch.stream_skill --out out/stream-skill`。DSK 在一次拟合里边看 χ² 边调 7 个轨道参数；每轮拟合两个训练场景后，对照真值改写自己的调参经验，锁定后到 8 个没见过的场景上盲测。先读[结果](../../docs/stream-skill.md)再讲：经验积累比空经验和随机搜索好，和 Nelder–Mead 相当，第 5 轮之后回升，原因没有单独验证过。可以让学生对比第 5 轮和第 8 轮的经验原文（`stream_plots.skill_text(5)`），找出被最新场景带偏的规则。
 
 ### 继续 9 月光变课堂的模型时
 

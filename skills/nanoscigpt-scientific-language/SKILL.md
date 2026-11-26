@@ -19,7 +19,7 @@ python -m nanoscigpt.tasks.eleven --field field
 
 `--field` 可选 `spectrum`、`protein`、`dna`、`rna`、`smiles`、`crystal`、`structure3d`、`weather`、`field`、`image`、`text`，默认扩散场 `field`。学生已经选了方向就沿用；还没选时只问一句“你想先看哪一种数据？”。课堂提问见 [课堂对话](../../docs/classroom-prompts.md)。
 
-讲 token 时对着实际输出说：Notebook 第二格（或命令行开头）会打印一条样本的前几个 token。例如扩散场的一个 token 是“4 个相邻位置在 4 帧里的浓度”，16 个数；蛋白质的一个 token 是一个氨基酸；晶体先放晶格矩阵，再每个原子一个 token。十一种数据共用同一个两层的 nanoGPT，换的只是编码器和读出头。十一方向的 token 定义见仓库 README 的表。
+讲 token 时对着实际输出说：Notebook 第 1 节画出几条样本和标签分布，第 2 节把同一条样本画成 token 并打印前几个（命令行开头也会打印）。例如扩散场的一个 token 是“4 个相邻位置在 4 帧里的浓度”，16 个数；蛋白质的一个 token 是一个氨基酸；晶体先放晶格矩阵，再每个原子一个 token。十一种数据共用同一个两层的 nanoGPT，换的只是编码器和读出头，第 3 节的参数图能直接看到。十一方向的 token 定义见仓库 README 的表。
 
 读结果时分三行讲：预训练损失是模型在留出样本上预测下一个 token 的误差；下游误差是用 32 个标签训练读出后，在留出组 A 上的平均绝对误差；“只猜平均值”和“不预训练”是两条对照。单个种子、只到 3,200 档时曲线会有起伏，结论以 [五种子结果](../../docs/pretraining-scale/shared-checkpoints/README.md) 为准。读出方式和预训练预算按方向固定在 `nanoscigpt/tasks/eleven.py` 的 `FIELDS` 里，结果页写明了为什么有的方向冻结主干、有的方向全参数微调。
 

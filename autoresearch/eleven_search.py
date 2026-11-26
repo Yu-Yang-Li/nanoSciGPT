@@ -194,7 +194,7 @@ def ask_model(prompt, temperature, max_tokens=1200):
                 payload = json.load(response)
             text = payload["choices"][0]["message"].get("content") or ""
             return text, {"model": payload.get("model"), "usage": payload.get("usage", {})}
-        except (urllib.error.URLError, TimeoutError) as error:
+        except (urllib.error.URLError, TimeoutError, ConnectionError) as error:  # the server may also drop the connection
             if attempt == 2:
                 raise RuntimeError(f"模型接口连续失败：{type(error).__name__}") from None
             time.sleep(2 ** attempt)

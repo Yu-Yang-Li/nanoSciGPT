@@ -39,45 +39,81 @@
 
 ## 怎么装、怎么跑
 
-**Notebook（推荐）。** 打开 [notebooks/eleven_fields.ipynb](notebooks/eleven_fields.ipynb)，在第一格把 `FIELD` 改成想看的方向（默认 `field`，即扩散场），然后从上到下运行。第一格会自己安装缺少的依赖，在魔搭 Notebook、本机 Jupyter 都能用，只需要 CPU。后面四格依次是：打印一条样本被切成的 token，用 200、800、3,200 个对象预训练，用 32 个标签训练下游读出，把预训练损失和下游误差画在一张图上。在仓库外单独打开 Notebook 时，第一格会先克隆仓库。
+**Notebook（推荐）。** [notebooks/eleven_fields.ipynb](notebooks/eleven_fields.ipynb) 是一本从头到尾的教程，每一节有图、有一两句说明、有可以改的参数。在第 0 节把 `FIELD` 改成想看的方向（默认 `field`，即扩散场），然后从上到下运行。只需要 CPU。
 
-第一格的用时取决于网络。在一台 24 核 Windows 电脑上，从只装了 Jupyter 内核的 Python 3.11 环境开始，第一格从 PyTorch 官方源装 CPU 版 torch 2.15.0、NumPy、scikit-learn 和 Matplotlib，约用 10.5 分钟，几乎都花在下载 torch 上。魔搭 Notebook 的镜像通常自带 torch，这一步会跳过。依赖装好后，11 个方向各跑一遍都没有报错，整本 Notebook 的用时如下（三个方向同时运行，每个用 2 个线程）。默认方向是扩散场。
+| 节 | 做什么 | 能看到什么 | 可以改的参数 |
+|---|---|---|---|
+| 0 | 选方向，装依赖 | 这个方向要回答的问题、数据是真实还是模拟、标签怎么来的 | `FIELD`、`SEED`、`N_LABELS`、`THREADS` |
+| 1 | 看数据 | 标签偏低、居中、偏高的三条样本，标签的分布 | `N_EXAMPLES` |
+| 2 | 预处理 | 同一条样本画成 token；标准化前后的数值分布 | `ROW` |
+| 3 | 搭模型 | 编码器结构；和另一个方向对比每一段的参数个数 | `COMPARE_WITH` |
+| 4 | 预训练 | 每一档数据量的训练曲线和留出损失 | `SIZES` |
+| 5 | 下游训练 | 留出组上预测值对真实值，预训练前后对比 | `READOUT`、`COMPARE` |
+| 6 | 评测 | 下游误差随预训练数据量的变化，和两条基线比 | |
+| 7 | 自动研究 | 存档的搜索过程和十一方向对照；现场跑一次搜索 | `METHOD`、`ROUNDS`、`DEV_SEEDS` |
+| 8 | 星流轨道拟合 | 轨道叠在观测点上随轮次怎么变、经验怎么改写、盲测成绩 | `SCENARIO`、`SHOW_ROUNDS`、`READ_ROUND` |
 
-| 方向 | 整本用时 | 种子 53 的下游误差（200 / 800 / 3,200） | 只猜均值 | 三档逐档下降 |
-|---|---:|---|---:|:---:|
-| 扩散场（默认） | 25 秒 | 0.130 / 0.124 / 0.094 | 0.170 | 是 |
-| 光谱 | 17 秒 | 0.112 / 0.094 / 0.062 | 0.330 | 是 |
-| 蛋白质 | 57 秒 | 13.20 / 13.95 / 8.02 | 10.84 | 否 |
-| DNA | 189 秒 | 5.26 / 5.05 / 4.15 | 7.03 | 是 |
-| RNA | 56 秒 | 0.310 / 0.254 / 0.169 | 0.174 | 是 |
-| 小分子 | 46 秒 | 0.200 / 0.147 / 0.092 | 0.236 | 是 |
-| 晶体 | 24 秒 | 0.607 / 0.597 / 0.560 | 0.551 | 是 |
-| 三维结构 | 39 秒 | 0.9997 / 0.8652 / 0.8647 | 2.950 | 是 |
-| 天气场 | 36 秒 | 0.150 / 0.168 / 0.161 | 0.166 | 否 |
-| 天文图像 | 38 秒 | 0.708 / 0.567 / 0.431 | 0.625 | 是 |
-| 文本 | 103 秒 | 1.295 / 1.392 / 1.272 | 1.243 | 否 |
+第 0 节会自己安装缺少的依赖，在仓库外单独打开时会先克隆仓库。机器上没有中文字体时，它会下载一次 Noto Sans SC（约 8 MB）用来显示图里的中文。魔搭 Notebook 的镜像通常自带 torch，装依赖这一步会跳过。
+
+依赖装好后，默认方向每一节的用时（24 核 Windows 电脑，2 个线程，机器上同时有别的任务）：看数据、切 token、搭模型共 2 秒，预训练三档 31 秒，下游训练和评测 38 秒，读自动研究的存档 1 秒，现场随机搜索 2 轮 204 秒，星流的四组图 2 秒。
+
+十一个方向各把整本 Notebook 跑了一遍，都没有报错：
+
+| 方向 | 整本用时 | 其中预训练 | 下游和评测 | 种子 53 的下游误差（200 / 800 / 3,200） | 不预训练 | 只猜均值 | 三档逐档下降 |
+|---|---:|---:|---:|---|---:|---:|:---:|
+| 扩散场（默认） | 284 秒 | 31 秒 | 38 秒 | 0.130 / 0.124 / 0.093 | 0.169 | 0.170 | 是 |
+| 光谱 | 253 秒 | 31 秒 | 2 秒 | 0.112 / 0.094 / 0.062 | 0.101 | 0.330 | 是 |
+| 蛋白质 | 128 秒 | 55 秒 | 1 秒 | 13.20 / 13.95 / 8.02 | 8.17 | 10.84 | 否 |
+| DNA | 231 秒 | 100 秒 | 9 秒 | 5.261 / 5.055 / 4.148 | 3.623 | 7.032 | 是 |
+| RNA | 111 秒 | 54 秒 | 0 秒 | 0.310 / 0.254 / 0.169 | 0.268 | 0.174 | 是 |
+| 小分子 | 222 秒 | 113 秒 | 1 秒 | 0.200 / 0.147 / 0.092 | 0.108 | 0.235 | 是 |
+| 晶体 | 62 秒 | 10 秒 | 3 秒 | 0.607 / 0.597 / 0.559 | 0.573 | 0.551 | 是 |
+| 三维结构 | 67 秒 | 36 秒 | 1 秒 | 1.000 / 0.865 / 0.865 | 1.055 | 2.950 | 是 |
+| 天气场 | 58 秒 | 27 秒 | 0 秒 | 0.150 / 0.168 / 0.161 | 0.154 | 0.166 | 否 |
+| 天文图像 | 50 秒 | 26 秒 | 0 秒 | 0.708 / 0.567 / 0.431 | 0.524 | 0.625 | 是 |
+| 文本 | 189 秒 | 101 秒 | 9 秒 | 1.294 / 1.392 / 1.272 | 1.568 | 1.243 | 否 |
 
 单个种子、单组留出、只到 3,200 档时，曲线会有起伏，上图的五种子平均才是结论依据。在 Windows 上，种子 53 的每个数都和五种子实验里同一种子的记录一致；Linux 上浮点计算顺序不同，预训练损失差 2% 以内，单种子下游误差可能差到 20% 左右。
 
-**命令行。** 需要 Python 3.10 及以上和 Git。
+**安装。** 需要 Python 3.10 及以上和 Git。
 
 ```bash
 git clone https://github.com/Yu-Yang-Li/nanoSciGPT.git
 cd nanoSciGPT
 python -m venv .venv
 .venv/bin/python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
-.venv/bin/python -m pip install -e .
-.venv/bin/python -m nanoscigpt.tasks.eleven --field field
+.venv/bin/python -m pip install -e ".[notebook]"
+.venv/bin/python -m jupyter notebook notebooks/eleven_fields.ipynb
 ```
 
-Windows 把 `.venv/bin/python` 换成 `.venv\Scripts\python.exe`。在本机打开 Notebook 需要先装 Jupyter：`.venv/bin/python -m pip install notebook`，再运行 `.venv/bin/python -m jupyter notebook`。不打开界面、直接整本执行可以用 `.venv/bin/python -m jupyter nbconvert --to notebook --execute notebooks/eleven_fields.ipynb --output-dir out`，执行后的 Notebook 存在 `out/eleven_fields.ipynb`。最后一条命令和 Notebook 做的事一样：先打印 token，再输出每档的预训练损失和下游误差。用 `--sizes 200,800,3200,12800` 可以加到最大档，`--seed` 可以换种子。Windows 上种子 53 的结果和五种子实验里的同一种子逐项一致。照这一节在空目录首次安装的耗时和两个平台的结果，见 [首次使用检查](docs/first-run-2026-11-26.md)；从 PyTorch 官方源下载 torch 在当时的网络下要 27 到 36 分钟。
+Windows 把 `.venv/bin/python` 换成 `.venv\Scripts\python.exe`。`[notebook]` 会装上 Jupyter 和 Matplotlib；只用命令行时写 `pip install -e .` 就够了。不打开界面、直接整本执行：
+
+```bash
+.venv/bin/python -m jupyter nbconvert --to notebook --execute notebooks/eleven_fields.ipynb --output-dir out
+```
+
+执行后的 Notebook 存在 `out/eleven_fields.ipynb`。从空目录照这一节走一遍的耗时见 [首次使用检查](docs/first-run.md)。
+
+**命令行。** Notebook 的每一段都有对应的命令，不需要 Jupyter：
+
+```bash
+.venv/bin/python -m nanoscigpt.tasks.eleven --field field            # 第 2 到 6 节：打印 token，预训练三档，下游误差
+.venv/bin/python -m autoresearch.common_search --field field --method random --rounds 2   # 第 7 节：自动研究
+.venv/bin/python -m autoresearch.replay_stream                       # 第 8 节：从存档参数重算星流拟合的 χ²
+```
+
+第一条命令用 `--sizes 200,800,3200,12800` 可以加到最大档，`--seed` 可以换种子。第二条命令把 `--method` 换成 `model` 就由 DSK 来提改动，需要先在自己的进程环境里设置 `SCNET_API_BASE`、`SCNET_API_KEY`、`SCNET_MODEL`，密钥不写进任何文件。
+
+## 从一次训练到自动研究，再到经验积累
+
+- **[十一个方向用同一套自动研究](docs/autoresearch-eleven.md)**：主干固定，程序每轮提一个改动、跑实验、看开发集，8 轮后在留出组上评一次。DSK 在 9 个方向上两次运行都好于起点，按事先写定的标准在 4 个方向上好于同预算的随机搜索，5 个方向分不出高下，2 个方向没有跑赢。每个方向的对照（起点、自动研究后、随机搜索）见结果页和 Notebook 第 7 节。
+- **[扩散场上更早的两版自动研究](docs/autoresearch-field.md)**：搜索空间为扩散场单独设计，DSK 和随机搜索各跑 3 次。
+- **[星流轨道拟合与调参经验积累](docs/stream-skill.md)**：DSK 边看拟合结果边调 7 个轨道参数，每轮拟合两个训练场景后改写自己的调参经验，锁定后到 8 个没见过的场景上盲测，共 8 轮。带着经验比空经验好，最好的是第 5 轮，之后回升。Notebook 第 8 节把轨道、经验的改写和盲测成绩画了出来。
 
 ## 更多
 
 - [五种子完整实验与留出结果](docs/pretraining-scale/shared-checkpoints/README.md)，含读出方式、预算的选择规则和没有通过的任务
 - [只看预训练损失的四档总表与离线复现包](docs/pretraining-scale/data-scaling/README.md)
-- [扩散场上的自动研究](docs/autoresearch-field.md)：DSK 每轮提一个改动，和同预算随机搜索比较，各跑 3 次；第 2 版合并等价配置、开发集用 5 个种子
-- 星流部分可先在 CPU 离线运行 `python -m autoresearch.replay_stream`，从封存的参数提议重新算出每一批的 χ²。[GD-1 轨道拟合与调参经验积累](docs/stream-skill.md)：DSK 边看 χ² 边调 7 个轨道参数，每轮拟合两个训练场景后改写自己的调参经验，锁定后到 8 个没见过的场景上盲测，共 8 轮
 - [课堂提问](docs/classroom-prompts.md)
 - [三个教学 Skill](skills/README.md)：配合编程 Agent 做基线、预训练和研究迭代
 - [早期课堂与验收记录](docs/history.md)：2026 年 9 月的光变课堂、三行对照和旧验收
@@ -85,11 +121,16 @@ Windows 把 `.venv/bin/python` 换成 `.venv\Scripts\python.exe`。在本机打�
 ## 仓库结构
 
 ```text
-notebooks/eleven_fields.ipynb   十一个方向的主入口
+notebooks/eleven_fields.ipynb   教程主入口：数据、token、模型、训练、评测、自动研究、星流拟合
 nanoscigpt/
   core/                         nanoGPT 主干和训练代码
   scientific/                   编码器（符号、数值块、晶胞）和 SciGPT
   tasks/eleven.py               十一个方向的数据、预训练和下游读出
+  tasks/eleven_plots.py         Notebook 第 1 到 6 节的图
+autoresearch/
+  common_search.py              十一个方向共用的自动研究
+  stream_fit.py, stream_skill.py   星流轨道拟合和调参经验积累
+  search_plots.py, stream_plots.py Notebook 第 7、8 节的图
 data/eleven/                    六个真实数据方向的 token 小表；模拟方向运行时生成
 docs/                           实验结果、课程资料和历史记录
 skills/                         三个教学 Skill

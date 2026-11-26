@@ -58,6 +58,7 @@ FIELDS = {
                  data="真实", question="去掉空格后，数原来有几个词", label="直接数出来的"),
 }
 SIZES = {"unlabeled": 12800, "pool": 256, "dev": 480, "A": 480, "B": 480}
+N_LABELS = 32  # labeled objects used to train the downstream readout
 
 
 # ---------- simulated generators (same random streams as the experiments) ----------
@@ -177,7 +178,7 @@ def symbols(field):
 
 
 def labeled_rows(n_pool, seed):
-    return np.random.default_rng(seed).choice(n_pool, 32, replace=False)
+    return np.random.default_rng(seed).choice(n_pool, N_LABELS, replace=False)
 
 
 def show_tokens(field, sample):
@@ -255,15 +256,20 @@ def heldout_loss(model, feed):
     return total / count
 
 
-def pretrain(field, parts, size, seed):
-    """Pretrain on the first size objects of this seed's fixed ordering of the unlabeled pool."""
+def pretrain(field, parts, size, seed, curve=None):
+    """Pretrain on the first size objects of this seed's fixed ordering of the unlabeled pool.
+
+    Pass a list as curve to receive the loss of every update.
+    """
     torch.manual_seed(seed)
     model = network(field)
     if size:
         order = torch.from_numpy(np.random.default_rng(seed).permutation(12800))
         train.SEED = seed
         train.PRETRAIN_STEPS = 1600 if FIELDS[field]["budget"] == "fixed" else size // 2
-        train.pretrain(model, train.select(parts["unlabeled"][0], order[:size]))
+        losses = train.pretrain(model, train.select(parts["unlabeled"][0], order[:size]))
+        if curve is not None:
+            curve.extend(losses)
     return model
 
 
@@ -273,13 +279,17 @@ def _pooled(model, feed):
     return torch.cat([model.pooled(*model.hidden({k: v[i:i + 256] for k, v in feed.items()})) for i in range(0, n, 256)]).numpy()
 
 
-def downstream(field, model, task, seed):
-    """Train the readout on 32 labels; return (MAE on holdout A, MAE of predicting the label mean)."""
+def downstream(field, model, task, seed, predictions=None, readout=None):
+    """Train the readout on 32 labels; return (MAE on holdout A, MAE of predicting the label mean).
+
+    Pass a list as predictions to receive the predicted value of every holdout object.
+    readout overrides the field's default: "probe" or "finetune".
+    """
     (pool_x, pool_y), (test_x, test_y) = task["pool"], task["A"]
     rows = labeled_rows(len(pool_y), seed)
     y = pool_y[rows]
     x = {k: v[torch.from_numpy(rows)] for k, v in pool_x.items()}
-    if FIELDS[field]["readout"] == "probe":
+    if (readout or FIELDS[field]["readout"]) == "probe":
         model.eval()
         a = _pooled(model, x)
         center, scale = a.mean(0), a.std(0).clip(1e-6)
@@ -291,6 +301,8 @@ def downstream(field, model, task, seed):
         train.finetune(model, x, target)
         model.eval()
         prediction = train.predict(model, test_x) * y.std() + y.mean()
+    if predictions is not None:
+        predictions.extend(prediction.tolist())
     return float(np.abs(prediction - test_y).mean()), float(np.abs(y.mean() - test_y).mean())
 
 
