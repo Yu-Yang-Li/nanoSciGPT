@@ -1,0 +1,21 @@
+{
+ "fold": "D",
+ "held_out": [
+  "structure3d",
+  "text"
+ ],
+ "sha256": "3393736e0fad4c6e9e229c0248bae894de4a26283bf7ab115f3f6cb42f199d7e",
+ "characters": 1447,
+ "model": "DeepSeek-V4.1-Flash-1017",
+ "usage": {
+  "completion_tokens": 858,
+  "prompt_tokens": 20483,
+  "total_tokens": 21341,
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "prompt_tokens_details": {
+   "cached_tokens": 20352
+  }
+ }
+}

@@ -54,6 +54,10 @@ python -m autoresearch.common_search --field field --method model
 
 ### 调参智能体的经验积累（RSI 实例）
 
+讲“从研究迭代到 RSI”有两个实例，先讲十一个方向上的，再讲星流。
+
+十一个方向上的搜索经验：`autoresearch.search_skill`（Notebook 第 7.1 小节）。十一个方向分成 4 折轮着留出，DSK 读其余方向的搜索记录写成一份搜索经验，锁定后带到留出的方向上，同样 8 轮，和不带经验的 DSK、随机搜索比。先读[结果](../../docs/search-skill.md)再讲，结论按事先写定的标准，好坏都照实说。可以让学生读当前方向用到的那份经验（Notebook 会打印），对照这个方向的搜索记录，找出哪条规则用上了、哪条不适用。
+
 讲“从研究迭代到 RSI”时用 GD-1 轨道拟合。Notebook 第 8 节从存档的参数重画四组图，不需要 API：每一轮经验找到的轨道叠在观测点上、一次拟合之内的四次提交、经验里的规则逐轮怎么变、盲测成绩曲线。想从头再跑一遍用 `python -m autoresearch.stream_skill --out out/stream-skill`。DSK 在一次拟合里边看 χ² 边调 7 个轨道参数；每轮拟合两个训练场景后，对照真值改写自己的调参经验，锁定后到 8 个没见过的场景上盲测。先读[结果](../../docs/stream-skill.md)再讲：经验积累比空经验和随机搜索好，和 Nelder–Mead 相当，第 5 轮之后回升，原因没有单独验证过。可以让学生对比第 5 轮和第 8 轮的经验原文（`stream_plots.skill_text(5)`），找出被最新场景带偏的规则。
 
 ### 继续 9 月光变课堂的模型时

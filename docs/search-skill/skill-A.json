@@ -1,0 +1,30 @@
+{
+ "fold": "A",
+ "held_out": [
+  "smiles",
+  "image",
+  "dna"
+ ],
+ "sha256": "b06ce3d07ed48513447cdb67ef549b4807dae56523e27719ffb0ac7ed594f63c",
+ "characters": 1552,
+ "model": "DeepSeek-V4.1-Flash-1017",
+ "usage": {
+  "completion_tokens": 1020,
+  "prompt_tokens": 17843,
+  "total_tokens": 18863,
+  "completion_tokens_details": {
+   "accepted_prediction_tokens": 0,
+   "audio_tokens": 0,
+   "reasoning_tokens": 0,
+   "rejected_prediction_tokens": 0,
+   "text_tokens": 0
+  },
+  "prompt_tokens_details": {
+   "audio_tokens": 0,
+   "cached_tokens": 17792,
+   "text_tokens": 0,
+   "image_tokens": 0,
+   "cache_write_tokens": 0
+  }
+ }
+}

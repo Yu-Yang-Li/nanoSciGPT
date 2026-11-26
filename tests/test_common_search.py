@@ -52,3 +52,29 @@ def test_verdict_follows_the_written_rule():
     stuck = search.verdict([run("model", 1, 1.0, 0), run("model", 2, 1.0, 0), run("random", 1, 1.0, 0), run("random", 2, 1.0, 0)])
     assert stuck["against_start"] == "没有找到更好的配置"
 
+
+def test_skill_goes_into_the_prompt_only_when_given():
+    history = [{"round": 0, "config": search.start("image"), "dev": 0.4, "dev_by_seed": [0.4, 0.4, 0.4],
+                "pretrain_loss": 1.0, "guess_mean_dev": 0.6, "reason": "起点"}]
+    plain = search.proposal_prompt("image", history, (53, 71, 89))
+    with_skill = search.proposal_prompt("image", history, (53, 71, 89), "先试 masked")
+    assert "经验" not in plain and with_skill.count("先试 masked") == 1
+    assert [line for line in with_skill.splitlines() if line not in plain.splitlines()][1] == "先试 masked"
+    with pytest.raises(ValueError):
+        search.run("image", "skill", "unused")
+    with pytest.raises(ValueError):
+        search.run("image", "model", "unused", skill="先试 masked")
+
+
+def test_transfer_rule_needs_mean_wins_and_interval():
+    from autoresearch import search_skill
+
+    fields = list(eleven.FIELDS)
+    base = {f: 1.0 for f in fields}
+    clear = search_skill.compare({f: 0.9 for f in fields}, base)
+    assert clear["conclusion"] == "有用" and clear["wins"] == 11
+    mixed = search_skill.compare({f: (0.8 if i < 6 else 1.1) for i, f in enumerate(fields)}, base)
+    assert mixed["conclusion"] == "没有看到改进"
+    worse = search_skill.compare({f: 1.1 for f in fields}, base)
+    assert worse["conclusion"] == "反而更差"
+

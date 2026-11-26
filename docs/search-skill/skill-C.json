@@ -1,0 +1,22 @@
+{
+ "fold": "C",
+ "held_out": [
+  "protein",
+  "field",
+  "rna"
+ ],
+ "sha256": "05e653ad358e092c1a5c73e1db5cbc91cce051375544d70268039d7d1e3a337a",
+ "characters": 1499,
+ "model": "DeepSeek-V4.1-Flash-1017",
+ "usage": {
+  "completion_tokens": 954,
+  "prompt_tokens": 18244,
+  "total_tokens": 19198,
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "prompt_tokens_details": {
+   "cached_tokens": 18176
+  }
+ }
+}

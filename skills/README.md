@@ -4,7 +4,7 @@
 
 1. [`research-baseline-builder`](research-baseline-builder/SKILL.md)：先得到第一份结果并解释它。十一方向里，“只猜平均值”和“不预训练”两行就是最先要看的基线；学生也可以带自己的表格数据。
 2. [`nanoscigpt-scientific-language`](nanoscigpt-scientific-language/SKILL.md)：讲清一种科学观测怎样切成 token，再带学生预训练、接下游读出，比较不同无标签数据量。
-3. [`ai-scientist-research-loop`](ai-scientist-research-loop/SKILL.md)：接着同一个方向做模型迭代和小研究。课堂实例是十一个方向共用的自动研究（`autoresearch.common_search`，Notebook 第 7 节），由 DSK 每轮提一个改动，和随机搜索比较；方法上参考 `karpathy/autoresearch`、`SakanaAI/AI-Scientist` v1 和 `SakanaAI/AI-Scientist-v2`。
+3. [`ai-scientist-research-loop`](ai-scientist-research-loop/SKILL.md)：接着同一个方向做模型迭代和小研究。课堂实例是十一个方向共用的自动研究（`autoresearch.common_search`，Notebook 第 7 节），由 DSK 每轮提一个改动，和随机搜索比较；再把搜索经验带到没见过的方向（`autoresearch.search_skill`，第 7.1 小节）。方法上参考 `karpathy/autoresearch`、`SakanaAI/AI-Scientist` v1 和 `SakanaAI/AI-Scientist-v2`。
 
 所有 Skill 都沿用学生已经提供的信息。想先听解释就先讨论，要求动手时再运行；结果回来后接着解释，不把课堂提问变成强制流程。十一方向的数据来源见 [data/eleven/SOURCES.md](../data/eleven/SOURCES.md)，五种子结果见 [docs/pretraining-scale/shared-checkpoints](../docs/pretraining-scale/shared-checkpoints/README.md)。
 

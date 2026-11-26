@@ -236,7 +236,7 @@ def score(field, config, seeds, cache, confirm=False):
     return results
 
 
-def proposal_prompt(field, history, dev_seeds):
+def proposal_prompt(field, history, dev_seeds, skill=""):
     spec = eleven.FIELDS[field]
     lines = [json.dumps({"round": t["round"], "config": t["config"], "dev_mae": round(t["dev"], 5),
                          "dev_mae_by_seed": [round(v, 5) for v in t["dev_by_seed"]],
@@ -258,6 +258,8 @@ def proposal_prompt(field, history, dev_seeds):
         "readout=probe 时 finetune_steps 和 finetune_lr 不起作用；readout=finetune 时 ridge_alpha 不起作用。" + no_merge,
         "dev_mae_by_seed 是各个种子的误差。两个配置的平均差距小于种子之间的波动时，不要把它当成确定的改进。"
         "pretrain_loss 是预训练最后 50 步的平均损失，不同 objective 和 merge 之间不能直接比较。",
+        *(["下面是你此前在别的方向上做同类搜索后总结的经验。它来自别的方向，不一定适用于这个方向，以本方向的实验结果为准：", skill]
+          if skill else []),
         "已经做过的实验（按轮次，第 0 轮是起点）：",
         *lines,
         "请根据这些结果提出下一个要试的配置，不要和已做过的配置相同。只返回一个 JSON 对象，形如",
@@ -286,6 +288,8 @@ def verdict(runs):
             result["against_start"] = "没有稳定好于起点"
     if len(held["model"]) > 1 and len(held["random"]) > 1:
         spread = max(np.ptp(held["model"]), np.ptp(held["random"]))
+        error = np.sqrt(sum(np.var(values, ddof=1) / len(values) for values in held.values()))
+        result["difference_in_standard_errors"] = float((result["random"] - result["model"]) / error) if error else None
         if result["model"] >= result["random"]:
             result["against_random"] = "没有跑赢随机搜索"
         elif result["random"] - result["model"] > spread:
@@ -295,8 +299,13 @@ def verdict(runs):
     return result
 
 
-def run(field, method, out, repeat=1, rounds=8, dev_seeds=DEV_SEEDS, confirm_seeds=CONFIRM_SEEDS, report=print):
-    """Search one field. method is "model" or "random"; returns the journal, which is also saved under out."""
+def run(field, method, out, repeat=1, rounds=8, dev_seeds=DEV_SEEDS, confirm_seeds=CONFIRM_SEEDS, report=print, skill=""):
+    """Search one field; returns the journal, which is also saved under out.
+
+    method is "model", "random", or "skill": the model again, with the written skill added to its prompt.
+    """
+    if (method == "skill") != bool(skill):
+        raise ValueError('method "skill" needs a skill text, and only that method takes one')
     out = Path(out)
     folder = out / field / f"{method}-{repeat}"
     folder.mkdir(parents=True, exist_ok=True)
@@ -305,6 +314,10 @@ def run(field, method, out, repeat=1, rounds=8, dev_seeds=DEV_SEEDS, confirm_see
     journal = json.loads(journal_path.read_text(encoding="utf-8")) if journal_path.exists() else {
         "field": field, "method": method, "repeat": repeat, "backbone": BACKBONE, "dev_seeds": list(dev_seeds),
         "space": space(field), "trials": [], "calls": []}
+    if skill:
+        journal.setdefault("skill_sha256", hashlib.sha256(skill.encode("utf-8")).hexdigest())
+        if journal["skill_sha256"] != hashlib.sha256(skill.encode("utf-8")).hexdigest():
+            raise ValueError(f"{journal_path} 是带着另一份经验跑的")
     if journal["dev_seeds"] != list(dev_seeds):
         raise ValueError(f"{journal_path} 是用种子 {journal['dev_seeds']} 跑的，换种子请换一个输出目录")
 
@@ -325,7 +338,7 @@ def run(field, method, out, repeat=1, rounds=8, dev_seeds=DEV_SEEDS, confirm_see
                     drawn.append(candidate)
             config, reason = drawn[index], "均匀随机抽样"
         else:
-            prompt = proposal_prompt(field, journal["trials"], dev_seeds)
+            prompt = proposal_prompt(field, journal["trials"], dev_seeds, skill)
             config = None
             for attempt in (1, 2, 3):
                 tag = f"r{index:02d}-a{attempt}"
@@ -338,7 +351,10 @@ def run(field, method, out, repeat=1, rounds=8, dev_seeds=DEV_SEEDS, confirm_see
                     value = json.loads(FENCE.sub("", text.strip()))
                     candidate = canonical(field, validate(field, value["config"]))
                     if candidate in seen:
-                        raise ValueError("这个配置已经做过")
+                        ignored = [key for key, wanted in value["config"].items() if candidate[key] != wanted]
+                        raise ValueError(f"这个配置等于第 {seen.index(candidate)} 轮做过的配置"
+                                         + (f"：{'、'.join(ignored)} 在这个方向或这个组合下不起作用" if ignored else "")
+                                         + "。请换一个实际不同的配置")
                     config, reason, call["accepted"] = candidate, str(value.get("reason", "")), True
                 except (ValueError, KeyError, TypeError) as error:
                     call["accepted"], call["error"] = False, str(error)
