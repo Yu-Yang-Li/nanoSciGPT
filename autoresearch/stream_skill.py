@@ -81,15 +81,20 @@ def fit_prompt(case, skill, history, call):
     ])
 
 
-def parse_candidates(text):
+def parse_candidates(text, exact=False):
     value = json.loads(FENCE.sub("", text.strip()))
+    if exact:
+        batch = np.asarray(value["candidates"], dtype=float)
+        if batch.shape != (PER_CALL, len(sf.NAMES)) or not np.isfinite(batch).all():
+            raise ValueError("每批必须恰好有 10 组，每组 7 个有限数值")
+        return np.clip(batch, LOW, HIGH), str(value.get("reason", ""))
     rows = [np.asarray(c, float) for c in value["candidates"] if len(c) == 7]
     if not rows:
         raise ValueError("没有长度为 7 的参数组")
     return np.clip(np.array(rows[:PER_CALL]), LOW, HIGH), str(value.get("reason", ""))
 
 
-def agent_fit(case, skill, folder, tag):
+def agent_fit(case, skill, folder, tag, exact=False):
     """One fit by the model; cached on disk so an interrupted run resumes."""
     path = folder / f"{tag}.json"
     if path.exists():
@@ -101,7 +106,7 @@ def agent_fit(case, skill, folder, tag):
             text, meta = ask_model(prompt, FIT_TEMPERATURE, max_tokens=1500)
             entry = {"call": call, "attempt": attempt, **meta}
             try:
-                batch, reason = parse_candidates(text)
+                batch, reason = parse_candidates(text, exact=exact)
                 entry["reason"] = reason
                 calls.append(entry)
                 break
@@ -110,6 +115,8 @@ def agent_fit(case, skill, folder, tag):
                 calls.append(entry)
                 prompt += f"\n上一个回答没有通过检查：{error}。请只返回要求的 JSON。"
         else:
+            if exact:
+                raise RuntimeError(f"{tag}: 无法得到完整的第 {call + 1} 批")
             continue
         for theta, c in zip(batch, sf.chi2(batch, case["data"])):
             history.append({"call": call, "theta": theta.tolist(), "chi2": c.tolist()})

@@ -57,3 +57,15 @@ def test_stream_orbit_fits_gd1_and_mock_truth_scores_near_data_count():
     assert stream_fit.chi2([150, 1.5, 0.5, 13, -5, 1, -150])[0].min() == 1e6  # orbit misses the phi1 span
     batch, _ = stream_skill.parse_candidates('{"reason": "", "candidates": [[999, 0.9, -1, 10, -9, -2, -250], [1, 2]]}')
     assert batch.shape == (1, 7) and batch[0, 0] == stream_fit.PRIOR["vc"][1]
+
+
+def test_equal_budget_stream_fit_requires_ten_finite_parameter_vectors():
+    import json
+    from autoresearch.stream_skill import REFERENCE, parse_candidates
+
+    rows = [REFERENCE.tolist() for _ in range(10)]
+    batch, _ = parse_candidates(json.dumps({"candidates": rows}), exact=True)
+    assert batch.shape == (10, 7)
+    for invalid in (rows[:-1], rows + rows[:1], [[float("nan")] * 7] + rows[1:]):
+        with pytest.raises(ValueError):
+            parse_candidates(json.dumps({"candidates": invalid}), exact=True)
