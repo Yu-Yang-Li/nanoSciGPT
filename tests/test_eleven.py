@@ -69,3 +69,24 @@ def test_equal_budget_stream_fit_requires_ten_finite_parameter_vectors():
     for invalid in (rows[:-1], rows + rows[:1], [[float("nan")] * 7] + rows[1:]):
         with pytest.raises(ValueError):
             parse_candidates(json.dumps({"candidates": invalid}), exact=True)
+
+
+def test_stream_updater_charges_forty_orbits_and_scores_the_selected_parameters(monkeypatch):
+    from autoresearch import stream_updater as updater
+
+    scene = updater.s.scenario(38001)
+    data = np.concatenate([scene["data"][key][:, 1] for key in updater.NODES])
+    forward = updater.observe_batch
+    charged = []
+
+    def counted(points):
+        charged.append(len(points))
+        return forward(points)
+
+    updater.observables.cache_clear()
+    monkeypatch.setattr(updater, "observe_batch", counted)
+    chi2, scaled = updater.fit(data, updater.START)
+    assert sum(charged) == 40
+    expected = updater.sf.chi2(updater.s.LOW + scaled * updater.WIDTH, scene["data"]).sum()
+    np.testing.assert_allclose(chi2, expected, rtol=1e-10)
+    updater.observables.cache_clear()
