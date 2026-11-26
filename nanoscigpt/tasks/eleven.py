@@ -26,7 +26,7 @@ FIELDS = {
                      token="连续 4 个波长采样点的通量"),
     "protein": dict(name="蛋白质", kind="symbol", vocab=19, positions=32, task="色谱保留时间（分钟）", readout="probe", budget="fixed",
                     token="1 个氨基酸"),
-    "dna": dict(name="DNA", kind="symbol", vocab=6, positions=64, task="发夹熔解温度（°C）", readout="probe", budget="fixed",
+    "dna": dict(name="DNA", kind="symbol", vocab=6, positions=64, task="发夹熔解温度（°C）", readout="finetune", budget="fixed",
                 token="1 个碱基"),
     "rna": dict(name="RNA", kind="symbol", vocab=6, positions=32, task="三核苷酸熵（bit）", readout="probe", budget="fixed",
                 token="1 个碱基"),
