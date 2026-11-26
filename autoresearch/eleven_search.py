@@ -5,6 +5,10 @@ diffusion field is cut into tokens, the pretraining objective and masking, the p
 schedule, and the downstream readout. Every trial is scored on the development set; the two
 confirmation groups are scored once, after the search, for the best development configuration.
 
+Version 2 (the default) treats configurations that differ only in settings with no effect as the
+same trial, scores the development set on five seeds instead of three, and shows the model the
+per-seed errors. Version 1 reproduces the first study.
+
 Credentials are read from the process environment (SCNET_API_BASE, SCNET_API_KEY, SCNET_MODEL)
 and never written to disk.
 """
@@ -43,7 +47,7 @@ START = {"space_per_token": 4, "frames_per_token": 4, "order": "space", "objecti
          "pretrain_steps": 6400, "pretrain_lr": 0.001, "readout": "finetune", "ridge_alpha": 1.0,
          "finetune_steps": 200, "finetune_lr": 0.001}
 BACKBONE = {"n_layer": 2, "n_head": 2, "n_embd": 32}
-DEV_SEEDS = (53, 71, 89)
+DEV_SEEDS = {1: (53, 71, 89), 2: (53, 71, 89, 107, 131)}
 CONFIRM_SEEDS = (53, 71, 89, 107, 131)
 SIZES = {"unlabeled": 12800, "pool": 256, "dev": 480, "A": 480, "B": 480}
 FENCE = re.compile(r"^\s*\x60{3}(?:json)?\s*|\s*\x60{3}\s*$")
@@ -86,6 +90,20 @@ def validate(config):
     for key, allowed in SPACE.items():
         if config[key] not in allowed:
             raise ValueError(f"{key} 只能取 {allowed}")
+    return config
+
+
+def canonical(config):
+    """Reset settings that cannot change the result, so equivalent configurations compare equal."""
+    config = dict(config)
+    if config["frames_per_token"] == 4:  # one time block: space and time order give the same tokens
+        config["order"] = START["order"]
+    if config["objective"] != "masked":
+        config["mask_ratio"] = START["mask_ratio"]
+    if config["readout"] == "probe":
+        config["finetune_steps"], config["finetune_lr"] = START["finetune_steps"], START["finetune_lr"]
+    else:
+        config["ridge_alpha"] = START["ridge_alpha"]
     return config
 
 
@@ -182,19 +200,34 @@ def ask_model(prompt, temperature):
             time.sleep(2 ** attempt)
 
 
-def proposal_prompt(history):
-    lines = [json.dumps({"round": h["round"], "config": h["config"], "dev_mae": round(h["mae"]["dev"], 5),
-                         "dev_pretrain_loss": round(h["dev_pretrain_loss"], 5), "reason": h.get("reason", "")},
-                        ensure_ascii=False) for h in history]
+def proposal_prompt(history, version=1):
+    lines = []
+    for h in history:
+        record = {"round": h["round"], "config": h["config"], "dev_mae": round(h["mae"]["dev"], 5)}
+        if version == 2:
+            record["dev_mae_by_seed"] = [round(v, 5) for v in h["mae_by_seed"]["dev"]]
+        record["dev_pretrain_loss"] = round(h["dev_pretrain_loss"], 5)
+        record["reason"] = h.get("reason", "")
+        lines.append(json.dumps(record, ensure_ascii=False))
+    seeds = len(DEV_SEEDS[version])
+    notes = []
+    if version == 2:
+        notes = [
+            "这些设置在下列条件下不起作用，只改它们等于重复已做过的实验，会被拒绝：frames_per_token=4 时 order 不起作用；"
+            "objective 不是 masked 时 mask_ratio 不起作用；readout=probe 时 finetune_steps 和 finetune_lr 不起作用；"
+            "readout=finetune 时 ridge_alpha 不起作用。",
+            f"dev_mae_by_seed 是 {seeds} 个种子各自的误差，两个配置的平均差距小于种子之间的波动时，不要把它当成确定的改进。",
+        ]
     return "\n".join([
         "你在做一个小型科学机器学习研究。任务：从一维扩散场的 4 帧观测（每帧 64 个位置）估计扩散系数的 log10。",
         "模型主干固定为 2 层、2 头、32 维的 nanoGPT，不能改。先用 12,800 个无标签场做自监督预训练，再用 32 个带标签样本训练下游读出。",
-        "目标：让开发集上的下游平均绝对误差（dev_mae，3 个种子平均）尽量低。",
+        f"目标：让开发集上的下游平均绝对误差（dev_mae，{seeds} 个种子平均）尽量低。",
         "你只能改下面这些设置，每个键只能取列出的值：",
         json.dumps(SPACE, ensure_ascii=False),
         "含义：space_per_token 和 frames_per_token 决定一个 token 包含几个空间位置、几帧；order 决定 token 按空间还是按时间排列；",
         "objective=next 预测下一个 token，skip 预测隔一个的 token，masked 先把 mask_ratio 比例的输入 token 置零再预测下一个 token（mask_ratio 只在 masked 时起作用）；",
         "readout=probe 冻结主干用岭回归读出（ridge_alpha），finetune 全参数微调（finetune_steps, finetune_lr）。",
+        *notes,
         "已经做过的实验（按轮次）：",
         *lines,
         "请根据这些结果提出下一个要试的配置，不要和已做过的配置完全相同。只返回一个 JSON 对象，形如",
@@ -214,15 +247,20 @@ def main():
     parser.add_argument("--rounds", type=int, default=10)
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--threads", type=int, default=2)
+    parser.add_argument("--version", type=int, choices=(1, 2), default=2)
     args = parser.parse_args()
     torch.set_num_threads(args.threads)
     torch.set_num_interop_threads(1)
+    same = canonical if args.version == 2 else dict  # how two configurations are compared for repeats
+    dev_seeds = DEV_SEEDS[args.version]
     run = args.out / f"{args.method}-{args.repeat}"
     run.mkdir(parents=True, exist_ok=True)
     journal_path = run / "journal.json"
     journal = json.loads(journal_path.read_text(encoding="utf-8")) if journal_path.exists() else {
-        "method": args.method, "repeat": args.repeat, "backbone": BACKBONE, "dev_seeds": DEV_SEEDS,
-        "space": SPACE, "trials": [], "calls": []}
+        "method": args.method, "repeat": args.repeat, "version": args.version, "backbone": BACKBONE,
+        "dev_seeds": dev_seeds, "space": SPACE, "trials": [], "calls": []}
+    if journal.get("version", 1) != args.version:
+        raise SystemExit(f"{journal_path} 是第 {journal.get('version', 1)} 版的记录，请用同一个 --version 续跑")
 
     def save():
         journal_path.write_text(json.dumps(journal, ensure_ascii=False, indent=1), encoding="utf-8")
@@ -231,21 +269,21 @@ def main():
     sampler = random.Random(1000 + args.repeat)
     for t in journal["trials"]:  # replay the sampler so a resumed random run draws the same sequence
         if t["round"] and args.method == "random":
-            while {k: sampler.choice(v) for k, v in SPACE.items()} != t["config"]:
+            while same({k: sampler.choice(v) for k, v in SPACE.items()}) != t["config"]:
                 pass
     while len(journal["trials"]) <= args.rounds:
         round_index = len(journal["trials"])
-        seen = [t["config"] for t in journal["trials"]]
+        seen = [same(t["config"]) for t in journal["trials"]]
         if round_index == 0:
             config, reason = dict(START), "起点：README 中扩散场的配置"
         elif args.method == "random":
             while True:
-                config = {k: sampler.choice(v) for k, v in SPACE.items()}
+                config = same({k: sampler.choice(v) for k, v in SPACE.items()})
                 if config not in seen:
                     break
             reason = "均匀随机抽样"
         else:
-            prompt = proposal_prompt(journal["trials"])
+            prompt = proposal_prompt(journal["trials"], args.version)
             config = None
             for attempt in (1, 2):
                 tag = f"r{round_index:02d}-a{attempt}"
@@ -257,9 +295,9 @@ def main():
                 try:
                     candidate, reason = parse(text)
                     validate(candidate)
-                    if candidate in seen:
+                    if same(candidate) in seen:
                         raise ValueError("这个配置已经做过")
-                    config = candidate
+                    config = same(candidate)
                     entry["accepted"] = True
                 except (ValueError, KeyError, TypeError) as error:
                     entry["accepted"] = False
@@ -272,7 +310,7 @@ def main():
             if config is None:
                 raise RuntimeError("模型两次都没有给出合格配置")
         tick = time.perf_counter()
-        result = evaluate(config, DEV_SEEDS, ["dev"], data)
+        result = evaluate(config, dev_seeds, ["dev"], data)
         journal["trials"].append({"round": round_index, "config": config, "reason": reason,
                                   "seconds": round(time.perf_counter() - tick, 1), **result})
         save()

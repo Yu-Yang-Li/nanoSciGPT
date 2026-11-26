@@ -41,7 +41,7 @@ metadata:
 
 ### 十一方向上的自动研究（课堂实例）
 
-学生在十一方向 Notebook 上跑通一个方向后，用 `autoresearch.eleven_search` 接着迭代。它固定主干（2 层、2 头、32 维），只允许改编码器切法、预训练目标与遮盖比例、预训练步数和学习率、读出方式；每轮在开发集上评估 3 个种子，确认集只在全部轮次结束后评一次。
+学生在十一方向 Notebook 上跑通一个方向后，用 `autoresearch.eleven_search` 接着迭代。它固定主干（2 层、2 头、32 维），只允许改编码器切法、预训练目标与遮盖比例、预训练步数和学习率、读出方式；每轮在开发集上评估 5 个种子，只改不起作用的设置（例如每个 token 含 4 帧时的排列顺序）算作重复、不再评估，确认集只在全部轮次结束后评一次。加 `--version 1` 复现第一版（3 个种子、不合并等价配置）。
 
 ```powershell
 python -m autoresearch.eleven_search --method model --repeat 1 --out out/autoresearch

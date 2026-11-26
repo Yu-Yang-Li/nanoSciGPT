@@ -74,7 +74,7 @@ Windows 把 `.venv/bin/python` 换成 `.venv\Scripts\python.exe`。在本机打�
 
 - [五种子完整实验与留出结果](docs/pretraining-scale/shared-checkpoints/README.md)，含读出方式、预算的选择规则和没有通过的任务
 - [只看预训练损失的四档总表与离线复现包](docs/pretraining-scale/data-scaling/README.md)
-- [扩散场上的自动研究](docs/autoresearch-field.md)：DSK 每轮提一个改动，和同预算随机搜索比较，各跑 3 次
+- [扩散场上的自动研究](docs/autoresearch-field.md)：DSK 每轮提一个改动，和同预算随机搜索比较，各跑 3 次；第 2 版合并等价配置、开发集用 5 个种子
 - [课堂提问](docs/classroom-prompts.md)
 - [三个教学 Skill](skills/README.md)：配合编程 Agent 做基线、预训练和研究迭代
 - [早期课堂与验收记录](docs/history.md)：2026 年 9 月的光变课堂、三行对照和旧验收

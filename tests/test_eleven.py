@@ -32,3 +32,17 @@ def test_research_search_keeps_the_backbone_and_matches_the_notebook_tokens():
         search.validate({**search.START, "n_layer": 4})
     with pytest.raises(ValueError):
         search.validate({**search.START, "space_per_token": 2})
+
+
+def test_research_search_merges_settings_that_have_no_effect():
+    from autoresearch import eleven_search as search
+    raw, _ = search.fields("pool")
+    by_time = {**search.START, "order": "time"}
+    np.testing.assert_array_equal(search.tokenize(raw[:4], by_time), search.tokenize(raw[:4], search.START))
+    assert search.canonical(by_time) == search.START
+    assert search.canonical({**search.START, "mask_ratio": 0.5, "ridge_alpha": 10.0}) == search.START
+    probe = {**search.START, "readout": "probe", "finetune_steps": 400}
+    assert search.canonical(probe) == {**search.START, "readout": "probe"}
+    masked = {**search.START, "objective": "masked", "mask_ratio": 0.5}
+    assert search.canonical(masked) == masked
+    assert len(search.DEV_SEEDS[1]) == 3 and len(search.DEV_SEEDS[2]) == 5
