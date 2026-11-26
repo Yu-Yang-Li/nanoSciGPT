@@ -4,7 +4,9 @@
 
 从科学问题出发，先做分类或回归，再用小模型学习预训练与微调，最后讨论怎样让研究 Agent 继续实验。可以选课程样例，也可以带自己的数据；不用先会写模型代码。
 
-从仓库根目录运行 `python -m nanoscigpt.classroom --domain protein`，即可用 32 个精确标签预测酵母肽段的色谱保留时间。默认入口与 v8 学生包的三行实验使用同一批数据、模型和训练配置。`--list` 查看全部 11 个方向，`--domain all` 依次训练。演示固定种子 53，每个方向输出 `three_rows.csv` 和训练回执。RNA 默认预测实测短双链形成自由能。[任务、安装版本和参考成绩](docs/eleven-domain-examples.md)
+**从预训练规模实验开始。** 安装本项目后，运行 `python -m nanoscigpt.tasks.structure_scale`。程序在 CPU 上生成模拟链，遮去含有答案的两个距离块，用同一批 32 个标签预测链的首尾距。默认用种子 53 训练 200、800、3,200 三档，各输出两组新样本上的平均绝对误差。十一方向共享两层 nanoGPT 和一个标量读出，换的是科学输入的编码方式。五种子实验中，8 个方向在两组确认集上都随四档规模逐档改善。[十一方向数据、编码与曲线](docs/pretraining-scale/README.md) · [可运行的 Notebook](docs/pretraining-scale/structure-scale.ipynb)
+
+早期三行对照仍可用 `python -m nanoscigpt.classroom --domain protein` 运行，预测酵母肽段色谱保留时间。`--list` 列出所有方向。[三行实验及成绩](docs/eleven-domain-examples.md)
 
 ## 当前光变课堂（2026-09-07）
 
