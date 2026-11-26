@@ -143,6 +143,8 @@ python -m autoresearch.common_search --field field --method random
 python -m autoresearch.common_search --field field --method model
 ```
 
-`--field` 可以换成十一个方向里的任意一个。`--method model` 需要先在自己的进程环境里设置 `SCNET_API_BASE`、`SCNET_API_KEY`、`SCNET_MODEL`，密钥不写进任何文件。运行记录存在 `out/search/<方向>/<方法>-<次数>/journal.json`，同一个配置在同一个种子上的结果存在 `out/search/cache/` 里复用，中断后用同一条命令接着跑。Notebook 第 7 节做的是同一件事，默认只跑 3 轮、1 个种子。
+`--field` 可以换成十一个方向里的任意一个。`--method model` 需要先在自己的进程环境里设置 `SCNET_API_BASE`、`SCNET_API_KEY`、`SCNET_MODEL`，密钥不写进任何文件。运行记录存在 `out/search/<方向>/<方法>-<次数>/journal.json`，同一个配置在同一个种子上的结果存在 `out/search/cache/` 里复用，中断后用同一条命令接着跑。
+
+这两条命令用的是存档的设置：8 轮，每个配置 3 个种子，结束后 5 个种子评留出。存档的那批运行里，一次运行的训练时间从三维结构的约 5 分钟到扩散场的约 23 分钟不等（同时跑着六到九路，单独跑会快一些）。 只想几分钟内看一遍流程，加上 `--rounds 2 --seeds 53`，这也是 Notebook 第 7 节的默认设置；这么少的轮数和种子，结果的波动比存档大得多。
 
 结果与线程数有关：晶体用 1 个线程和 2 个线程训练出的模型不同。上面的数字都用 2 个线程，命令的默认值也是 2。

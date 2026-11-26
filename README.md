@@ -98,11 +98,11 @@ Windows 把 `.venv/bin/python` 换成 `.venv\Scripts\python.exe`。`[notebook]` 
 
 ```bash
 .venv/bin/python -m nanoscigpt.tasks.eleven --field field            # 第 2 到 6 节：打印 token，预训练三档，下游误差
-.venv/bin/python -m autoresearch.common_search --field field --method random --rounds 2   # 第 7 节：自动研究
+.venv/bin/python -m autoresearch.common_search --field field --method random --rounds 2 --seeds 53   # 第 7 节：自动研究
 .venv/bin/python -m autoresearch.replay_stream                       # 第 8 节：从存档参数重算星流拟合的 χ²
 ```
 
-第一条命令用 `--sizes 200,800,3200,12800` 可以加到最大档，`--seed` 可以换种子。第二条命令把 `--method` 换成 `model` 就由 DSK 来提改动，需要先在自己的进程环境里设置 `SCNET_API_BASE`、`SCNET_API_KEY`、`SCNET_MODEL`，密钥不写进任何文件。
+第一条命令用 `--sizes 200,800,3200,12800` 可以加到最大档，`--seed` 可以换种子。第二条命令和 Notebook 第 7 节一样，只跑 2 轮、1 个种子，几分钟看完流程；去掉 `--rounds 2 --seeds 53` 就是存档用的设置（8 轮、3 个种子打分、5 个种子评留出），扩散场要跑几十分钟。把 `--method` 换成 `model` 就由 DSK 来提改动，需要先在自己的进程环境里设置 `SCNET_API_BASE`、`SCNET_API_KEY`、`SCNET_MODEL`，密钥不写进任何文件。
 
 ## 从一次训练到自动研究，再到经验积累
 

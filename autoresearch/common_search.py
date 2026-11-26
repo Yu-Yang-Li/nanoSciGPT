@@ -382,12 +382,16 @@ def main():
     parser.add_argument("--method", choices=("model", "random"), required=True)
     parser.add_argument("--repeat", type=int, default=1)
     parser.add_argument("--rounds", type=int, default=8)
+    parser.add_argument("--seeds", help="comma-separated seeds for both the development and the holdout score, "
+                                        "for a quick look; default: 53,71,89 during the search and five seeds on the holdout")
     parser.add_argument("--out", type=Path, default=Path("out/search"))
     parser.add_argument("--threads", type=int, default=2)
     args = parser.parse_args()
     torch.set_num_threads(args.threads)
     torch.set_num_interop_threads(1)
-    run(args.field, args.method, args.out, args.repeat, args.rounds, report=lambda line: print(line, flush=True))
+    seeds = tuple(int(seed) for seed in args.seeds.split(",")) if args.seeds else None
+    run(args.field, args.method, args.out, args.repeat, args.rounds, dev_seeds=seeds or DEV_SEEDS,
+        confirm_seeds=seeds or CONFIRM_SEEDS, report=lambda line: print(line, flush=True))
 
 
 if __name__ == "__main__":
