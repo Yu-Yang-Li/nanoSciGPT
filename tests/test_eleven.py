@@ -46,3 +46,14 @@ def test_research_search_merges_settings_that_have_no_effect():
     masked = {**search.START, "objective": "masked", "mask_ratio": 0.5}
     assert search.canonical(masked) == masked
     assert len(search.DEV_SEEDS[1]) == 3 and len(search.DEV_SEEDS[2]) == 5
+
+
+def test_stream_orbit_fits_gd1_and_mock_truth_scores_near_data_count():
+    from autoresearch import stream_fit, stream_skill
+    real = stream_fit.chi2(stream_skill.REFERENCE)[0].sum()
+    assert real < 125  # large-budget fit to the 59 GD-1 measurements reached 117
+    case = stream_skill.scenario(9001)
+    assert 20 < case["truth_chi2"] < 120
+    assert stream_fit.chi2([150, 1.5, 0.5, 13, -5, 1, -150])[0].min() == 1e6  # orbit misses the phi1 span
+    batch, _ = stream_skill.parse_candidates('{"reason": "", "candidates": [[999, 0.9, -1, 10, -9, -2, -250], [1, 2]]}')
+    assert batch.shape == (1, 7) and batch[0, 0] == stream_fit.PRIOR["vc"][1]

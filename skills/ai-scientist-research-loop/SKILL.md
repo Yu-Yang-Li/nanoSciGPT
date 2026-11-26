@@ -50,6 +50,10 @@ python -m autoresearch.eleven_search --method random --repeat 1 --out out/autore
 
 `--method model` 由 DSK 读取此前每一轮的配置和开发集误差，提出下一个配置并写出理由；需要学生在自己的进程环境里设置 `SCNET_API_BASE`、`SCNET_API_KEY`、`SCNET_MODEL`，密钥不写进任何文件。`--method random` 是同样预算的随机搜索，不需要 API。课堂上的三次对比结果见 [自动研究结果](../../docs/autoresearch-field.md)：先读那里的结论再讲，不把单次运行的赢面说成方法的普遍优势。学生使用当前编程助手自带的模型时，也可以由你读取 `journal.json` 里的历史，按同样的规则提出下一个配置，再用脚本的评估函数运行。
 
+### 调参智能体的经验积累（RSI 实例）
+
+讲“从研究迭代到 RSI”时用 GD-1 轨道拟合：`python -m autoresearch.stream_skill --out out/stream-skill`。DSK 在一次拟合里边看 χ² 边调 7 个轨道参数；每轮拟合两个训练场景后，对照真值改写自己的调参经验，锁定后到 8 个没见过的场景上盲测。先读[结果](../../docs/stream-skill.md)再讲：经验积累比空经验和随机搜索好，和 Nelder–Mead 相当，第 5 轮之后因为只看最新两个场景而回升。可以让学生对比第 5 轮和第 8 轮的经验原文，找出被最新场景带偏的规则。
+
 ### 继续 9 月光变课堂的模型时
 
 

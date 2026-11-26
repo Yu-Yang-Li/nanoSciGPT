@@ -177,7 +177,7 @@ def evaluate(config, seeds, groups, data):
             "dev_pretrain_loss": float(np.mean(losses)), "tokens": length, "token_width": width}
 
 
-def ask_model(prompt, temperature):
+def ask_model(prompt, temperature, max_tokens=1200):
     names = ("SCNET_API_BASE", "SCNET_API_KEY", "SCNET_MODEL")
     base, key, model = (os.environ.get(n, "").strip() for n in names)
     if not (base and key and model):
@@ -185,7 +185,7 @@ def ask_model(prompt, temperature):
     url = base.rstrip("/")
     url = url if url.endswith("/chat/completions") else url + "/chat/completions"
     body = {"model": model, "messages": [{"role": "user", "content": prompt}], "temperature": temperature,
-            "thinking": {"type": "disabled"}, "max_tokens": 1200, "stream": False}
+            "thinking": {"type": "disabled"}, "max_tokens": max_tokens, "stream": False}
     request = urllib.request.Request(url, data=json.dumps(body, ensure_ascii=False).encode("utf-8"),
                                      headers={"Content-Type": "application/json", "Authorization": "Bearer " + key})
     for attempt in range(3):
