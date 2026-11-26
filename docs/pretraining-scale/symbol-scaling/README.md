@@ -66,3 +66,5 @@ python docs/pretraining-scale/symbol-scaling/run_rna.py --objective entropy
 
 
 本地 CPU 已用两种目标各完成五种子全量复现。两个进程并行、各设两个 PyTorch 线程，用时分别为 5 分 43 秒、7 分 51 秒。40 个预训练交叉熵均与原回执相同，40 个下游 MAE 的最大绝对差为 1.3 × 10⁻⁸ bit 以内。
+
+在相同的开发输入上又分别验证了 DNA 二阶条件熵及小分子 sp³ 碳比例。两项都止于冻结读出筛选。固定 1,600 步后全模型微调的四档数据另列。[下游迁移对照](transfer-check.md) · [十一方向等步数预训练总表](../data-scaling/README.md)
