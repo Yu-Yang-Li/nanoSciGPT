@@ -68,7 +68,7 @@ python -m venv .venv
 .venv/bin/python -m nanoscigpt.tasks.eleven --field field
 ```
 
-Windows 把 `.venv/bin/python` 换成 `.venv\Scripts\python.exe`。最后一条命令和 Notebook 做的事一样：先打印 token，再输出每档的预训练损失和下游误差。用 `--sizes 200,800,3200,12800` 可以加到最大档，`--seed` 可以换种子。种子 53 的结果和五种子实验里的同一种子逐项一致。
+Windows 把 `.venv/bin/python` 换成 `.venv\Scripts\python.exe`。在本机打开 Notebook 需要先装 Jupyter：`.venv/bin/python -m pip install notebook`，再运行 `.venv/bin/python -m jupyter notebook`。不打开界面、直接整本执行可以用 `.venv/bin/python -m jupyter nbconvert --to notebook --execute notebooks/eleven_fields.ipynb --output-dir out`，执行后的 Notebook 存在 `out/eleven_fields.ipynb`。最后一条命令和 Notebook 做的事一样：先打印 token，再输出每档的预训练损失和下游误差。用 `--sizes 200,800,3200,12800` 可以加到最大档，`--seed` 可以换种子。种子 53 的结果和五种子实验里的同一种子逐项一致。
 
 ## 更多
 
