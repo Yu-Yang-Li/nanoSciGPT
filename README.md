@@ -66,9 +66,11 @@ python -m nanoscigpt.quickstart
 
 [逐方向数字、口径说明和全部留出结果](docs/pretraining-scale/shared-checkpoints/README.md) · [遮住晶格、扰动文本的独立复验](docs/pretraining-scale/shared-checkpoints/masked-transfer.md) · [四处偏弱方向的再打磨](docs/pretraining-scale/shared-checkpoints/weak-four/README.md)
 
+面向公众的图文版教程在 [docs/wechat/article.md](docs/wechat/article.md)，配了封面、两条规模曲线和三个反例的图。
+
 ## 怎么装、怎么跑
 
-**Notebook（推荐）。** [notebooks/eleven_fields.ipynb](notebooks/eleven_fields.ipynb) 是一本从头到尾的教程，每一节有图、有一两句说明、有可以改的参数。在第 0 节把 `FIELD` 改成想看的方向（默认 `field`，即扩散场），然后从上到下运行。只需要 CPU。
+**Notebook（推荐）。** [notebooks/eleven_fields.ipynb](notebooks/eleven_fields.ipynb) 是一本从头到尾的教程：开头是课程定位和结论总表，每一节写着本节目标和检查点，每格有图、有一两句说明、有可以改的参数，最后是练习、常见问题和复现说明。在第 0 节把 `FIELD` 改成想看的方向（默认 `field`，即扩散场），然后从上到下运行。只需要 CPU。
 
 | 节 | 做什么 | 能看到什么 | 可以改的参数 |
 |---|---|---|---|
@@ -78,15 +80,16 @@ python -m nanoscigpt.quickstart
 | 3 | 搭模型 | 编码器结构；和另一个方向对比每一段的参数个数 | `COMPARE_WITH` |
 | 4 | 预训练 | 每一档数据量的训练曲线和留出损失 | `SIZES` |
 | 5 | 下游训练 | 留出组上预测值对真实值，预训练前后对比 | `READOUT`、`COMPARE` |
-| 6 | 评测 | 下游误差随预训练数据量的变化，和两条基线比 | |
+| 6 | 评测 | 下游误差随预训练数据量的变化，和两条基线比；再读入五个种子的封存结果对照 | |
 | 7 | 自动研究 | 存档的搜索过程和十一方向对照；现场跑一次搜索；把搜索经验带到没见过的方向 | `METHOD`、`ROUNDS`、`DEV_SEEDS` |
 | 8 | 星流轨道拟合 | 轨道叠在观测点上随轮次怎么变、经验怎么改写、盲测成绩 | `SCENARIO`、`SHOW_ROUNDS`、`READ_ROUND` |
+| 9 | 练习与延伸 | 换方向、换标签数、换读出方式；三个反例为什么失败；常见问题与复现说明 | `N_LABELS`、`READOUT` |
 
 每张图上方加粗的一句话是这张图的结论，由当前的数字生成，换方向会跟着变。全部的图用同一套样式（`nanoscigpt/style.py`）：同样的字号，主角、对照、第三种方法各用固定的颜色。
 
 第 0 节会自己安装缺少的依赖，在仓库外单独打开时会先克隆仓库。机器上没有中文字体时，它会下载一次 Noto Sans SC（约 8 MB）用来显示图里的中文。魔搭 Notebook 的镜像通常自带 torch，装依赖这一步会跳过。
 
-依赖装好后，默认方向每一节的用时（24 核 Windows 电脑，2 个线程，机器上同时有别的任务）：看数据、切 token、搭模型共 2 秒，预训练三档 34 秒，下游训练和评测 7 秒，读自动研究和搜索经验的存档 3 秒，现场随机搜索 2 轮 204 秒，星流的四组图 5 秒。
+依赖装好后，默认方向每一节的用时（24 核 Windows 电脑，2 个线程，机器上同时有别的任务）：看数据、切 token、搭模型共 2 秒，预训练三档 12 秒，下游训练和评测 4 秒，读自动研究和搜索经验的存档 1 秒，现场随机搜索 2 轮 1 到 4 分钟，星流的四组图 2 秒。整本约半分钟（现场搜索读的是已有记录时）。
 
 十一个方向各把整本 Notebook 跑了一遍（三个方向同时运行），都没有报错。误差是 Notebook 里打印的数：
 
