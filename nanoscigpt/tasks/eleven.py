@@ -9,7 +9,7 @@ import zlib
 
 import numpy as np
 import torch
-from sklearn.linear_model import Ridge
+from sklearn.linear_model import Ridge, RidgeCV
 from torch.nn import functional as F
 
 from ..scientific.encoders import CrystalEncoder, PatchEncoder, SymbolEncoder
@@ -19,7 +19,9 @@ from .structure_scale import chain_panel
 
 DATA = Path(__file__).resolve().parents[2] / "data" / "eleven"
 
-# readout: "probe" = frozen backbone + ridge regression; "finetune" = all weights, 200 steps.
+# readout: "probe" = frozen backbone + ridge regression; "finetune" = all weights, 200 steps;
+#          "probe+surprise" = frozen backbone, the pooled representation plus how surprised the model is by the
+#          object (mean and largest next-token loss), ridge strength chosen by leave-one-out on the 32 labels.
 # budget: "fixed" = 1,600 pretraining updates at every size; "passes" = size // 2 updates.
 # data, question, label: the plain-language description shown to students and the public.
 FIELDS = {
@@ -53,10 +55,14 @@ FIELDS = {
     "image": dict(name="天文图像", kind="patch", width=16, positions=16, task="星像半高全宽（像素）", readout="probe", budget="fixed",
                   token="4×4 像素块",
                   data="模拟", question="估计星点有多模糊", label="模拟设定"),
-    "text": dict(name="文本", kind="symbol", vocab=28, positions=62, task="去空格后的词数", readout="finetune", budget="fixed",
+    "text": dict(name="文本", kind="symbol", vocab=28, positions=62, task="被替换的字母数", readout="probe+surprise", budget="fixed",
                  token="1 个字母或空格",
-                 data="真实", question="去掉空格后，数原来有几个词", label="直接数出来的"),
+                 data="真实", question="一行英文里有几个字母被换掉了", label="替换时记下的"),
 }
+# The V1 text task stays in data/eleven/text.npz under the prefix "wordcount"; the archived automated searches
+# (autoresearch/common_search.py, search_skill.py) ran on it and keep using it.
+EARLIER_TASKS = {"text": dict(prefix="wordcount", readout="finetune", task="去空格后的词数",
+                              question="去掉空格后，数原来有几个词", label="直接数出来的")}
 SIZES = {"unlabeled": 12800, "pool": 256, "dev": 480, "A": 480, "B": 480}
 N_LABELS = 32  # labeled objects used to train the downstream readout
 
@@ -146,8 +152,11 @@ def _simulated(field):
     return parts
 
 
-def load(field):
-    """Return the pretraining panel and the task panel, each as {part: (inputs, labels)}."""
+def load(field, task_prefix="task"):
+    """Return the pretraining panel and the task panel, each as {part: (inputs, labels)}.
+
+    task_prefix="wordcount" loads the earlier text task kept for comparison (see EARLIER_TASKS).
+    """
     if field in ("spectrum", "image", "weather", "field"):
         parts = _simulated(field)
         return parts, {g: parts[g] for g in ("pool", "A")}
@@ -167,7 +176,7 @@ def load(field):
                 for k in keys}
 
     parts = {g: (inputs(g), None) for g in ("unlabeled", "pool", "A")}
-    task = {g: (inputs("task_" + g) or parts[g][0], arrays["task_" + g + ":y"].astype(np.float64)) for g in ("pool", "A")}
+    task = {g: (inputs(f"{task_prefix}_{g}") or parts[g][0], arrays[f"{task_prefix}_{g}:y"].astype(np.float64)) for g in ("pool", "A")}
     return parts, task
 
 
@@ -279,22 +288,45 @@ def _pooled(model, feed):
     return torch.cat([model.pooled(*model.hidden({k: v[i:i + 256] for k, v in feed.items()})) for i in range(0, n, 256)]).numpy()
 
 
+@torch.no_grad()
+def _surprise(model, feed):
+    """Mean and largest next-token loss of every object, from the model's own prediction head."""
+    n = len(next(iter(feed.values())))
+    rows = []
+    for i in range(0, n, 256):
+        tokens = feed["tokens"][i:i + 256]
+        hidden = model.hidden({"tokens": tokens})[0][:, :-1]
+        target = tokens[:, 1:]
+        loss = F.cross_entropy(model.encoder.to_symbol(hidden).transpose(1, 2), target, ignore_index=0, reduction="none")
+        real = target != 0
+        rows.append(torch.stack([loss.sum(1) / real.sum(1), loss.masked_fill(~real, 0).max(1).values], 1))
+    return torch.cat(rows).numpy()
+
+
 def downstream(field, model, task, seed, predictions=None, readout=None):
     """Train the readout on 32 labels; return (MAE on holdout A, MAE of predicting the label mean).
 
     Pass a list as predictions to receive the predicted value of every holdout object.
-    readout overrides the field's default: "probe" or "finetune".
+    readout overrides the field's default: "probe", "finetune" or "probe+surprise" (symbol fields only).
     """
     (pool_x, pool_y), (test_x, test_y) = task["pool"], task["A"]
     rows = labeled_rows(len(pool_y), seed)
     y = pool_y[rows]
     x = {k: v[torch.from_numpy(rows)] for k, v in pool_x.items()}
-    if (readout or FIELDS[field]["readout"]) == "probe":
+    readout = readout or FIELDS[field]["readout"]
+    if readout == "probe":
         model.eval()
         a = _pooled(model, x)
         center, scale = a.mean(0), a.std(0).clip(1e-6)
         ridge = Ridge(alpha=1.0).fit((a - center) / scale, y)
         prediction = ridge.predict((_pooled(model, test_x) - center) / scale)
+    elif readout == "probe+surprise":
+        model.eval()
+        a = np.concatenate([_pooled(model, x), _surprise(model, x)], 1)
+        b = np.concatenate([_pooled(model, test_x), _surprise(model, test_x)], 1)
+        center, scale = a.mean(0), a.std(0).clip(1e-6)
+        ridge = RidgeCV(alphas=np.logspace(-2, 4, 13)).fit((a - center) / scale, y)
+        prediction = ridge.predict((b - center) / scale)
     else:
         target = torch.from_numpy(((y - y.mean()) / y.std()).astype(np.float32))
         model.train()

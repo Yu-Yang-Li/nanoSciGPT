@@ -30,7 +30,7 @@ def fold_of(field):
 
 def evidence(field):
     """What the skill writer sees of one training field: every round of its archived runs, relative to the start."""
-    spec, default = eleven.FIELDS[field], search.start(field)
+    spec, default = search.searched(field), search.start(field)
     runs = [r for r in search.archived(field) if r["repeat"] in EVIDENCE_REPEATS and r["method"] in ("model", "random")]
     first = runs[0]["trials"][0]
     lines = [f"## {spec['name']}：{KINDS[spec['kind']]}，每条 {spec['positions']} 个 token，一个 token = {spec['token']}。任务：{spec['question']}",

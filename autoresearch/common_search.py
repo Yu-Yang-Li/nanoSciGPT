@@ -4,6 +4,8 @@ The nanoGPT backbone is fixed (2 layers, 2 heads, 32 dimensions). A proposal may
 are grouped into one token, the pretraining objective and masking, the pretraining schedule, and the
 downstream readout. Round 0 is the V1 default of the field (nanoscigpt.tasks.eleven), and it reproduces
 the numbers of the five-seed study.
+For text the archived searches ran on the V1 task (word count, full fine-tuning), kept as
+eleven.EARLIER_TASKS["text"]; the search keeps using it so that the archive stays reproducible.
 
 During the search every trial is scored on development objects: the labeled pool objects that are not
 among the 32 training labels of that seed. Holdout A is scored once per run, after the search, for the
@@ -59,8 +61,13 @@ def space(field):
 def start(field):
     """The V1 default configuration of this field."""
     return {"merge": 1, "objective": "next", "mask_ratio": 0.15, "pretrain_lr": 0.001,
-            "readout": eleven.FIELDS[field]["readout"], "pool": "mean", "ridge_alpha": 1.0,
+            "readout": searched(field)["readout"], "pool": "mean", "ridge_alpha": 1.0,
             "finetune_steps": 200, "finetune_lr": 0.001, "pretrain_steps": default_steps(field)}
+
+
+def searched(field):
+    """The field's settings as searched: the V1 entry, with the earlier text task where one is kept."""
+    return {**eleven.FIELDS[field], **eleven.EARLIER_TASKS.get(field, {})}
 
 
 def validate(field, config):
@@ -151,7 +158,7 @@ def summary(model, feed, pool):
 
 def panel(field):
     if field not in _PANELS:
-        _PANELS[field] = eleven.load(field)
+        _PANELS[field] = eleven.load(field, eleven.EARLIER_TASKS.get(field, {}).get("prefix", "task"))
     return _PANELS[field]
 
 
@@ -237,7 +244,7 @@ def score(field, config, seeds, cache, confirm=False):
 
 
 def proposal_prompt(field, history, dev_seeds, skill=""):
-    spec = eleven.FIELDS[field]
+    spec = searched(field)
     lines = [json.dumps({"round": t["round"], "config": t["config"], "dev_mae": round(t["dev"], 5),
                          "dev_mae_by_seed": [round(v, 5) for v in t["dev_by_seed"]],
                          "pretrain_loss": round(t["pretrain_loss"], 5), "reason": t.get("reason", "")}, ensure_ascii=False)
