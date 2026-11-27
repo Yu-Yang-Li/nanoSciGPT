@@ -57,7 +57,7 @@ python -m nanoscigpt.quickstart
 - **DNA**：预训练损失在最后一档基本持平。
 - **晶体**：预测形成能时，200 和 800 两档还不如只猜均值，到 3,200 档才超过，末档比只猜均值低约 17% 到 20%。Notebook 默认的单种子三档演示里，三档都还没超过只猜均值，加上 12,800 档才超过（0.488 对 0.551）。
 
-[逐方向数字、口径说明和全部留出结果](docs/pretraining-scale/shared-checkpoints/README.md) · [遮住晶格、扰动文本的独立复验](docs/pretraining-scale/shared-checkpoints/masked-transfer.md)
+[逐方向数字、口径说明和全部留出结果](docs/pretraining-scale/shared-checkpoints/README.md) · [遮住晶格、扰动文本的独立复验](docs/pretraining-scale/shared-checkpoints/masked-transfer.md) · [四处偏弱方向的再打磨](docs/pretraining-scale/shared-checkpoints/weak-four/README.md)
 
 ## 怎么装、怎么跑
 

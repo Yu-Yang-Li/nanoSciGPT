@@ -1,0 +1,1085 @@
+{
+ "text": {
+  "choice": {
+   "budget": "fixed1600",
+   "task": "被替换字母数",
+   "readout": "probe-cv+nll",
+   "ok": true,
+   "steps": true,
+   "wins": 5,
+   "near_mean": true,
+   "beats_zero": true,
+   "gain": 28.56208016073536,
+   "ratio": 0.6716080683390322,
+   "mean": [
+    2.3096,
+    2.174,
+    1.8611,
+    1.5902,
+    1.5531
+   ],
+   "guess": 2.3124739583333334
+  },
+  "candidates": [
+   {
+    "budget": "fixed1600",
+    "task": "用词常见度",
+    "readout": "probe",
+    "ok": false,
+    "steps": false,
+    "wins": 5,
+    "near_mean": false,
+    "beats_zero": false,
+    "gain": 17.300635105337104,
+    "ratio": 1.1970071693584476,
+    "mean": [
+     0.6044,
+     0.7367,
+     0.6118,
+     0.5997,
+     0.6092
+    ],
+    "guess": 0.5089605162018248
+   },
+   {
+    "budget": "fixed1600",
+    "task": "用词常见度",
+    "readout": "probe-cv",
+    "ok": false,
+    "steps": false,
+    "wins": 4,
+    "near_mean": false,
+    "beats_zero": false,
+    "gain": -5.446335989343742,
+    "ratio": 1.0375785233025996,
+    "mean": [
+     0.476,
+     0.5008,
+     0.4816,
+     0.5606,
+     0.5281
+    ],
+    "guess": 0.5089605162018248
+   },
+   {
+    "budget": "fixed1600",
+    "task": "用词常见度",
+    "readout": "ft",
+    "ok": false,
+    "steps": false,
+    "wins": 3,
+    "near_mean": false,
+    "beats_zero": true,
+    "gain": 3.3747379015666157,
+    "ratio": 0.8978113373044642,
+    "mean": [
+     0.56,
+     0.4729,
+     0.4617,
+     0.4701,
+     0.457
+    ],
+    "guess": 0.5089605162018248
+   },
+   {
+    "budget": "fixed1600",
+    "task": "罕见词占比",
+    "readout": "probe",
+    "ok": false,
+    "steps": true,
+    "wins": 3,
+    "near_mean": false,
+    "beats_zero": true,
+    "gain": 8.499697408199669,
+    "ratio": 1.380991291911037,
+    "mean": [
+     0.1251,
+     0.1337,
+     0.1312,
+     0.1257,
+     0.1223
+    ],
+    "guess": 0.0885573912487975
+   },
+   {
+    "budget": "fixed1600",
+    "task": "罕见词占比",
+    "readout": "probe-cv",
+    "ok": false,
+    "steps": false,
+    "wins": 4,
+    "near_mean": false,
+    "beats_zero": false,
+    "gain": 22.62431556129494,
+    "ratio": 1.008682836134283,
+    "mean": [
+     0.0892,
+     0.1154,
+     0.1207,
+     0.0962,
+     0.0893
+    ],
+    "guess": 0.0885573912487975
+   },
+   {
+    "budget": "fixed1600",
+    "task": "罕见词占比",
+    "readout": "ft",
+    "ok": false,
+    "steps": false,
+    "wins": 2,
+    "near_mean": false,
+    "beats_zero": true,
+    "gain": -3.2438413970594437,
+    "ratio": 1.0616156458107546,
+    "mean": [
+     0.1141,
+     0.0911,
+     0.0896,
+     0.0949,
+     0.094
+    ],
+    "guess": 0.0885573912487975
+   },
+   {
+    "budget": "fixed1600",
+    "task": "音节数",
+    "readout": "probe",
+    "ok": false,
+    "steps": false,
+    "wins": 3,
+    "near_mean": false,
+    "beats_zero": false,
+    "gain": 1.738482424401011,
+    "ratio": 1.7284075447921656,
+    "mean": [
+     1.0984,
+     1.5244,
+     1.636,
+     1.4993,
+     1.4979
+    ],
+    "guess": 0.8666163141993959
+   },
+   {
+    "budget": "fixed1600",
+    "task": "音节数",
+    "readout": "probe-cv",
+    "ok": false,
+    "steps": false,
+    "wins": 0,
+    "near_mean": false,
+    "beats_zero": false,
+    "gain": -22.070113562843762,
+    "ratio": 1.238245995024241,
+    "mean": [
+     0.8258,
+     0.8791,
+     0.8829,
+     0.9142,
+     1.0731
+    ],
+    "guess": 0.8666163141993959
+   },
+   {
+    "budget": "fixed1600",
+    "task": "音节数",
+    "readout": "ft",
+    "ok": false,
+    "steps": false,
+    "wins": 3,
+    "near_mean": false,
+    "beats_zero": true,
+    "gain": 4.834962467609283,
+    "ratio": 1.0357477094116487,
+    "mean": [
+     1.038,
+     0.9432,
+     0.8901,
+     0.8983,
+     0.8976
+    ],
+    "guess": 0.8666163141993959
+   },
+   {
+    "budget": "fixed1600",
+    "task": "被替换字母数",
+    "readout": "probe",
+    "ok": false,
+    "steps": true,
+    "wins": 4,
+    "near_mean": false,
+    "beats_zero": true,
+    "gain": 17.57832836829004,
+    "ratio": 1.1533662672965066,
+    "mean": [
+     2.819,
+     3.236,
+     3.163,
+     2.8298,
+     2.6671
+    ],
+    "guess": 2.3124739583333334
+   },
+   {
+    "budget": "fixed1600",
+    "task": "被替换字母数",
+    "readout": "probe-cv",
+    "ok": false,
+    "steps": true,
+    "wins": 5,
+    "near_mean": false,
+    "beats_zero": true,
+    "gain": 13.388594412409006,
+    "ratio": 0.8975512213253801,
+    "mean": [
+     2.9407,
+     2.3964,
+     2.1171,
+     2.0935,
+     2.0756
+    ],
+    "guess": 2.3124739583333334
+   },
+   {
+    "budget": "fixed1600",
+    "task": "词数",
+    "readout": "probe",
+    "ok": false,
+    "steps": true,
+    "wins": 4,
+    "near_mean": false,
+    "beats_zero": false,
+    "gain": 10.70915375727538,
+    "ratio": 1.4830105153214572,
+    "mean": [
+     1.5155,
+     1.8623,
+     1.7589,
+     1.6827,
+     1.6628
+    ],
+    "guess": 1.12125
+   },
+   {
+    "budget": "fixed1600",
+    "task": "词数",
+    "readout": "probe-cv",
+    "ok": false,
+    "steps": false,
+    "wins": 4,
+    "near_mean": false,
+    "beats_zero": false,
+    "gain": -17.121681605120042,
+    "ratio": 1.3706781821363179,
+    "mean": [
+     1.135,
+     1.3122,
+     1.259,
+     1.34,
+     1.5369
+    ],
+    "guess": 1.12125
+   },
+   {
+    "budget": "fixed1600",
+    "task": "被替换字母数",
+    "readout": "nll",
+    "ok": false,
+    "steps": false,
+    "wins": 5,
+    "near_mean": true,
+    "beats_zero": true,
+    "gain": 34.832223689751764,
+    "ratio": 0.5248943664966966,
+    "mean": [
+     2.3365,
+     1.8626,
+     1.2894,
+     1.2087,
+     1.2138
+    ],
+    "guess": 2.3124739583333334
+   },
+   {
+    "budget": "fixed1600",
+    "task": "被替换字母数",
+    "readout": "probe-cv+nll",
+    "ok": true,
+    "steps": true,
+    "wins": 5,
+    "near_mean": true,
+    "beats_zero": true,
+    "gain": 28.56208016073536,
+    "ratio": 0.6716080683390322,
+    "mean": [
+     2.3096,
+     2.174,
+     1.8611,
+     1.5902,
+     1.5531
+    ],
+    "guess": 2.3124739583333334
+   },
+   {
+    "budget": "fixed1600",
+    "task": "用词常见度",
+    "readout": "nll",
+    "ok": false,
+    "steps": false,
+    "wins": 5,
+    "near_mean": false,
+    "beats_zero": true,
+    "gain": 19.004396682274937,
+    "ratio": 0.7682225296612908,
+    "mean": [
+     0.5411,
+     0.4827,
+     0.3884,
+     0.3928,
+     0.391
+    ],
+    "guess": 0.5089605162018248
+   },
+   {
+    "budget": "fixed1600",
+    "task": "用词常见度",
+    "readout": "probe-cv+nll",
+    "ok": false,
+    "steps": false,
+    "wins": 4,
+    "near_mean": false,
+    "beats_zero": true,
+    "gain": 18.101503164435773,
+    "ratio": 0.7890334597573956,
+    "mean": [
+     0.4768,
+     0.4903,
+     0.405,
+     0.4291,
+     0.4016
+    ],
+    "guess": 0.5089605162018248
+   },
+   {
+    "budget": "fixed1600",
+    "task": "罕见词占比",
+    "readout": "nll",
+    "ok": false,
+    "steps": false,
+    "wins": 5,
+    "near_mean": false,
+    "beats_zero": true,
+    "gain": 7.876260229091081,
+    "ratio": 0.905689113850655,
+    "mean": [
+     0.0935,
+     0.0871,
+     0.0759,
+     0.0778,
+     0.0802
+    ],
+    "guess": 0.0885573912487975
+   },
+   {
+    "budget": "fixed1600",
+    "task": "罕见词占比",
+    "readout": "probe-cv+nll",
+    "ok": false,
+    "steps": false,
+    "wins": 4,
+    "near_mean": false,
+    "beats_zero": true,
+    "gain": 0.9986636184677655,
+    "ratio": 0.9870970037692891,
+    "mean": [
+     0.0882,
+     0.0883,
+     0.1051,
+     0.0807,
+     0.0874
+    ],
+    "guess": 0.0885573912487975
+   }
+  ]
+ },
+ "rna": {
+  "choice": null,
+  "candidates": [
+   {
+    "budget": "fixed1600",
+    "task": "保守程度",
+    "readout": "probe",
+    "ok": false,
+    "steps": true,
+    "wins": 5,
+    "near_mean": false,
+    "beats_zero": true,
+    "gain": 27.78489784995625,
+    "ratio": 0.9615453463433365,
+    "mean": [
+     0.2364,
+     0.2973,
+     0.2568,
+     0.2237,
+     0.2147
+    ],
+    "guess": 0.22330070293914978
+   },
+   {
+    "budget": "fixed1600",
+    "task": "保守程度",
+    "readout": "probe-cv",
+    "ok": false,
+    "steps": true,
+    "wins": 5,
+    "near_mean": false,
+    "beats_zero": true,
+    "gain": 1.912996866873251,
+    "ratio": 0.9807332682933132,
+    "mean": [
+     0.222,
+     0.2233,
+     0.223,
+     0.2215,
+     0.219
+    ],
+    "guess": 0.22330070293914978
+   },
+   {
+    "budget": "fixed1600",
+    "task": "保守程度",
+    "readout": "ft",
+    "ok": false,
+    "steps": false,
+    "wins": 1,
+    "near_mean": false,
+    "beats_zero": true,
+    "gain": -6.9847120052308975,
+    "ratio": 1.1349603210403993,
+    "mean": [
+     0.2564,
+     0.2369,
+     0.2412,
+     0.248,
+     0.2534
+    ],
+    "guess": 0.22330070293914978
+   },
+   {
+    "budget": "fixed1600",
+    "task": "空位占比",
+    "readout": "probe",
+    "ok": false,
+    "steps": false,
+    "wins": 5,
+    "near_mean": false,
+    "beats_zero": true,
+    "gain": 23.323387196654433,
+    "ratio": 1.0629456530902386,
+    "mean": [
+     0.1035,
+     0.1284,
+     0.1174,
+     0.0956,
+     0.0985
+    ],
+    "guess": 0.09262003888987531
+   },
+   {
+    "budget": "fixed1600",
+    "task": "空位占比",
+    "readout": "probe-cv",
+    "ok": false,
+    "steps": false,
+    "wins": 3,
+    "near_mean": false,
+    "beats_zero": true,
+    "gain": 1.8682533589897243,
+    "ratio": 0.9905998053448665,
+    "mean": [
+     0.0921,
+     0.0935,
+     0.0947,
+     0.0919,
+     0.0917
+    ],
+    "guess": 0.09262003888987531
+   },
+   {
+    "budget": "fixed1600",
+    "task": "空位占比",
+    "readout": "ft",
+    "ok": false,
+    "steps": true,
+    "wins": 5,
+    "near_mean": false,
+    "beats_zero": true,
+    "gain": 18.811582364521428,
+    "ratio": 0.9815101004363146,
+    "mean": [
+     0.1114,
+     0.112,
+     0.1044,
+     0.0924,
+     0.0909
+    ],
+    "guess": 0.09262003888987531
+   },
+   {
+    "budget": "fixed1600",
+    "task": "亚基来源",
+    "readout": "probe",
+    "ok": false,
+    "steps": false,
+    "wins": 5,
+    "near_mean": false,
+    "beats_zero": true,
+    "gain": 15.857822692875756,
+    "ratio": 1.0216923726787852,
+    "mean": [
+     0.5186,
+     0.6029,
+     0.5713,
+     0.5029,
+     0.5073
+    ],
+    "guess": 0.4965625
+   },
+   {
+    "budget": "fixed1600",
+    "task": "亚基来源",
+    "readout": "probe-cv",
+    "ok": false,
+    "steps": false,
+    "wins": 4,
+    "near_mean": false,
+    "beats_zero": true,
+    "gain": 0.803016865445505,
+    "ratio": 0.9990135505783707,
+    "mean": [
+     0.5488,
+     0.5001,
+     0.5081,
+     0.4944,
+     0.4961
+    ],
+    "guess": 0.4965625
+   },
+   {
+    "budget": "fixed1600",
+    "task": "亚基来源",
+    "readout": "ft",
+    "ok": false,
+    "steps": false,
+    "wins": 3,
+    "near_mean": false,
+    "beats_zero": true,
+    "gain": 2.063013989761864,
+    "ratio": 1.0244483967688107,
+    "mean": [
+     0.5386,
+     0.5194,
+     0.5069,
+     0.5154,
+     0.5087
+    ],
+    "guess": 0.4965625
+   },
+   {
+    "budget": "fixed1600",
+    "task": "相对位置",
+    "readout": "probe",
+    "ok": false,
+    "steps": true,
+    "wins": 5,
+    "near_mean": false,
+    "beats_zero": true,
+    "gain": 23.142373528427562,
+    "ratio": 1.0562340350827943,
+    "mean": [
+     0.2758,
+     0.3484,
+     0.3101,
+     0.2871,
+     0.2678
+    ],
+    "guess": 0.2535338792374734
+   },
+   {
+    "budget": "fixed1600",
+    "task": "相对位置",
+    "readout": "probe-cv",
+    "ok": false,
+    "steps": true,
+    "wins": 4,
+    "near_mean": false,
+    "beats_zero": true,
+    "gain": 15.693084820643666,
+    "ratio": 1.0060420505129475,
+    "mean": [
+     0.2559,
+     0.3025,
+     0.2814,
+     0.2649,
+     0.2551
+    ],
+    "guess": 0.2535338792374734
+   },
+   {
+    "budget": "fixed1600",
+    "task": "相对位置",
+    "readout": "ft",
+    "ok": false,
+    "steps": false,
+    "wins": 0,
+    "near_mean": false,
+    "beats_zero": true,
+    "gain": -8.119403755134847,
+    "ratio": 1.2242443072907476,
+    "mean": [
+     0.3157,
+     0.2871,
+     0.291,
+     0.3076,
+     0.3104
+    ],
+    "guess": 0.2535338792374734
+   },
+   {
+    "budget": "fixed1600",
+    "task": "保守程度",
+    "readout": "nll",
+    "ok": false,
+    "steps": false,
+    "wins": 4,
+    "near_mean": false,
+    "beats_zero": true,
+    "gain": 1.8269529173979393,
+    "ratio": 0.9877046269103246,
+    "mean": [
+     0.2234,
+     0.2247,
+     0.226,
+     0.2237,
+     0.2206
+    ],
+    "guess": 0.22330070293914978
+   },
+   {
+    "budget": "fixed1600",
+    "task": "保守程度",
+    "readout": "probe-cv+nll",
+    "ok": false,
+    "steps": true,
+    "wins": 5,
+    "near_mean": false,
+    "beats_zero": true,
+    "gain": 2.510153406071758,
+    "ratio": 0.9747844082960825,
+    "mean": [
+     0.2221,
+     0.2233,
+     0.2231,
+     0.2198,
+     0.2177
+    ],
+    "guess": 0.22330070293914978
+   }
+  ]
+ },
+ "crystal": {
+  "choice": null,
+  "candidates": [
+   {
+    "budget": "fixed1600",
+    "task": "形成能",
+    "readout": "probe",
+    "ok": false,
+    "steps": false,
+    "wins": 5,
+    "near_mean": false,
+    "beats_zero": true,
+    "gain": 17.554351202983597,
+    "ratio": 0.9832323446754002,
+    "mean": [
+     0.7597,
+     0.7138,
+     0.7624,
+     0.6186,
+     0.5885
+    ],
+    "guess": 0.5985114583333333
+   },
+   {
+    "budget": "fixed1600",
+    "task": "形成能",
+    "readout": "probe-cv",
+    "ok": false,
+    "steps": false,
+    "wins": 4,
+    "near_mean": false,
+    "beats_zero": true,
+    "gain": 0.7136697048742091,
+    "ratio": 0.9710035051365689,
+    "mean": [
+     0.6189,
+     0.5853,
+     0.6624,
+     0.5552,
+     0.5812
+    ],
+    "guess": 0.5985114583333333
+   },
+   {
+    "budget": "fixed1600",
+    "task": "形成能",
+    "readout": "ft",
+    "ok": false,
+    "steps": false,
+    "wins": 4,
+    "near_mean": true,
+    "beats_zero": true,
+    "gain": 9.879879753318487,
+    "ratio": 0.883566541921436,
+    "mean": [
+     0.6822,
+     0.5868,
+     0.5909,
+     0.543,
+     0.5288
+    ],
+    "guess": 0.5985114583333333
+   },
+   {
+    "budget": "passes",
+    "task": "形成能",
+    "readout": "probe",
+    "ok": false,
+    "steps": false,
+    "wins": 5,
+    "near_mean": false,
+    "beats_zero": true,
+    "gain": 14.83514245667491,
+    "ratio": 1.0555994758762046,
+    "mean": [
+     0.7597,
+     0.7418,
+     0.6894,
+     0.6186,
+     0.6318
+    ],
+    "guess": 0.5985114583333333
+   },
+   {
+    "budget": "passes",
+    "task": "形成能",
+    "readout": "probe-cv",
+    "ok": false,
+    "steps": false,
+    "wins": 5,
+    "near_mean": false,
+    "beats_zero": true,
+    "gain": 9.760149659387219,
+    "ratio": 0.9354919279575965,
+    "mean": [
+     0.6189,
+     0.6205,
+     0.6057,
+     0.5552,
+     0.5599
+    ],
+    "guess": 0.5985114583333333
+   },
+   {
+    "budget": "passes",
+    "task": "形成能",
+    "readout": "ft",
+    "ok": false,
+    "steps": true,
+    "wins": 5,
+    "near_mean": false,
+    "beats_zero": true,
+    "gain": 25.073207328758464,
+    "ratio": 0.8245248150962132,
+    "mean": [
+     0.6822,
+     0.6586,
+     0.6355,
+     0.543,
+     0.4935
+    ],
+    "guess": 0.5985114583333333
+   },
+   {
+    "budget": "fixed1600",
+    "task": "形成能",
+    "readout": "ft-slow",
+    "ok": false,
+    "steps": false,
+    "wins": 4,
+    "near_mean": false,
+    "beats_zero": true,
+    "gain": 9.253189388827977,
+    "ratio": 0.9174372017679286,
+    "mean": [
+     0.6736,
+     0.6051,
+     0.598,
+     0.5479,
+     0.5491
+    ],
+    "guess": 0.5985114583333333
+   },
+   {
+    "budget": "fixed1600",
+    "task": "形成能",
+    "readout": "ft-short",
+    "ok": false,
+    "steps": false,
+    "wins": 4,
+    "near_mean": true,
+    "beats_zero": true,
+    "gain": 9.723406603251695,
+    "ratio": 0.8857019708920469,
+    "mean": [
+     0.6829,
+     0.5872,
+     0.5932,
+     0.5411,
+     0.5301
+    ],
+    "guess": 0.5985114583333333
+   },
+   {
+    "budget": "passes",
+    "task": "形成能",
+    "readout": "ft-slow",
+    "ok": false,
+    "steps": true,
+    "wins": 5,
+    "near_mean": false,
+    "beats_zero": true,
+    "gain": 24.984365432881617,
+    "ratio": 0.8752062896657757,
+    "mean": [
+     0.6736,
+     0.6983,
+     0.6685,
+     0.5479,
+     0.5238
+    ],
+    "guess": 0.5985114583333333
+   },
+   {
+    "budget": "passes",
+    "task": "形成能",
+    "readout": "ft-short",
+    "ok": false,
+    "steps": true,
+    "wins": 5,
+    "near_mean": false,
+    "beats_zero": true,
+    "gain": 25.0748772355998,
+    "ratio": 0.824800575527154,
+    "mean": [
+     0.6829,
+     0.6589,
+     0.6367,
+     0.5411,
+     0.4937
+    ],
+    "guess": 0.5985114583333333
+   },
+   {
+    "budget": "fixed1600",
+    "task": "形成能",
+    "readout": "nll",
+    "ok": false,
+    "steps": false,
+    "wins": 1,
+    "near_mean": false,
+    "beats_zero": false,
+    "gain": -2.9988332073454638,
+    "ratio": 1.0440980356562204,
+    "mean": [
+     0.5995,
+     0.6067,
+     0.6125,
+     0.6198,
+     0.6249
+    ],
+    "guess": 0.5985114583333333
+   },
+   {
+    "budget": "fixed1600",
+    "task": "形成能",
+    "readout": "probe-cv+nll",
+    "ok": false,
+    "steps": false,
+    "wins": 5,
+    "near_mean": false,
+    "beats_zero": true,
+    "gain": 3.5753650159147665,
+    "ratio": 0.9397029415385804,
+    "mean": [
+     0.6908,
+     0.5833,
+     0.6586,
+     0.5603,
+     0.5624
+    ],
+    "guess": 0.5985114583333333
+   },
+   {
+    "budget": "passes",
+    "task": "形成能",
+    "readout": "nll",
+    "ok": false,
+    "steps": false,
+    "wins": 2,
+    "near_mean": false,
+    "beats_zero": false,
+    "gain": -1.0932533951782952,
+    "ratio": 1.033107611402842,
+    "mean": [
+     0.5995,
+     0.6116,
+     0.5991,
+     0.6198,
+     0.6183
+    ],
+    "guess": 0.5985114583333333
+   },
+   {
+    "budget": "passes",
+    "task": "形成能",
+    "readout": "probe-cv+nll",
+    "ok": false,
+    "steps": false,
+    "wins": 5,
+    "near_mean": false,
+    "beats_zero": true,
+    "gain": 9.716817896259355,
+    "ratio": 0.9393547516697306,
+    "mean": [
+     0.6908,
+     0.6227,
+     0.7083,
+     0.5603,
+     0.5622
+    ],
+    "guess": 0.5985114583333333
+   }
+  ]
+ },
+ "dna": {
+  "choice": null,
+  "candidates": [
+   {
+    "budget": "fixed3200",
+    "task": "发夹熔解温度",
+    "readout": "probe-cv",
+    "ok": false,
+    "steps": false,
+    "wins": 5,
+    "near_mean": true,
+    "beats_zero": true,
+    "gain": 38.20019996715517,
+    "ratio": 0.635125181013823,
+    "mean": [
+     7.0914,
+     10.5556,
+     10.773,
+     6.5605,
+     6.5233
+    ],
+    "guess": 10.270908372110119,
+    "dev_pretrain_loss": [
+     4.15298,
+     1.526022,
+     1.348518,
+     1.343867
+    ]
+   },
+   {
+    "budget": "fixed3200",
+    "task": "发夹熔解温度",
+    "readout": "ft",
+    "ok": false,
+    "steps": false,
+    "wins": 5,
+    "near_mean": true,
+    "beats_zero": false,
+    "gain": 32.58681969366389,
+    "ratio": 0.6444037473394751,
+    "mean": [
+     6.168,
+     9.818,
+     8.2355,
+     6.0147,
+     6.6186
+    ],
+    "guess": 10.270908372110119,
+    "dev_pretrain_loss": [
+     4.15298,
+     1.526022,
+     1.348518,
+     1.343867
+    ]
+   },
+   {
+    "budget": "fixed6400",
+    "task": "发夹熔解温度",
+    "readout": "probe-cv",
+    "ok": false,
+    "steps": false,
+    "wins": 5,
+    "near_mean": true,
+    "beats_zero": true,
+    "gain": 41.09370191681876,
+    "ratio": 0.6137407061697023,
+    "mean": [
+     7.0914,
+     10.7012,
+     12.3082,
+     7.1467,
+     6.3037
+    ],
+    "guess": 10.270908372110119,
+    "dev_pretrain_loss": [
+     7.083003,
+     2.017933,
+     1.367018,
+     1.341459
+    ]
+   },
+   {
+    "budget": "fixed6400",
+    "task": "发夹熔解温度",
+    "readout": "ft",
+    "ok": false,
+    "steps": true,
+    "wins": 5,
+    "near_mean": true,
+    "beats_zero": false,
+    "gain": 30.43415327594783,
+    "ratio": 0.6264075091265389,
+    "mean": [
+     6.168,
+     9.2485,
+     9.0579,
+     7.0045,
+     6.4338
+    ],
+    "guess": 10.270908372110119,
+    "dev_pretrain_loss": [
+     7.083003,
+     2.017933,
+     1.367018,
+     1.341459
+    ]
+   }
+  ]
+ }
+}
