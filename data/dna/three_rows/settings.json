@@ -1,0 +1,48 @@
+{
+  "variant": "measured_sequence",
+  "sha256": "00863a88dbb84059d17147b5c3e7e02388171b392c8abe5feccf6250f2e83b35",
+  "seeds": {
+    "53": {
+      "rf": {
+        "residual": false,
+        "leaf": 1,
+        "fraction": 0.6
+      },
+      "direct": {
+        "steps": 56,
+        "alpha": 0.015,
+        "shape": "linear"
+      },
+      "pre": {
+        "steps": 56,
+        "alpha": 0.015,
+        "shape": "linear"
+      },
+      "unit": 100.0,
+      "task": {
+        "scale": 0.35,
+        "width": 0.07,
+        "cuts": [
+          0.35,
+          0.45,
+          0.55,
+          0.65,
+          0.75
+        ],
+        "target": "ordinal"
+      },
+      "expected": [
+        [
+          3.060613618623081,
+          2.094562567215669,
+          1.9142519922085206
+        ],
+        [
+          2.9753695352970295,
+          2.314642192740244,
+          2.001113048360403
+        ]
+      ]
+    }
+  }
+}

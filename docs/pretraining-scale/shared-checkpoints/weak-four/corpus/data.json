@@ -1,0 +1,32 @@
+{
+ "dna": {
+  "corpus_available": 25705,
+  "dev": 480,
+  "series": {
+   "MisMatches": 10725,
+   "Bulges": 9097,
+   "TETRAloop": 4691,
+   "TRIloop": 1168,
+   "External": 19,
+   "VARloop": 5
+  },
+  "sha256": "56570dc8f58827865732e7586227efe268fcc950d0bc5d5cae06fa37de1acc89"
+ },
+ "rna": {
+  "windows": {
+   "unlabeled": 111389,
+   "pool": 3286,
+   "dev": 4622,
+   "A": 3686,
+   "B": 4095
+  },
+  "families_used": {
+   "pool": 92,
+   "dev": 104,
+   "A": 99,
+   "B": 102
+  },
+  "families_unlabeled": 1722,
+  "sha256": "6ed77d611d6822176046980ee77211b4ed189ee6877cb5940e0a545c479dc02d"
+ }
+}

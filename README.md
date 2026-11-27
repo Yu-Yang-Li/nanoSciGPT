@@ -1,189 +1,191 @@
 # nanoSciGPT
 
-“科学模型专题实训（二）：如何构建领域基座模型与 AI Scientist 系统”的配套代码、数据和三个教学 Skill。
+“科学模型专题实训（二）：如何构建领域基座模型与 AI Scientist 系统”的配套代码、数据和教学 Skill。
 
-从科学问题出发，先做分类或回归，再用小模型学习预训练与微调，最后讨论怎样让研究 Agent 继续实验。可以选课程样例，也可以带自己的数据；不用先会写模型代码。
+**V2 定稿（2026-11-27）**：十一个方向的标签、数据来源和“同一个主干、只换编码器和读出”的口径已逐项复核，结论与已知限制见 [V2 复核页](docs/version-v2.md)。
 
-## 当前光变课堂（2026-09-07）
+这套材料的目标是展示一种教学可能性：把不同科学观测写成 token，交给同一个 nanoGPT，让学员看到预训练数据量增加时下游误差怎么变。它不是各领域的真实基准。十个科学方向里有五个是公式生成的理想化模拟，用来隔离变量、控制难度和 CPU 用时；它们的适用范围和“不是什么”写在[数据来源页](data/eleven/SOURCES.md#模拟数据指什么)。真实数据上的精度要另做验证。
 
-先按下方“下载与安装”准备环境，再从[课堂提问](docs/classroom-lightcurve-prompts.md)开始。第一轮在仓库目录对助手说：
+![十一种观测切成 token，交给同一个两层 nanoGPT](docs/overview.png)
 
-> 请读这个仓库 skills/README.md 里的三个 Skill，接下来带我做实验。
->
-> 我想用课程里的光变数据做分类，帮我跑一遍吧。
+## 三分钟上手
 
-教师示例已改为 **StarLightCurves 光变三分类**：LSTM 直接分类 → 文本 nanoGPT 预训练与问答微调 → 连续光变片段预训练与分类。光变不是光谱，横轴是采样点，不补写物理时间或波长。
+需要 Python 3.10 及以上和 Git，只用 CPU。
 
-- [数据下载与完整训练命令](docs/starlight-classroom.md)：首次下载约110 MB；CPU两线程，不要求GPU。随机森林仍保留为补充对照。
-- [三个教学 Skill](skills/README.md)：学生可以沿用自己的数据；助手根据当前问题接话，不要求照念三条口令。
-- [本次发布验证](docs/acceptance/starlight-release-20260907.md)：区分代码运行、真实对话和待完成内容。
-
-**光变版 autoresearch / The AI Scientist v1、v2 的完整三轮对话尚未验收。** 研究 Skill 已提供同一光变任务的接续方法，但不把准备好入口说成研究完成。文本短问答也不等于通用聊天能力；模型的正确和错误输出都应保留。
-
-下面保留此前其他领域的说明和运行记录。参加本次光变课堂时，以以上链接为准，不将旧光谱或蛋白质结果当作这次实验。
-
-## 其他领域与此前验证（2026-09-05）
-
-截至 **2026-09-05**，基础课堂实验已有真实运行记录，**不代表所有研究流程都已跑通**。
-
-本次发布前重新运行186项测试，并在干净克隆中按下方命令完成基线、文本和蛋白质训练；[发布检查记录](docs/acceptance/publish-2026-09-05/README.md)说明验证条件和实际结果。
-
-| 课堂内容 | 当前情况 | 实测材料 |
-|---|---|---|
-| LAMOST 光谱估计有效温度 | 已运行数据检查、RandomForest 训练和评价 | [实际对话](docs/acceptance/cli-after-repair-2026-09-05/baseline/dialogue.md) |
-| 文本及九类科学数据的预训练、任务微调 | 十类课程样例均有运行记录；微调实际更新模型参数 | [训练记录](docs/acceptance/training-ten-domains-2026-09-05/)、[微调记录](data/precomputed_results/finetuning-2026-09-05.md) |
-| 自己的蛋白质 CSV | 序列＋数值标签可做回归；无标签时只预训练，已有实测 | [自有数据记录](docs/acceptance/student-protein-2026-09-05/) |
-| Agent 分析已有结果、讨论下一轮实验 | 有 CLI 对话记录；建议仍需复核，不保证每次回答相同 | [两轮问答](docs/acceptance/provider-boundary-2026-09-05/glm-cli/dialogue.md) |
-| 原版 autoresearch、The AI Scientist v1/v2 自动研究 | **试验中，完整流程未验收**；源码准备和部分基线/API已测 | [当前状态](docs/acceptance/training-and-native-status-2026-09-05.md) |
-
-GLM-5.3 的普通 CLI 问答已有成功记录，但本机接入下 **v1 长改码仍未完成**：流式响应最终因长度限制结束，没有代码补丁，见[实测摘要](docs/acceptance/native-stream-2026-09-05/README.md)。课堂可以先做基线、预训练、微调和实验讨论，不把原版 AI Scientist 自动完成论文作为现场必过环节。
-
-## 1. 下载与安装
-
-需要 Git、Python 和可用的编程 Agent。本机实测 Python 3.12；包声明支持 Python 3.10 及以上，但未逐版本验收。**普通课堂实验使用单线程 CPU 小配置，不需要 GPU 或大模型权重。**首次安装依赖需要联网，课程样例数据随仓库提供。
-
-Windows PowerShell：
-
-```powershell
+```bash
 git clone https://github.com/Yu-Yang-Li/nanoSciGPT.git
 cd nanoSciGPT
-py -3.12 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install torch --index-url https://download.pytorch.org/whl/cpu
-.\.venv\Scripts\python.exe -m pip install -e .
-.\.venv\Scripts\python.exe -m nanoscigpt.classroom --list
+python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+python -m pip install -e .
+python -m nanoscigpt.quickstart
 ```
 
-这里直接调用虚拟环境解释器，不必调整 PowerShell 执行策略。Linux 使用 `python3 -m venv .venv`，后续解释器路径换为 `.venv/bin/python`。已有合适的 torch 时无需重复安装；不要覆盖自己研究环境中的依赖。
+最后一条命令用扩散场跑一遍完整流程：200、800、3,200 个无标签对象各预训练一次，再用 32 个标签训练下游读出，约半分钟。它打印每一档的留出误差，并把结果图存成 `quickstart-field.png`：
 
-`--list` 检查课程数据，不启动训练。安装失败时把报错交给 Agent，不用备用分数冒充本次运行。
+![最短路径的输出：扩散场的下游误差随预训练数据量下降](docs/quickstart-field.png)
 
-## 2. 在 Codex CLI 中怎样开始
+换方向在命令后面加名字，例如 `python -m nanoscigpt.quickstart protein`。前两条安装命令的用时取决于网络，实测见 [首次使用检查](docs/first-run.md)。想一步一步看数据、token、模型和训练，打开 [Notebook](notebooks/eleven_fields.ipynb)，见下面的“怎么装、怎么跑”。
 
-先完成自己电脑上的 Codex CLI 安装及登录/模型服务配置，再从 **nanoSciGPT 仓库根目录**启动 `codex`。仓库不提供密钥，也不会切换默认模型；不要照抄教师机器的本地代理地址。
+## 科学语言
 
-下面三段提问任选一段发送即可。明确让 Agent 读取**仓库内**的 Skill，避免读到本机旧同名版本。`pip install -e .` 安装课程代码，不会把这三个 Skill 自动安装到 Codex 全局目录；直接读取文件无需覆盖已有 Skill。
+**科学语言**是这个项目的出发点。语言模型读的是一串 token，学的是根据前面的 token 预测下一个。光谱、氨基酸序列、晶胞、天气图、星场图像也可以写成一串 token：光谱每 4 个相邻波长的通量算一个 token，蛋白质每个氨基酸算一个，晶体先放晶格、再放每个原子。写成 token 之后，十一种科学观测都交给同一个两层的 nanoGPT，用同一个目标预训练：预测下一个 token。方向不同，只换把观测切成 token 的编码器，以及最后读出一个数的线性头。
 
-### 第一段：有标签数据，先做基线
+| 方向 | 数据 | 要回答的问题 | 标签怎么来的 | 一个 token 是什么 |
+|---|---|---|---|---|
+| 光谱 | 模拟 | 看可见光部分，推测紫外有多亮 | 模拟设定 | 连续 4 个波长采样点的通量 |
+| 蛋白质 | 真实 | 预测蛋白质片段在仪器里多久流出来 | 实验测的 | 1 个氨基酸 |
+| DNA | 真实 | 预测一小段 DNA 加热到多少度会解开 | 实验测的 | 1 个碱基 |
+| RNA | 真实 | 判断一段序列的局部组成有多复杂 | 直接数出来的 | 1 个碱基 |
+| 小分子 | 真实分子 | 预测分子里饱和碳占多少 | 由结构式算出来的 | 1 个 SMILES 词法单元，如 `[nH]`、`[NH3+]` |
+| 晶体 | 计算数据 | 预测晶体稳不稳定 | 量子力学计算 | 晶格矩阵占 1 个，之后每个原子 1 个 |
+| 三维结构 | 模拟 | 根据部分原子间的距离，推测分子链两端相距多远 | 模拟设定 | 原子间距离矩阵中的 1 个 4×4 块 |
+| 天气场 | 简化模拟 | 看几帧亮斑移动的画面，估计亮斑有多亮 | 模拟设定 | 同一 4×4 区域的连续四帧 |
+| 扩散场 | 模拟 | 看几帧画面，推测扩散得多快 | 模拟设定 | 4 个相邻位置的连续四帧 |
+| 天文图像 | 模拟 | 估计星点有多模糊 | 模拟设定 | 4×4 像素块 |
+| 文本 | 真实 | 一行英文里有几个字母被换掉了 | 替换时记下的 | 1 个字母或空格 |
 
-```text
-请读取 skills/research-baseline-builder/SKILL.md，按它带我做实验。
-我想用仓库的 LAMOST 光谱示例预测恒星有效温度。
-请使用这个仓库 .venv 中的 Python，实际运行后解释结果。
+这是一套教学演示：十个科学方向加一个文本方向，都用同一个小模型。“数据”和“标签怎么来的”两列说明每个方向的结果能代表什么。每个方向的专业定义、单位、数据范围和出处见 [数据来源与专业说明](data/eleven/SOURCES.md)。
+
+符号类 token 查词表得到向量，数值类 token 经过一个线性层投影，晶体的原子 token 由元素向量加坐标投影组成。[编码器代码](nanoscigpt/scientific/encoders.py) · [主干](nanoscigpt/scientific/scigpt.py)
+
+## 预训练数据越多，下游越好
+
+每个方向用 200、800、3,200、12,800 个无标签对象各预训练一次，五个随机种子。然后从这批检查点出发，只用 32 个标签训练下游读出，在两组未参与训练的留出样本上测误差。按五种子平均计算，11 个默认下游任务在两组留出上都逐档下降（实线）。预训练留出损失在 10 个方向也逐档下降（虚线），DNA 的最后两档基本持平。
+
+![十一个方向的预训练损失与下游误差](docs/pretraining-scale/shared-checkpoints/curves.png)
+
+6 个方向的口径完全统一：冻结主干，只训练线性头，每档固定 1,600 次预训练更新，所以曲线只反映数据量的变化。另外 5 个方向保留了其他做法。光谱、扩散场和晶体每个对象平均训练 32 遍，数据越多训练步数越多；晶体和 DNA 用全参数微调。DNA 换成冻结读出后也能逐档下降，但 12,800 档比不预训练差约 5%，所以保留全参数微调，这时比不预训练好 21%。文本的线性头除了模型的表示，还读两个数：模型逐个预测下一个字母时平均有多意外、最意外的一处有多意外。拼写学得越熟，碰到被换掉的字母越意外。
+
+文本原来的任务是去掉空格后数词数，误差始终和只猜均值差不多，后来换成数被换掉的字母。现在末档比只猜均值低约三成，B 组是只猜均值的 0.707 倍，比换任务时事先定的 0.7 门槛差一点。
+
+另外三个方向比较弱，各对应一种预训练帮不上忙的情况：
+
+- **标签少：晶体。** 预测形成能时，200 和 800 两档还不如只猜均值，到 3,200 档才超过，末档比只猜均值低约 17% 到 20%。只有 32 个标签时，不预训练的模型无论怎么读出都比只猜均值差；预训练数据也少的时候，学到的东西还不够把它拉回来。Notebook 默认的单种子三档演示里，三档都还没超过只猜均值，加上 12,800 档才超过（0.488 对 0.551）。
+- **标签简单：RNA。** 三核苷酸熵可以直接从序列数出来，不预训练的模型取嵌入平均就能读出一部分，所以末档只比只猜均值好约 10%。换成要靠比对或注释才知道的量（保守程度、来自大亚基还是小亚基），32 个标签又读不出来；换成和碱基组成关系很紧的折叠自由能，又看不出预训练比不预训练好。
+- **标签不对应：DNA。** 预训练读的是酵母基因组片段，下游是 14 到 18 个碱基的人工发夹，两者长度、成分、结构都对不上。基因组片段到 3,200 条以后，预训练损失基本不再下降，下游靠全参数微调还在变好。改用和发夹同一个实验的两万多条序列预训练，又因为都是少数几种骨架的变体，800 条就学完了，下游反而不如不预训练。
+
+[逐方向数字、口径说明和全部留出结果](docs/pretraining-scale/shared-checkpoints/README.md) · [遮住晶格、扰动文本的独立复验](docs/pretraining-scale/shared-checkpoints/masked-transfer.md) · [四处偏弱方向的再打磨](docs/pretraining-scale/shared-checkpoints/weak-four/README.md)
+
+面向公众的图文版教程在 [docs/wechat/article.md](docs/wechat/article.md)，配了封面、两条规模曲线和三个反例的图。
+
+## 怎么装、怎么跑
+
+**Notebook（推荐）。** [notebooks/eleven_fields.ipynb](notebooks/eleven_fields.ipynb) 是一本从头到尾的教程：开头是课程定位和结论总表，每一节写着本节目标和检查点，每格有图、有一两句说明、有可以改的参数，最后是练习、常见问题和复现说明。在第 0 节把 `FIELD` 改成想看的方向（默认 `field`，即扩散场），然后从上到下运行。只需要 CPU。
+
+| 节 | 做什么 | 能看到什么 | 可以改的参数 |
+|---|---|---|---|
+| 0 | 选方向，装依赖 | 这个方向要回答的问题、数据是真实还是模拟、标签怎么来的 | `FIELD`、`SEED`、`N_LABELS`、`THREADS` |
+| 1 | 看数据 | 标签偏低、居中、偏高的三条样本，标签的分布 | `N_EXAMPLES` |
+| 2 | 预处理 | 同一条样本画成 token；标准化前后的数值分布 | `ROW` |
+| 3 | 搭模型 | 编码器结构；和另一个方向对比每一段的参数个数 | `COMPARE_WITH` |
+| 4 | 预训练 | 每一档数据量的训练曲线和留出损失 | `SIZES` |
+| 5 | 下游训练 | 留出组上预测值对真实值，预训练前后对比 | `READOUT`、`COMPARE` |
+| 6 | 评测 | 下游误差随预训练数据量的变化，和两条基线比；再读入五个种子的封存结果对照 | |
+| 7 | 自动研究 | 存档的搜索过程和十一方向对照；现场跑一次搜索；把搜索经验带到没见过的方向 | `METHOD`、`ROUNDS`、`DEV_SEEDS` |
+| 8 | 星流轨道拟合 | 轨道叠在观测点上随轮次怎么变、经验怎么改写、盲测成绩 | `SCENARIO`、`SHOW_ROUNDS`、`READ_ROUND` |
+| 9 | 练习与延伸 | 换方向、换标签数、换读出方式；三个反例为什么失败；常见问题与复现说明 | `N_LABELS`、`READOUT` |
+
+每张图上方加粗的一句话是这张图的结论，由当前的数字生成，换方向会跟着变。全部的图用同一套样式（`nanoscigpt/style.py`）：同样的字号，主角、对照、第三种方法各用固定的颜色。
+
+第 0 节会自己安装缺少的依赖，在仓库外单独打开时会先克隆仓库。机器上没有中文字体时，它会下载一次 Noto Sans SC（约 8 MB）用来显示图里的中文。魔搭 Notebook 的镜像通常自带 torch，装依赖这一步会跳过。
+
+依赖装好后，默认方向每一节的用时（24 核 Windows 电脑，2 个线程，机器上同时有别的任务）：看数据、切 token、搭模型共 2 秒，预训练三档 12 秒，下游训练和评测 4 秒，读自动研究和搜索经验的存档 1 秒，现场随机搜索 2 轮 1 到 4 分钟，星流的四组图 2 秒。整本约半分钟（现场搜索读的是已有记录时）。
+
+十一个方向各把整本 Notebook 跑了一遍（三个方向同时运行），都没有报错。误差是 Notebook 里打印的数：
+
+| 方向 | 整本用时 | 其中预训练 | 下游和评测 | 种子 53 的下游误差（200 / 800 / 3,200） | 不预训练 | 只猜均值 | 三档逐档下降 |
+|---|---:|---:|---:|---|---:|---:|:---:|
+| 扩散场（默认） | 266 秒 | 34 秒 | 7 秒 | 0.1296 / 0.1242 / 0.0935 | 0.1692 | 0.1696 | 是 |
+| 光谱 | 263 秒 | 34 秒 | 1 秒 | 0.1115 / 0.0941 / 0.0622 | 0.1013 | 0.3301 | 是 |
+| 蛋白质 | 179 秒 | 101 秒 | 1 秒 | 13.2014 / 13.9479 / 8.0208 | 8.1670 | 10.8433 | 否 |
+| DNA | 308 秒 | 164 秒 | 16 秒 | 5.2613 / 5.0546 / 4.1484 | 3.6229 | 7.0323 | 是 |
+| RNA | 141 秒 | 79 秒 | 1 秒 | 0.3097 / 0.2539 / 0.1691 | 0.2675 | 0.1744 | 是 |
+| 小分子 | 201 秒 | 82 秒 | 1 秒 | 0.1998 / 0.1474 / 0.0917 | 0.1084 | 0.2355 | 是 |
+| 晶体 | 71 秒 | 15 秒 | 3 秒 | 0.6072 / 0.5966 / 0.5595 | 0.5727 | 0.5506 | 是 |
+| 三维结构 | 99 秒 | 61 秒 | 1 秒 | 0.9997 / 0.8652 / 0.8647 | 1.0549 | 2.9500 | 是 |
+| 天气场 | 79 秒 | 42 秒 | 1 秒 | 0.1499 / 0.1678 / 0.1606 | 0.1540 | 0.1661 | 否 |
+| 天文图像 | 80 秒 | 50 秒 | 1 秒 | 0.7082 / 0.5668 / 0.4306 | 0.5238 | 0.6250 | 是 |
+| 文本 | 114 秒 | 100 秒 | 1 秒 | 2.2234 / 1.7755 / 1.7531 | 2.2878 | 2.2882 | 是 |
+
+文本一行是 2026-11-27 换任务后单独重跑的，只跑这一个方向，现场搜索读的是已有的存档，所以整本用时比别的方向短。单个种子、单组留出、只到 3,200 档时，曲线会有起伏，上图的五种子平均才是结论依据。在 Windows 上，种子 53 的每个数都和五种子实验里同一种子的记录一致；Linux 上浮点计算顺序不同，预训练损失差 2% 以内，单种子下游误差可能差到 20% 左右。
+
+**安装 Notebook。** 在“三分钟上手”的基础上再装 Jupyter。下面用了虚拟环境，和别的项目互不影响。
+
+```bash
+git clone https://github.com/Yu-Yang-Li/nanoSciGPT.git
+cd nanoSciGPT
+python -m venv .venv
+.venv/bin/python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+.venv/bin/python -m pip install -e ".[notebook]"
+.venv/bin/python -m jupyter notebook notebooks/eleven_fields.ipynb
 ```
 
-换成自己的数据可以这样说：
+Windows 把 `.venv/bin/python` 换成 `.venv\Scripts\python.exe`。`[notebook]` 会装上 Jupyter；只用命令行时写 `pip install -e .` 就够了。不打开界面、直接整本执行：
 
-```text
-请读取 skills/research-baseline-builder/SKILL.md。
-我想用[自己的数据地址][实现分类/参数估计或者具体下游任务]。
-请先看看数据，缺少什么再问我。
+```bash
+.venv/bin/python -m jupyter nbconvert --to notebook --execute notebooks/eleven_fields.ipynb --output-dir out
 ```
 
-方括号替换为你的数据地址和任务。Agent 应沿用已给的信息，只补问当前缺少的内容。课程 LAMOST 子集有 2000 条光谱、128 个流量特征，目标只有 `teff`，不是所有恒星参数。
+执行后的 Notebook 存在 `out/eleven_fields.ipynb`。从空目录照这一节走一遍，Windows 和 WSL 上每一步、每一节的耗时见 [首次使用检查](docs/first-run.md)。不想运行也可以先看[执行过的版本](notebooks/eleven_fields.executed.ipynb)，它是 2026-11-27 换文本任务后在 Windows 上整本重新执行的结果，图和输出都在里面。
 
-**输出**：`out/baseline/` 内新实验目录的 `metrics.json`、`baseline_summary.json`、`train_log.txt`。具体位置以命令返回为准。
+**命令行。** Notebook 的每一段都有对应的命令，不需要 Jupyter：
 
-### 第二段：科学数据预训练，再微调
-
-```text
-请读取 skills/nanoscigpt-scientific-language/SKILL.md。
-我先选 protein 课程样例，带我实际完成小规模预训练和任务微调。
-使用仓库 .venv 中的 Python，并解释两次训练分别学什么。
+```bash
+.venv/bin/python -m nanoscigpt.tasks.eleven --field field            # 第 2 到 6 节：打印 token，预训练三档，下游误差
+.venv/bin/python -m autoresearch.common_search --field field --method random --rounds 2 --seeds 53   # 第 7 节：自动研究
+.venv/bin/python -m autoresearch.replay_stream                       # 第 8 节：从存档参数重算星流拟合的 χ²
 ```
 
-没有选好方向，直接问“你可以带我做哪些数据？”即可。不必都选蛋白质，也不必运行所有领域。
+第一条命令用 `--sizes 200,800,3200,12800` 可以加到最大档，`--seed` 可以换种子。第二条命令和 Notebook 第 7 节一样，只跑 2 轮、1 个种子，几分钟看完流程；去掉 `--rounds 2 --seeds 53` 就是存档用的设置（8 轮、3 个种子打分、5 个种子评留出），扩散场要跑几十分钟。把 `--method` 换成 `model` 就由 DSK 来提改动，需要先在自己的进程环境里设置 `SCNET_API_BASE`、`SCNET_API_KEY`、`SCNET_MODEL`，密钥不写进任何文件。
 
-| 名称 | 数据形式 | 课程数据身份 |
-|---|---|---|
-| `text` | 文本 | 公开文本子集；问答微调用少量人工教学题 |
-| `protein` | 氨基酸序列 | 公开序列子集；课程标签不等于真实功能验证 |
-| `dna` | 碱基序列 | 公开基因组片段 |
-| `smiles` | 分子字符串 | 公开 ESOL 数据 |
-| `weather` | 天气网格 | 生成的教学样例 |
-| `crystal` | 晶体图 | 生成的教学样例 |
-| `structure3d` | 三维结构 | 生成的教学样例 |
-| `image` | 图像 | 生成的教学样例 |
-| `spectrum` | 光谱 | 生成的教学样例，与第一段真实来源的 LAMOST 子集不同 |
-| `field` | 连续物理场 | 生成的教学样例 |
+## 从一次训练到自动研究，再到经验积累
 
-来源见 [data/manifest.json](data/manifest.json)。文本、蛋白质、DNA、SMILES 共享因果 GPT 核心；其余六类保留各自的网格、图、几何或连续场结构，不是只换词表。
+- **[十一个方向用同一套自动研究](docs/autoresearch-eleven.md)**：主干固定，程序每轮提一个改动、跑实验、看开发集，8 轮后在留出组上评一次。DSK 在 7 个方向上每次运行都好于起点，按事先写定的标准在 4 个方向上好于同预算的随机搜索，5 个方向分不出高下，2 个方向没有跑赢。每个方向的对照（起点、自动研究后、随机搜索）见结果页和 Notebook 第 7 节。
+- **[把搜索经验带到没见过的方向](docs/search-skill.md)**：十一个方向分成 4 折轮着留出，DSK 把其余方向的搜索记录写成一份搜索经验，锁定后带到留出的方向上，和不带经验的 DSK、随机搜索比。按事先写定的标准，没有看到经验带来的改进：带着经验的留出误差平均比不带经验低 0.9%，11 个方向里 6 个更好。
+- **[扩散场上更早的两版自动研究](docs/autoresearch-field.md)**：搜索空间为扩散场单独设计，DSK 和随机搜索各跑 3 次。
+- **[星流轨道拟合与调参经验积累](docs/stream-skill.md)**：DSK 边看拟合结果边调 7 个轨道参数，每轮拟合两个训练场景后改写自己的调参经验，锁定后到 8 个没见过的场景上盲测，共 8 轮。带着经验比空经验好，最好的是第 5 轮，之后回升。Notebook 第 8 节把轨道、经验的改写和盲测成绩画了出来。
 
-**输出**：`out/classroom/<domain>/run_report.json` 和 `model/ckpt.pt`；微调另存到 `finetune/`，其中 `downstream_result.json` 记录实际评价和任务 checkpoint。效果变差也保留，不能保证预训练必然带来提升。
+## 更多
 
-想继续时可以说：“接着刚才微调后的模型再训练一下，数据和评价保持不变，结果另存。”
-
-### 第三段：围绕结果，安排下一轮实验
-
-```text
-请读取 skills/ai-scientist-research-loop/SKILL.md。
-接着刚才训练的模型，先看已有结果，帮我安排下一轮比较。
-这次先讨论，不运行新实验。
-```
-
-这一步讨论实际模型、评价方式和预算，不把方案说成已运行。尝试原版研究前可以问：
-
-```text
-我想尝试 The AI Scientist v1。先检查这个模型能否接入原版，
-告诉我需要哪些环境、模型 API 和运行预算，暂时不要启动研究。
-```
-
-完整命令和限制见[原项目接入说明](skills/ai-scientist-research-loop/references/native-projects.md)。`prepare` 只下载固定源码和设置教学配置，不自动安装依赖、调用 API 或完成研究。原版 autoresearch 仍需相应 CUDA 环境；v1 小基线可在 CPU 运行，完整研究另需编程、检索与写作依赖。
-
-实验在本地执行，也可能把代码、日志和数据片段发给模型服务。私有材料先确认允许发送的范围。**不使用历史 `autoresearch/` 规则演示替代原项目后声称已复现 AI Scientist。**
-
-## 3. 不用 Agent，也可以直接运行
-
-从仓库根目录执行。以下使用 Windows 虚拟环境解释器，首次按顺序运行；重做时换输出目录，保留以前的结果。
-
-```powershell
-# LAMOST 回归
-.\.venv\Scripts\python.exe -m nanoscigpt.baseline --case lamost --out_root out/baseline
-
-# 文本预训练，然后用八组教学问答做微调
-.\.venv\Scripts\python.exe -m nanoscigpt.classroom --domain text --profile classroom --out_root out/classroom
-.\.venv\Scripts\python.exe -m nanoscigpt.tasks.text_sft --ckpt out/classroom/text/model/ckpt.pt --steps 200 --out_dir out/classroom/text/sft
-
-# 蛋白质预训练与任务微调
-.\.venv\Scripts\python.exe -m nanoscigpt.classroom --domain protein --profile classroom --out_root out/classroom
-.\.venv\Scripts\python.exe -m nanoscigpt.tasks.downstream_demo --domain protein --ckpt out/classroom/protein/model/ckpt.pt --adaptation finetune --epochs 2 --max_samples 32 --out_dir out/classroom/protein/finetune
-```
-
-最后两条命令中的 `protein` 可一并替换为其他领域。`classroom` 会先运行冻结表示的下游探针；后一条显式 `--adaptation finetune` 才继续更新预训练参数。文本问答用 `text_sft`，不能把文本分类误称为聊天微调。小模型可能记住原题，但答不好换个问法的题。
-
-自己的表格用 `nanoscigpt.baseline --csv <绝对路径> --target <目标列> --task regression`；自己的蛋白质见 [CSV 接入说明](skills/nanoscigpt-scientific-language/references/student-protein.md)。其余自有格式需要逐项适配，十类样例能运行不代表任意数据都能直接训练。
-
-## 4. 真实输入、输出与课程资料
-
-上面的提问是**使用示例**，不是伪造的逐字实测记录。原始输入与实际回复另存：
-
-- [LAMOST 实测对话](docs/acceptance/cli-after-repair-2026-09-05/baseline/dialogue.md)
-- [蛋白质预训练、微调实测对话](docs/acceptance/cli-after-repair-2026-09-05/protein/dialogue.md)
-- [GLM 研究讨论实测对话](docs/acceptance/provider-boundary-2026-09-05/glm-cli/dialogue.md)
-- [当前运行范围与未完成项](docs/acceptance/training-and-native-status-2026-09-05.md)
-- [课程大纲](docs/course-outline.md) · [讲师导航](docs/instructor/README.md) · [课后证据包](docs/evidence-pack-template.md)
-
-历史稿件和调研材料保留在 `docs/`，旧规则演示保留在 `autoresearch/`，均不替代本页当前用法。课堂代码可执行，不代表三段连续 CLI 带练、所有电脑和所有模型服务均已验收。
+- [五种子完整实验与留出结果](docs/pretraining-scale/shared-checkpoints/README.md)，含读出方式、预算的选择规则和没有通过的任务
+- [只看预训练损失的四档总表与离线复现包](docs/pretraining-scale/data-scaling/README.md)
+- [课堂提问](docs/classroom-prompts.md)
+- [三个教学 Skill](skills/README.md)：配合编程 Agent 做基线、预训练和研究迭代
+- [早期课堂与验收记录](docs/history.md)：2026 年 9 月的光变课堂、三行对照和旧验收
 
 ## 仓库结构
 
 ```text
-skills/                         三个教学入口及配套脚本
-  research-baseline-builder/     科学问题与监督学习基线
-  nanoscigpt-scientific-language/ 预训练、微调与自有数据
-  ai-scientist-research-loop/    原版研究流程接入
+notebooks/eleven_fields.ipynb   教程主入口：数据、token、模型、训练、评测、自动研究、星流拟合
 nanoscigpt/
-  core/                         序列 GPT 和训练代码
-  domains/                      四类序列的数据准备
-  scientific/                   六类结构化数据与模型
-  tasks/                        下游探针、任务微调、文本回答微调
-data/                           离线数据、来源清单与备用结果
-docs/                           使用说明、实测记录与课程资料
-tests/                          代码回归测试
-out/                            本机结果，不上传 Git
+  core/                         nanoGPT 主干和训练代码
+  scientific/                   编码器（符号、数值块、晶胞）和 SciGPT
+  tasks/eleven.py               十一个方向的数据、预训练和下游读出
+  tasks/eleven_plots.py         Notebook 第 1 到 6 节的图
+  style.py                      全部图共用的样式
+  quickstart.py                 三分钟上手的那条命令
+autoresearch/
+  common_search.py              十一个方向共用的自动研究
+  search_skill.py               把搜索经验写下来，带到没见过的方向
+  stream_fit.py, stream_skill.py   星流轨道拟合和调参经验积累
+  search_plots.py, stream_plots.py Notebook 第 7、8 节的图
+data/eleven/                    六个真实数据方向的 token 小表；模拟方向运行时生成
+docs/                           实验结果、课程资料和历史记录
+skills/                         三个教学 Skill
+tests/                          回归测试
 ```
 
 ## 许可与致谢
 
-代码采用 [MIT 许可](LICENSE)。序列核心改编自 [karpathy/nanoGPT](https://github.com/karpathy/nanoGPT)。科学序列处理思路参考 prot-gpt、nanoGPT-DNA 等项目，没有将缺少许可的代码视为可任意复制。
+代码采用 [MIT 许可](LICENSE)。主干改编自 [karpathy/nanoGPT](https://github.com/karpathy/nanoGPT)，见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
 
-原版研究项目下载到本机 `out/upstream/`，各自许可仍适用。数据来源与条件见 [data/manifest.json](data/manifest.json)；本仓库许可不替代上游代码和数据许可。
+真实数据的来源如下，各自许可仍然适用：
+
+- 酵母肽段保留时间：DeepLC 数据集，[CC BY 4.0](https://doi.org/10.5281/zenodo.4542884)
+- 核糖体 RNA 片段：[Rfam 15.1](https://rfam.org/downloads)，CC0
+- DNA 窗口：酿酒酵母参考基因组 [sacCer3](https://hgdownload.soe.ucsc.edu/goldenPath/sacCer3/bigZips/)
+- 小分子：[QM9](https://doi.org/10.6084/m9.figshare.978904)
+- 晶体：[Matbench 钙钛矿](https://matbench.materialsproject.org/Leaderboards/00matbench_v0.1_matbench_perovskites/)
+- 文本：Tiny Shakespeare
+
+DNA 发夹熔解温度的出处见 [data/eleven/SOURCES.md](data/eleven/SOURCES.md)。

@@ -1,0 +1,22 @@
+{
+ "fold": "B",
+ "held_out": [
+  "spectrum",
+  "weather",
+  "crystal"
+ ],
+ "sha256": "2215686c6aa0e9a998055428bee8b5f021c9cbaa1fd6c51ce0cd4a2f4261878d",
+ "characters": 985,
+ "model": "DeepSeek-V4.1-Flash-1017",
+ "usage": {
+  "completion_tokens": 644,
+  "prompt_tokens": 18345,
+  "total_tokens": 18989,
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "prompt_tokens_details": {
+   "cached_tokens": 18176
+  }
+ }
+}

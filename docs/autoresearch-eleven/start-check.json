@@ -1,0 +1,132 @@
+{
+ "seed": 53,
+ "note": "search_A: holdout A error of the starting configuration computed by autoresearch.common_search; v1_A: the same from nanoscigpt.tasks.eleven at 12,800 unlabeled objects",
+ "checks": [
+  {
+   "field": "crystal",
+   "threads": 1,
+   "search_A": 0.44046748319694307,
+   "v1_A": 0.44046748319694307,
+   "dev": 0.49703856417768183,
+   "guess_mean_dev": 0.5649832589285714,
+   "guess_mean_A": 0.5506041666666667
+  },
+  {
+   "field": "crystal",
+   "threads": 2,
+   "search_A": 0.48792118641753507,
+   "v1_A": 0.48792118641753507,
+   "dev": 0.5301686366948227,
+   "guess_mean_dev": 0.5649832589285714,
+   "guess_mean_A": 0.5506041666666667
+  },
+  {
+   "field": "dna",
+   "threads": 2,
+   "search_A": 3.099398952110559,
+   "v1_A": 3.099398952110559,
+   "dev": 3.7142502175874768,
+   "guess_mean_dev": 8.256206823512912,
+   "guess_mean_A": 7.032339414206061
+  },
+  {
+   "field": "field",
+   "threads": 2,
+   "search_A": 0.0866263473470427,
+   "v1_A": 0.0866263473470427,
+   "dev": 0.09227238029509588,
+   "guess_mean_dev": 0.1852898602296548,
+   "guess_mean_A": 0.16963111547482435
+  },
+  {
+   "field": "image",
+   "threads": 1,
+   "search_A": 0.46701901036245225,
+   "v1_A": 0.46701901036245225,
+   "dev": 0.4244480735008164,
+   "guess_mean_dev": 0.5820924610464263,
+   "guess_mean_A": 0.6250444705747898
+  },
+  {
+   "field": "image",
+   "threads": 2,
+   "search_A": 0.46701937295737467,
+   "v1_A": 0.46701937295737467,
+   "dev": 0.4244482054825299,
+   "guess_mean_dev": 0.5820924610464263,
+   "guess_mean_A": 0.6250444705747898
+  },
+  {
+   "field": "protein",
+   "threads": 2,
+   "search_A": 7.142869410514831,
+   "v1_A": 7.142869410514831,
+   "dev": 6.767512045800686,
+   "guess_mean_dev": 10.126073967665434,
+   "guess_mean_A": 10.843346279263496
+  },
+  {
+   "field": "rna",
+   "threads": 2,
+   "search_A": 0.17030870864788691,
+   "v1_A": 0.17030870864788691,
+   "dev": 0.20246693385498865,
+   "guess_mean_dev": 0.21119835866349085,
+   "guess_mean_A": 0.174363378683726
+  },
+  {
+   "field": "smiles",
+   "threads": 1,
+   "search_A": 0.08621381956256098,
+   "v1_A": 0.08621381956256098,
+   "dev": 0.10318968282239574,
+   "guess_mean_dev": 0.2067920918367347,
+   "guess_mean_A": 0.23550781249999997
+  },
+  {
+   "field": "smiles",
+   "threads": 2,
+   "search_A": 0.08621467967000272,
+   "v1_A": 0.08621467967000272,
+   "dev": 0.1031905923254129,
+   "guess_mean_dev": 0.2067920918367347,
+   "guess_mean_A": 0.23550781249999997
+  },
+  {
+   "field": "spectrum",
+   "threads": 2,
+   "search_A": 0.060089609741658376,
+   "v1_A": 0.060089609741658376,
+   "dev": 0.06216417128937727,
+   "guess_mean_dev": 0.34792698564538477,
+   "guess_mean_A": 0.33010094471650536
+  },
+  {
+   "field": "structure3d",
+   "threads": 2,
+   "search_A": 0.8215815491974354,
+   "v1_A": 0.8215815491974354,
+   "dev": 0.8572747904275145,
+   "guess_mean_dev": 2.8190446847251485,
+   "guess_mean_A": 2.950009531279405
+  },
+  {
+   "field": "text",
+   "threads": 2,
+   "search_A": 1.261517202611405,
+   "v1_A": 1.261517202611405,
+   "dev": 1.0788997951627477,
+   "guess_mean_dev": 1.1389508928571428,
+   "guess_mean_A": 1.24296875
+  },
+  {
+   "field": "weather",
+   "threads": 2,
+   "search_A": 0.15793369141129818,
+   "v1_A": 0.15793369141129818,
+   "dev": 0.14753774159682,
+   "guess_mean_dev": 0.1726479425389243,
+   "guess_mean_A": 0.1660542797434971
+  }
+ ]
+}

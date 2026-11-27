@@ -1,0 +1,54 @@
+{
+  "seeds": {
+    "53": {
+      "domain": "image",
+      "observation": "crowded_exposure",
+      "rf": {
+        "form": "summary",
+        "fraction": 1.0,
+        "round": true
+      },
+      "direct": {
+        "alpha": 65.0,
+        "steps": 0,
+        "target": "A",
+        "round": true
+      },
+      "pre": {
+        "alpha": "affine",
+        "steps": 0,
+        "target": "A",
+        "round": true
+      },
+      "expected": [
+        [
+          1.6666666666666667,
+          1.5791666507720947,
+          1.306249976158142
+        ],
+        [
+          1.69375,
+          1.5854166746139526,
+          1.34375
+        ]
+      ]
+    }
+  },
+  "sha256": "8fc28c89635a5c9fe27bb1c2f07c3babab8868368de1750dc9be3f21527385b1",
+  "platform_expected": {
+    "linux": {
+      "53": [
+        [
+          1.6666666666666667,
+          1.5791666507720947,
+          1.306249976158142
+        ],
+        [
+          1.69375,
+          1.5854166746139526,
+          1.34375
+        ]
+      ]
+    }
+  }
+}

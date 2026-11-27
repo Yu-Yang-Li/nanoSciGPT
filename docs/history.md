@@ -1,0 +1,195 @@
+# 早期课堂与验收记录
+
+这一页收录 2026 年 9 月到 11 月初的课堂入口、验收记录和使用说明，原样保留，供查阅。项目当前的用法和结果见[首页](../README.md)。
+
+## 2026-11-26 复跑记录
+
+在空目录克隆本分支，用 Windows、Python 3.12、CPU 版 torch 2.12.0 把本页的命令逐条重跑，结果如下。
+
+| 命令 | 结果 | 用时 |
+|---|---|---:|
+| `nanoscigpt.classroom --list` | 可以运行 | 4 秒 |
+| `nanoscigpt.classroom --domain protein`（三行对照） | 可以运行 | 9 秒 |
+| `nanoscigpt.baseline --case lamost` | 可以运行 | 21 秒 |
+| `nanoscigpt.classroom --domain text --profile classroom` | 可以运行 | 29 秒 |
+| `nanoscigpt.tasks.text_sft` | 可以运行 | 12 秒 |
+| `nanoscigpt.classroom --domain protein --profile classroom` | 可以运行 | 25 秒 |
+| `nanoscigpt.tasks.downstream_demo ... --adaptation finetune` | 可以运行 | 6 秒 |
+| `nanoscigpt.classroom --profile smoke` | 可以运行 | 22 秒 |
+| `autoresearch.classroom_dsk` | **克隆后不能直接运行**：需要单独发放的 04、06 课堂包，仓库里没有；只有 `--help` 能运行 | — |
+
+光变课堂的命令在 [starlight-classroom.md](starlight-classroom.md)，要先下载约 110 MB 数据，这次没有复跑。
+
+## 三行对照（随机森林、直接微调、预训练后微调）
+
+三行对照仍可用 `python -m nanoscigpt.classroom --domain protein` 运行，预测酵母肽段色谱保留时间。`--list` 列出所有方向。[三行实验及成绩](eleven-domain-examples.md)
+
+## 光变课堂（2026-09-07）
+
+先按下方“下载与安装”准备环境，再从[课堂提问](classroom-lightcurve-prompts.md)开始。第一轮在仓库目录对助手说：
+
+> 请读这个仓库 skills/README.md 里的三个 Skill，接下来带我做实验。
+>
+> 我想用课程里的光变数据做分类，帮我跑一遍吧。
+
+教师示例已改为 **StarLightCurves 光变三分类**：LSTM 直接分类 → 文本 nanoGPT 预训练与问答微调 → 连续光变片段预训练与分类。光变不是光谱，横轴是采样点，不补写物理时间或波长。
+
+- [数据下载与完整训练命令](starlight-classroom.md)：首次下载约110 MB；CPU两线程，不要求GPU。随机森林仍保留为补充对照。
+- [三个教学 Skill](../skills/README.md)：学生可以沿用自己的数据；助手根据当前问题接话，不要求照念三条口令。
+- [本次发布验证](acceptance/starlight-release-20260907.md)：区分代码运行、真实对话和待完成内容。
+
+**光变版 autoresearch / The AI Scientist v1、v2 的完整三轮对话尚未验收。** 研究 Skill 已提供同一光变任务的接续方法，但不把准备好入口说成研究完成。文本短问答也不等于通用聊天能力；模型的正确和错误输出都应保留。
+
+下面保留此前其他领域的说明和运行记录。参加本次光变课堂时，以以上链接为准，不将旧光谱或蛋白质结果当作这次实验。
+
+## 其他领域与此前验证（2026-09-05）
+
+截至 **2026-09-05**，基础课堂实验已有真实运行记录，**不代表所有研究流程都已跑通**。
+
+本次发布前重新运行186项测试，并在干净克隆中按下方命令完成基线、文本和蛋白质训练；[发布检查记录](acceptance/publish-2026-09-05/README.md)说明验证条件和实际结果。
+
+| 课堂内容 | 当前情况 | 实测材料 |
+|---|---|---|
+| LAMOST 光谱估计有效温度 | 已运行数据检查、RandomForest 训练和评价 | [实际对话](acceptance/cli-after-repair-2026-09-05/baseline/dialogue.md) |
+| 文本及九类科学数据的预训练、任务微调 | 十类课程样例均有运行记录；微调实际更新模型参数 | [训练记录](acceptance/training-ten-domains-2026-09-05/)、[微调记录](../data/precomputed_results/finetuning-2026-09-05.md) |
+| 自己的蛋白质 CSV | 序列＋数值标签可做回归；无标签时只预训练，已有实测 | [自有数据记录](acceptance/student-protein-2026-09-05/) |
+| Agent 分析已有结果、讨论下一轮实验 | 有 CLI 对话记录；建议仍需复核，不保证每次回答相同 | [两轮问答](acceptance/provider-boundary-2026-09-05/glm-cli/dialogue.md) |
+| 原版 autoresearch、The AI Scientist v1/v2 自动研究 | **试验中，完整流程未验收**；源码准备和部分基线/API已测 | [当前状态](acceptance/training-and-native-status-2026-09-05.md) |
+
+GLM-5.3 的普通 CLI 问答已有成功记录，但本机接入下 **v1 长改码仍未完成**：流式响应最终因长度限制结束，没有代码补丁，见[实测摘要](acceptance/native-stream-2026-09-05/README.md)。课堂可以先做基线、预训练、微调和实验讨论，不把原版 AI Scientist 自动完成论文作为现场必过环节。
+
+## 1. 下载与安装
+
+需要 Git、Python 和可用的编程 Agent。本机实测 Python 3.12；包声明支持 Python 3.10 及以上，但未逐版本验收。**普通课堂实验使用单线程 CPU 小配置，不需要 GPU 或大模型权重。**首次安装依赖需要联网，课程样例数据随仓库提供。
+
+Windows PowerShell：
+
+```powershell
+git clone https://github.com/Yu-Yang-Li/nanoSciGPT.git
+cd nanoSciGPT
+py -3.12 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+.\.venv\Scripts\python.exe -m pip install -e .
+.\.venv\Scripts\python.exe -m nanoscigpt.classroom --list
+```
+
+这里直接调用虚拟环境解释器，不必调整 PowerShell 执行策略。Linux 使用 `python3 -m venv .venv`，后续解释器路径换为 `.venv/bin/python`。已有合适的 torch 时无需重复安装；不要覆盖自己研究环境中的依赖。
+
+`--list` 检查课程数据，不启动训练。安装失败时把报错交给 Agent，不用备用分数冒充本次运行。
+
+## 2. 在 Codex CLI 中怎样开始
+
+先完成自己电脑上的 Codex CLI 安装及登录/模型服务配置，再从 **nanoSciGPT 仓库根目录**启动 `codex`。仓库不提供密钥，也不会切换默认模型；不要照抄教师机器的本地代理地址。
+
+下面三段提问任选一段发送即可。明确让 Agent 读取**仓库内**的 Skill，避免读到本机旧同名版本。`pip install -e .` 安装课程代码，不会把这三个 Skill 自动安装到 Codex 全局目录；直接读取文件无需覆盖已有 Skill。
+
+### 第一段：有标签数据，先做基线
+
+```text
+请读取 skills/research-baseline-builder/SKILL.md，按它带我做实验。
+我想用仓库的 LAMOST 光谱示例预测恒星有效温度。
+请使用这个仓库 .venv 中的 Python，实际运行后解释结果。
+```
+
+换成自己的数据可以这样说：
+
+```text
+请读取 skills/research-baseline-builder/SKILL.md。
+我想用[自己的数据地址][实现分类/参数估计或者具体下游任务]。
+请先看看数据，缺少什么再问我。
+```
+
+方括号替换为你的数据地址和任务。Agent 应沿用已给的信息，只补问当前缺少的内容。课程 LAMOST 子集有 2000 条光谱、128 个流量特征，目标只有 `teff`，不是所有恒星参数。
+
+**输出**：`out/baseline/` 内新实验目录的 `metrics.json`、`baseline_summary.json`、`train_log.txt`。具体位置以命令返回为准。
+
+### 第二段：科学数据预训练，再微调
+
+```text
+请读取 skills/nanoscigpt-scientific-language/SKILL.md。
+我先选 protein 课程样例，带我实际完成小规模预训练和任务微调。
+使用仓库 .venv 中的 Python，并解释两次训练分别学什么。
+```
+
+默认的 11 个方向在[学生实验表](eleven-domain-examples.md)中列出。下表是保留的十个原始教学对照，运行时显式指定 `--profile classroom`；例如 `python -m nanoscigpt.classroom --profile classroom --domain protein`。快速走通旧流程可用 `--profile smoke`。
+
+| 名称 | 数据形式 | 课程数据身份 |
+|---|---|---|
+| `text` | 文本 | 公开文本子集；问答微调用少量人工教学题 |
+| `protein` | 氨基酸序列 | 公开序列子集；课程标签不等于真实功能验证 |
+| `dna` | 碱基序列 | 公开基因组片段 |
+| `smiles` | 分子字符串 | 公开 ESOL 数据 |
+| `weather` | 天气网格 | 生成的教学样例 |
+| `crystal` | 晶体图 | 生成的教学样例 |
+| `structure3d` | 三维结构 | 生成的教学样例 |
+| `image` | 图像 | 生成的教学样例 |
+| `spectrum` | 光谱 | 生成的教学样例，与第一段真实来源的 LAMOST 子集不同 |
+| `field` | 连续物理场 | 生成的教学样例 |
+
+来源见 [data/manifest.json](../data/manifest.json)。文本、蛋白质、DNA、SMILES 共享因果 GPT 核心；其余六类保留各自的网格、图、几何或连续场结构，不是只换词表。
+
+**输出**：`out/classroom/<domain>/run_report.json` 和 `model/ckpt.pt`；微调另存到 `finetune/`，其中 `downstream_result.json` 记录实际评价和任务 checkpoint。效果变差也保留，不能保证预训练必然带来提升。
+
+想继续时可以说：“接着刚才微调后的模型再训练一下，数据和评价保持不变，结果另存。”
+
+### 第三段：围绕结果，安排下一轮实验
+
+```text
+请读取 skills/ai-scientist-research-loop/SKILL.md。
+接着刚才训练的模型，先看已有结果，帮我安排下一轮比较。
+这次先讨论，不运行新实验。
+```
+
+这一步讨论实际模型、评价方式和预算，不把方案说成已运行。尝试原版研究前可以问：
+
+```text
+我想尝试 The AI Scientist v1。先检查这个模型能否接入原版，
+告诉我需要哪些环境、模型 API 和运行预算，暂时不要启动研究。
+```
+
+完整命令和限制见[原项目接入说明](../skills/ai-scientist-research-loop/references/native-projects.md)。`prepare` 只下载固定源码和设置教学配置，不自动安装依赖、调用 API 或完成研究。原版 autoresearch 仍需相应 CUDA 环境；v1 小基线可在 CPU 运行，完整研究另需编程、检索与写作依赖。
+
+实验在本地执行，也可能把代码、日志和数据片段发给模型服务。私有材料先确认允许发送的范围。**不使用历史 `autoresearch/` 规则演示替代原项目后声称已复现 AI Scientist。**
+
+## 3. 不用 Agent，也可以直接运行
+
+从仓库根目录执行。以下使用 Windows 虚拟环境解释器，首次按顺序运行；重做时换输出目录，保留以前的结果。
+
+```powershell
+# LAMOST 回归
+.\.venv\Scripts\python.exe -m nanoscigpt.baseline --case lamost --out_root out/baseline
+
+# 文本预训练，然后用八组教学问答做微调
+.\.venv\Scripts\python.exe -m nanoscigpt.classroom --domain text --profile classroom --out_root out/classroom
+.\.venv\Scripts\python.exe -m nanoscigpt.tasks.text_sft --ckpt out/classroom/text/model/ckpt.pt --steps 200 --out_dir out/classroom/text/sft
+
+# 蛋白质预训练与任务微调
+.\.venv\Scripts\python.exe -m nanoscigpt.classroom --domain protein --profile classroom --out_root out/classroom
+.\.venv\Scripts\python.exe -m nanoscigpt.tasks.downstream_demo --domain protein --ckpt out/classroom/protein/model/ckpt.pt --adaptation finetune --epochs 2 --max_samples 32 --out_dir out/classroom/protein/finetune
+```
+
+最后两条命令中的 `protein` 可一并替换为其他领域。`classroom` 会先运行冻结表示的下游探针；后一条显式 `--adaptation finetune` 才继续更新预训练参数。文本问答用 `text_sft`，不能把文本分类误称为聊天微调。小模型可能记住原题，但答不好换个问法的题。
+
+自己的表格用 `nanoscigpt.baseline --csv <绝对路径> --target <目标列> --task regression`；自己的蛋白质见 [CSV 接入说明](../skills/nanoscigpt-scientific-language/references/student-protein.md)。其余自有格式需要逐项适配，十类样例能运行不代表任意数据都能直接训练。
+
+## 4. 真实输入、输出与课程资料
+
+修订后的 ATLAS-A 课堂包也提供 DSK 实验入口。将 04 和 06 学生包分别解压后运行：
+
+```bash
+python -m autoresearch.classroom_dsk --lesson path/to/04 --client-dir path/to/06 --output atlas-dsk-run
+```
+
+> **2026-11-26 复跑**：这条命令需要单独发放的 04、06 课堂包，仓库里没有，克隆后不能直接运行。
+
+这一入口使用 06 包的个人接口配置。DSK 读开发记录给出三次提议，本地 CPU 训练和锁定后确认，最后生成短报告和独立上下文的四项评分。输出目录含逐轮理由、请求和响应、锁定记录、逐种子误差以及分阶段用时。已完成的实验可通过 `--writeup-from atlas-dsk-run` 在新输出目录中校核数据后只做写作和评审。
+
+上面的提问是**使用示例**，不是伪造的逐字实测记录。原始输入与实际回复另存：
+
+- [LAMOST 实测对话](acceptance/cli-after-repair-2026-09-05/baseline/dialogue.md)
+- [蛋白质预训练、微调实测对话](acceptance/cli-after-repair-2026-09-05/protein/dialogue.md)
+- [GLM 研究讨论实测对话](acceptance/provider-boundary-2026-09-05/glm-cli/dialogue.md)
+- [当前运行范围与未完成项](acceptance/training-and-native-status-2026-09-05.md)
+- [课程大纲](course-outline.md) · [讲师导航](instructor/README.md) · [课后证据包](evidence-pack-template.md)
+
+历史稿件和调研材料保留在 `docs/`，旧规则演示保留在 `autoresearch/`，均不替代本页当前用法。课堂代码可执行，不代表三段连续 CLI 带练、所有电脑和所有模型服务均已验收。

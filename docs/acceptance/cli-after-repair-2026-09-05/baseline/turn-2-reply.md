@@ -26,9 +26,9 @@ out\cli-after-repair-baseline\LAMOST光谱有效温度回归\
 
 其中可直接查看：
 
-- [metrics.json](C:/Users/16571/Documents/Codex/2026-09-04/nanoscigpt-classroom-hardening/out/cli-after-repair-baseline/LAMOST光谱有效温度回归/metrics.json)：测试指标。
-- [baseline_summary.json](C:/Users/16571/Documents/Codex/2026-09-04/nanoscigpt-classroom-hardening/out/cli-after-repair-baseline/LAMOST光谱有效温度回归/baseline_summary.json)：数据来源、划分、交叉验证和模型摘要。
-- [train_log.txt](C:/Users/16571/Documents/Codex/2026-09-04/nanoscigpt-classroom-hardening/out/cli-after-repair-baseline/LAMOST光谱有效温度回归/train_log.txt)：实际训练日志。
+- metrics.json（当时教师机器上的文件，未随仓库提供）：测试指标。
+- baseline_summary.json（当时教师机器上的文件，未随仓库提供）：数据来源、划分、交叉验证和模型摘要。
+- train_log.txt（当时教师机器上的文件，未随仓库提供）：实际训练日志。
 
 分数应当这样理解：
 

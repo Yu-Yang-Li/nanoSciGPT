@@ -1,0 +1,149 @@
+{
+  "archive": "十一方向预训练复现包.zip",
+  "zip_sha256": "1e276d1e143e214e260789cd5c05bcf23a43394e22fb53bc03f2eb6db33703d5",
+  "seed": 53,
+  "four_scales": [
+    200,
+    800,
+    3200,
+    12800
+  ],
+  "updates": 1600,
+  "workers": 4,
+  "torch_threads_per_worker": 2,
+  "windows": {
+    "domains": 11,
+    "points": 88,
+    "max_abs_difference": 1.2806671101373013e-07,
+    "elapsed_seconds": 258.9,
+    "seconds_per_domain": {
+      "spectrum": 61.11,
+      "protein": 91.13,
+      "crystal": 45.98,
+      "structure3d": 59.04,
+      "weather": 67.68,
+      "field": 64.6,
+      "image": 64.43,
+      "text": 154.11,
+      "dna": 145.14,
+      "rna": 89.42,
+      "smiles": 76.72
+    },
+    "python": "3.12.10"
+  },
+  "wsl_ubuntu_24_04": {
+    "zip_sha256": "1e276d1e143e214e260789cd5c05bcf23a43394e22fb53bc03f2eb6db33703d5",
+    "python": "3.12.3",
+    "torch": "2.12.0+cpu",
+    "numpy": "2.4.2",
+    "elapsed_seconds": 225.21,
+    "domains": {
+      "spectrum": {
+        "seconds": 47.81,
+        "count": 8,
+        "max_abs": 1.9914781053853754e-07,
+        "max_relative": 0.00011627217592688313,
+        "close": 6,
+        "same_endpoint_direction": 2,
+        "same_adjacent_direction": 6
+      },
+      "protein": {
+        "seconds": 69.83,
+        "count": 8,
+        "max_abs": 0.008831251659128014,
+        "max_relative": 0.0012931095955081638,
+        "close": 4,
+        "same_endpoint_direction": 2,
+        "same_adjacent_direction": 6
+      },
+      "crystal": {
+        "seconds": 36.07,
+        "count": 8,
+        "max_abs": 0.09873825709025041,
+        "max_relative": 0.023382075094697162,
+        "close": 0,
+        "same_endpoint_direction": 2,
+        "same_adjacent_direction": 6
+      },
+      "structure3d": {
+        "seconds": 46.91,
+        "count": 8,
+        "max_abs": 2.464537437144032e-06,
+        "max_relative": 2.973419177276468e-05,
+        "close": 6,
+        "same_endpoint_direction": 2,
+        "same_adjacent_direction": 6
+      },
+      "weather": {
+        "seconds": 57.22,
+        "count": 8,
+        "max_abs": 5.30245569017318e-05,
+        "max_relative": 0.00034463835678858053,
+        "close": 6,
+        "same_endpoint_direction": 2,
+        "same_adjacent_direction": 6
+      },
+      "field": {
+        "seconds": 56.66,
+        "count": 8,
+        "max_abs": 5.6378023905886976e-05,
+        "max_relative": 0.007681723748987122,
+        "close": 0,
+        "same_endpoint_direction": 2,
+        "same_adjacent_direction": 6
+      },
+      "image": {
+        "seconds": 56.54,
+        "count": 8,
+        "max_abs": 0.01415599452124705,
+        "max_relative": 0.013076371054200321,
+        "close": 4,
+        "same_endpoint_direction": 2,
+        "same_adjacent_direction": 6
+      },
+      "text": {
+        "seconds": 140.61,
+        "count": 8,
+        "max_abs": 0.00021687780871992857,
+        "max_relative": 4.631686198741533e-05,
+        "close": 7,
+        "same_endpoint_direction": 2,
+        "same_adjacent_direction": 6
+      },
+      "dna": {
+        "seconds": 131.47,
+        "count": 8,
+        "max_abs": 0.03242326363053882,
+        "max_relative": 0.01408165040520338,
+        "close": 4,
+        "same_endpoint_direction": 2,
+        "same_adjacent_direction": 6
+      },
+      "rna": {
+        "seconds": 77.62,
+        "count": 8,
+        "max_abs": 0.033718396771338366,
+        "max_relative": 0.012138572527321664,
+        "close": 4,
+        "same_endpoint_direction": 2,
+        "same_adjacent_direction": 6
+      },
+      "smiles": {
+        "seconds": 65.76,
+        "count": 8,
+        "max_abs": 9.005480504420404e-06,
+        "max_relative": 3.527504635490128e-06,
+        "close": 7,
+        "same_endpoint_direction": 2,
+        "same_adjacent_direction": 6
+      }
+    }
+  },
+  "comparison": {
+    "close_at_rtol_3e-6_atol_1e-9": 48,
+    "same_endpoint_direction_out_of_22": 22,
+    "same_adjacent_direction_out_of_66": 66,
+    "maximum_absolute_difference": 0.09873825709025041,
+    "maximum_relative_difference": 0.023382075094697162
+  }
+}

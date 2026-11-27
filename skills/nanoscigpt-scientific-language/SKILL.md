@@ -1,15 +1,35 @@
 ---
 name: nanoscigpt-scientific-language
-description: Use when a nanoSciGPT student asks about text pretraining and fine-tuning, scientific data representation, continuous light-curve patches, or comparing pretrained and directly trained scientific models.
+description: Use when a nanoSciGPT student runs the eleven-field notebook, asks how a scientific observation becomes tokens, compares pretraining data sizes and downstream readouts, or continues the earlier text and light-curve lessons.
 metadata:
   short-description: 从语言模型走到科学数据预训练
 ---
 
 # nanoSciGPT Scientific Language
 
-这门实训不要求学生先会写 Transformer。可以先用文本热身，也可以直接选一种科学数据；先跑通一个很小的预训练模型，再把模型接到一个具体任务上。
+这门实训不要求学生先会写 Transformer。课堂从十一方向的 Notebook 起步：先看一条观测被切成什么 token，再用不同数量的无标签数据预训练，最后用 32 个标签训练下游读出，看误差是否随预训练数据变小。
 
-当前课堂提问见[光变课堂对话](../../docs/classroom-lightcurve-prompts.md)。先用文本理解两段训练，再接着学生选定的科学数据；教师示例是 StarLightCurves 光变。旧蛋白质组成标签和文本标点分类的局限见[旧案例诊断](../../docs/acceptance/demo-task-audit-20260906.md)，不把构造标签当成学生的真实任务。
+## 从十一方向入口开始
+
+入口是 [`notebooks/eleven_fields.ipynb`](../../notebooks/eleven_fields.ipynb)，命令行等价于：
+
+```powershell
+python -m nanoscigpt.tasks.eleven --field field
+```
+
+`--field` 可选 `spectrum`、`protein`、`dna`、`rna`、`smiles`、`crystal`、`structure3d`、`weather`、`field`、`image`、`text`，默认扩散场 `field`。学生已经选了方向就沿用；还没选时只问一句“你想先看哪一种数据？”。课堂提问见 [课堂对话](../../docs/classroom-prompts.md)。
+
+讲 token 时对着实际输出说：Notebook 第 1 节画出几条样本和标签分布，第 2 节把同一条样本画成 token 并打印前几个（命令行开头也会打印）。例如扩散场的一个 token 是“4 个相邻位置在 4 帧里的浓度”，16 个数；蛋白质的一个 token 是一个氨基酸；晶体先放晶格矩阵，再每个原子一个 token。十一种数据共用同一个两层的 nanoGPT，换的只是编码器和读出头，第 3 节的参数图能直接看到。十一方向的 token 定义见仓库 README 的表。
+
+读结果时分三行讲：预训练损失是模型在留出样本上预测下一个 token 的误差；下游误差是用 32 个标签训练读出后，在留出组 A 上的平均绝对误差；“只猜平均值”和“不预训练”是两条对照。单个种子、只到 3,200 档时曲线会有起伏，结论以 [五种子结果](../../docs/pretraining-scale/shared-checkpoints/README.md) 为准。读出方式和预训练预算按方向固定在 `nanoscigpt/tasks/eleven.py` 的 `FIELDS` 里，结果页写明了为什么有的方向冻结主干、有的方向全参数微调。
+
+学生想把数据量加到最大档，用 `--sizes 200,800,3200,12800`；想换种子，用 `--seed`。种子 53 的结果与五种子实验中同一种子的记录一致，可以拿来对照。
+
+## 早期课堂入口（2026 年 9 月）
+
+下面是 9 月光变课堂和旧课堂样例的带练说明，学生明确要继续那些材料时再读。
+
+9 月光变课堂的提问见[光变课堂对话](../../docs/classroom-lightcurve-prompts.md)。先用文本理解两段训练，再接着学生选定的科学数据；教师示例是 StarLightCurves 光变。旧蛋白质组成标签和文本标点分类的局限见[旧案例诊断](../../docs/acceptance/demo-task-audit-20260906.md)，不把构造标签当成学生的真实任务。
 
 像一起看实验那样接话：学生问数字怎么输入，就拿一条实际曲线说明；说“训练试试”，再运行；问“不预训练会怎样”，就读本轮同设置的对照。普通追问先用几句连贯的话回答，不把数据清洗、所有架构和全部训练命令一次讲完。已有数据、路径和任务直接沿用，确实缺少信息时再补问。
 

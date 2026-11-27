@@ -12,8 +12,8 @@
 
 已核验生成的文件：
 
-- [metrics.json](C:/Users/16571/Documents/Codex/2026-09-04/nanoscigpt-classroom-hardening/out/cli-after-repair-baseline/LAMOST光谱有效温度回归/metrics.json)
-- [baseline_summary.json](C:/Users/16571/Documents/Codex/2026-09-04/nanoscigpt-classroom-hardening/out/cli-after-repair-baseline/LAMOST光谱有效温度回归/baseline_summary.json)
-- [train_log.txt](C:/Users/16571/Documents/Codex/2026-09-04/nanoscigpt-classroom-hardening/out/cli-after-repair-baseline/LAMOST光谱有效温度回归/train_log.txt)
+- metrics.json（当时教师机器上的文件，未随仓库提供）
+- baseline_summary.json（当时教师机器上的文件，未随仓库提供）
+- train_log.txt（当时教师机器上的文件，未随仓库提供）
 
 训练好的模型也已保存为同目录下的 `rf_model.joblib`。
